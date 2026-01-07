@@ -1,5 +1,6 @@
 #include "Anchor.h"
 #include "PlayerSerializer.h"
+#include "PlayerActionFuncs.inc"
 #include "soh/Enhancements/nametag.h"
 #include "soh/frame_interpolation.h"
 
@@ -185,13 +186,23 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     // Merge upper body limbs from upperJointTable into skelAnime.jointTable
     // This replicates what AnimationContext_SetCopyTrue does after Player_Update
     // Upper body limbs are indices 10-21 (PLAYER_LIMB_UPPER through PLAYER_LIMB_TORSO)
-    // Without this merge, arms won't be raised when holding items (rocks, bombs, etc.)
     for (int i = 10; i < 22; i++) {
         player->skelAnime.jointTable[i] = client.upperJointTable[i];
     }
 
     player->skelAnime.movementFlags = client.movementFlags;
     Math_Vec3s_Copy(&player->skelAnime.prevTransl, &client.prevTransl);
+
+    // Set action functions from network indices
+    // This ensures DummyPlayer is in the correct "state" for rendering
+    PlayerActionFunc actionFunc = GetPlayerActionFuncByIndex(client.actionFuncIdx);
+    if (actionFunc != NULL) {
+        player->actionFunc = actionFunc;
+    }
+    UpperActionFunc upperActionFunc = GetPlayerUpperActionFuncByIndex(client.upperActionFuncIdx);
+    if (upperActionFunc != NULL) {
+        player->upperActionFunc = upperActionFunc;
+    }
 
     // Save old modelGroup BEFORE deserializing (so we can detect changes)
     u8 oldModelGroup = player->modelGroup;

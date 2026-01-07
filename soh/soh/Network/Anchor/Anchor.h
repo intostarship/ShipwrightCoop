@@ -45,6 +45,8 @@ typedef struct {
     Vec3s upperMorphTable[24];  // Upper body morph targets
     u8 movementFlags;
     Vec3s prevTransl;
+    s16 actionFuncIdx;       // Index into actionFunc table
+    s8 upperActionFuncIdx;   // Index into upperActionFunc table for arm positions
 
     // All Player state fields serialized as JSON
     // This replaces individual fields - use PlayerSerializer to deserialize

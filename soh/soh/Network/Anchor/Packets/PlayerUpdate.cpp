@@ -1,6 +1,7 @@
 #include "soh/Network/Anchor/Anchor.h"
 #include "soh/Network/Anchor/JsonConversions.hpp"
 #include "soh/Network/Anchor/PlayerSerializer.h"
+#include "soh/Network/Anchor/PlayerActionFuncs.inc"
 #include <nlohmann/json.hpp>
 #include <libultraship/libultraship.h>
 
@@ -69,6 +70,10 @@ void Anchor::SendPacket_PlayerUpdate() {
 
     payload["prevTransl"] = player->skelAnime.prevTransl;
     payload["movementFlags"] = player->skelAnime.movementFlags;
+
+    // Sync action function indices for correct behavior
+    payload["actionFuncIdx"] = GetPlayerActionFuncIndex(player->actionFunc);
+    payload["upperActionFuncIdx"] = GetPlayerUpperActionFuncIndex(player->upperActionFunc);
 
     // Serialize ALL Player state fields using PlayerSerializer
     // This automatically handles ~100 fields including equipment, state flags,
@@ -150,6 +155,14 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
 
         client.movementFlags = payload["movementFlags"].get<u8>();
         client.prevTransl = payload["prevTransl"].get<Vec3s>();
+
+        // Action func indices for correct behavior
+        if (payload.contains("actionFuncIdx")) {
+            client.actionFuncIdx = payload["actionFuncIdx"].get<s16>();
+        }
+        if (payload.contains("upperActionFuncIdx")) {
+            client.upperActionFuncIdx = payload["upperActionFuncIdx"].get<s8>();
+        }
 
         // Store all Player state fields as JSON
         // DummyPlayer will deserialize this directly to the dummy player
