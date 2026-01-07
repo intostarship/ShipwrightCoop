@@ -163,10 +163,16 @@ class Anchor : public Network {
     u32 nextNetworkId = 1;                        // Counter for next available ID
     bool hasAssignedNetworkIds = false;           // Have we assigned IDs as the first player?
 
+    // Ownership tracking - which client owns which actors (for despawn detection)
+    std::map<u32, uint32_t> networkIdToOwner;    // Network ID -> owner client ID
+    std::map<uint32_t, std::set<u32>> ownerToNetworkIds;  // Owner client ID -> set of network IDs they own
+    std::vector<Actor*> actorsPendingKill;       // Actors to kill next frame (deferred for safety)
+
     u32 GetActorUniqueId(Actor* actor);           // Legacy hash-based ID (fallback)
     void SetActorNetworkId(Actor* actor, u32 networkActorId);  // Set networkActorId from snapshot
     Actor* FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos);  // Match by type+position
     void ClearNetworkIds();                       // Clear all networkActorId mappings (on scene change)
+    void ProcessPendingActorKills();              // Kill actors queued for deletion
 
     Actor* FindActorByUniqueId(u32 uniqueId);     // Legacy - keep for compatibility
     void ApplyActorInterpolation();

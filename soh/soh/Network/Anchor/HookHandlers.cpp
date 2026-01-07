@@ -107,6 +107,8 @@ void Anchor::RegisterHooks() {
     COND_HOOK(OnGameFrameUpdate, isConnected, [&]() {
         // Process incoming packets first (including WORLD_SNAPSHOT)
         ProcessIncomingPacketQueue();
+        // Kill actors that were queued for despawn (deferred from snapshot processing)
+        ProcessPendingActorKills();
         // Then apply interpolation with the new data
         ApplyActorInterpolation();
     });

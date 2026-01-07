@@ -162,8 +162,27 @@ Actor* Anchor::FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos
 void Anchor::ClearNetworkIds() {
     actorToNetworkId.clear();
     networkIdToActor.clear();
+    networkIdToOwner.clear();
+    ownerToNetworkIds.clear();
+    actorsPendingKill.clear();
     nextNetworkId = 1;
     hasAssignedNetworkIds = false;
+}
+
+/**
+ * Process deferred actor kills.
+ * Called from game thread to safely kill actors that were marked for deletion.
+ */
+void Anchor::ProcessPendingActorKills() {
+    if (actorsPendingKill.empty()) return;
+
+    for (Actor* actor : actorsPendingKill) {
+        if (actor != nullptr && actor->update != nullptr) {
+            SPDLOG_INFO("[Anchor] Killing actor id={} (owner stopped sending)", actor->id);
+            Actor_Kill(actor);
+        }
+    }
+    actorsPendingKill.clear();
 }
 
 /**
@@ -393,8 +412,12 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
-            // Only send actors we OWN (we're the closest player)
-            if (!IsActorOwner(actor)) {
+            // Check if this actor already has a networkActorId
+            bool hasNetworkId = (actorToNetworkId.find(actor) != actorToNetworkId.end());
+
+            // For actors WITH a networkActorId: use proximity-based ownership
+            // For actors WITHOUT: we claim them (first-to-see owns them)
+            if (hasNetworkId && !IsActorOwner(actor)) {
                 actor = actor->next;
                 continue;
             }
@@ -404,6 +427,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                 nlohmann::json actorJson;
 
                 // Get or assign a networkActorId for this actor
+                // If we get here without an ID, we're claiming this actor
                 u32 networkActorId = GetOrAssignNetworkId(actor);
                 actorJson["networkActorId"] = networkActorId;
                 actorJson["id"] = actor->id;
@@ -574,8 +598,14 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Track which networkActorIds we've seen from this sender
+    // Track which networkActorIds we receive from this sender
     std::set<u32> receivedNetworkActorIds;
+
+    // Get the set of networkActorIds this sender previously owned
+    std::set<u32> previouslyOwnedByThisSender;
+    if (ownerToNetworkIds.count(senderClientId) > 0) {
+        previouslyOwnedByThisSender = ownerToNetworkIds[senderClientId];
+    }
 
     for (const auto& actorJson : payload["actors"]) {
         // Skip actors with missing required fields
@@ -762,20 +792,39 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             // Let the actor die naturally by setting health to 0
             // The actor's own update logic should handle death
         }
+
+        // Track that this sender owns this actor
+        networkIdToOwner[networkActorId] = senderClientId;
     }
 
-    // Note: We intentionally do NOT despawn actors that aren't in the snapshot.
-    // The game's normal room loading/unloading handles actor lifecycle.
-    // Forcing despawns causes crashes because:
-    // 1. Setting health=0 doesn't work for many actors (props, switches, BG objects)
-    // 2. Actor_Kill during snapshot processing crashes the draw loop
-    // 3. Room transitions unload actors naturally - we just need to clean up our mappings
-    //
-    // Instead, our approach is:
-    // - Sync position/rotation/health for actors that exist on both sides
-    // - Spawn actors that exist remotely but not locally
-    // - Let the game naturally unload actors when rooms change
-    // - Clean up stale mappings in FindActorByNetworkId when actors become invalid
+    // Update the full set of actors owned by this sender
+    ownerToNetworkIds[senderClientId] = receivedNetworkActorIds;
+
+    // Despawn actors that this sender USED to own but no longer sends
+    // This handles cases like: player A throws a rock, rock breaks, player B should see it disappear
+    for (u32 oldNetworkId : previouslyOwnedByThisSender) {
+        if (receivedNetworkActorIds.count(oldNetworkId) == 0) {
+            // This actor was owned by the sender but is no longer in their snapshot
+            // The sender must have killed/despawned it, so we should too
+            Actor* actorToKill = FindActorByNetworkId(oldNetworkId);
+            if (actorToKill != nullptr && actorToKill->update != nullptr) {
+                // Don't kill it immediately during packet processing - defer to next frame
+                // This avoids crashes from killing actors during draw/update loops
+                actorsPendingKill.push_back(actorToKill);
+                SPDLOG_INFO("[Anchor] Queueing actor id={} networkActorId={} for kill (owner stopped sending)",
+                            actorToKill->id, oldNetworkId);
+            }
+
+            // Clean up mappings
+            networkIdToOwner.erase(oldNetworkId);
+            if (networkIdToActor.count(oldNetworkId) > 0) {
+                Actor* actor = networkIdToActor[oldNetworkId];
+                actorToNetworkId.erase(actor);
+                networkIdToActor.erase(oldNetworkId);
+            }
+            actorInterpData.erase(oldNetworkId);
+        }
+    }
     } catch (const std::exception& e) {
         SPDLOG_ERROR("[Anchor] Error in HandlePacket_WorldSnapshot: {}", e.what());
     }
