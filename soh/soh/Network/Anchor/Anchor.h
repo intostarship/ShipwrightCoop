@@ -6,6 +6,7 @@
 #include <libultraship/libultraship.h>
 #include <queue>
 #include <mutex>
+#include <chrono>
 
 extern "C" {
 #include "variables.h"
@@ -139,6 +140,8 @@ class Anchor : public Network {
     std::map<u32, ActorInterpData> actorInterpData;
     std::mutex actorInterpMutex;
     u8 snapshotSendCounter = 0;
+    s16 lastSnapshotSceneNum = -1;
+    bool hasReceivedSnapshotThisScene = false;  // Wait for first sync before broadcasting
 
     u32 GetActorUniqueId(Actor* actor);
     uint32_t GetClosestPlayerToActor(Actor* actor);

@@ -192,21 +192,27 @@ SkelAnime* Anchor::GetActorSkelAnime(Actor* actor) {
 /**
  * WORLD_SNAPSHOT
  *
- * Each client sends the state of actors they "own" (are closest to).
- * Other clients receive and apply these states with interpolation.
+ * Each client broadcasts the ENTIRE world state (all actors).
+ * Receivers decide which state to apply based on proximity - the state
+ * from the player closest to each actor wins.
  *
- * Proximity-based ownership:
- * - The player closest to an actor is responsible for broadcasting its state
- * - All clients do the same distance calculation, so they agree on ownership
- * - If ownership changes (player moves), the new owner starts broadcasting
+ * This is like parallel worlds merging at a frontier:
+ * - Each player lives in their own world
+ * - At the boundary where worlds collide, proximity determines truth
+ * - The closest player's reality becomes the shared reality
+ *
+ * Scene entry delay:
+ * - When entering a scene where others are already present, wait before broadcasting
+ * - This allows receiving existing state before potentially overwriting it
  */
 void Anchor::SendPacket_WorldSnapshot() {
     if (!IsSaveLoaded() || gPlayState == nullptr) return;
 
-    // Rate limit: send at ~15Hz (every 4 frames at 60fps)
-    snapshotSendCounter++;
-    if (snapshotSendCounter < 4) return;
-    snapshotSendCounter = 0;
+    // Detect scene change - reset sync state
+    if (gPlayState->sceneNum != lastSnapshotSceneNum) {
+        lastSnapshotSceneNum = gPlayState->sceneNum;
+        hasReceivedSnapshotThisScene = false;
+    }
 
     // Check if there are other players in the same scene
     bool hasOthersInScene = false;
@@ -219,18 +225,49 @@ void Anchor::SendPacket_WorldSnapshot() {
     }
     if (!hasOthersInScene) return;
 
+    // Wait until we've received at least one snapshot from others before broadcasting
+    // This ensures we don't overwrite existing state when entering a scene
+    // EXCEPTION: If we have the lowest priority hash among players in this scene, we go first
+    // This prevents deadlock when multiple players enter simultaneously
+    // Priority hash = hash(clientId + name) to handle same-PC clients with same config
+    if (!hasReceivedSnapshotThisScene) {
+        std::string ownName = CVarGetString(CVAR_REMOTE_ANCHOR("Name"), "");
+        size_t ownPriorityHash = std::hash<std::string>{}(std::to_string(ownClientId) + ownName);
+
+        bool hasLowerPriority = false;
+        for (auto& [clientId, client] : clients) {
+            if (client.sceneNum == gPlayState->sceneNum && client.online &&
+                client.isSaveLoaded && !client.self) {
+                size_t clientPriorityHash = std::hash<std::string>{}(std::to_string(clientId) + client.name);
+                if (clientPriorityHash < ownPriorityHash) {
+                    hasLowerPriority = true;
+                    break;
+                }
+            }
+        }
+        // If someone with a lower priority hash is in the scene, wait for them
+        if (hasLowerPriority) {
+            return;
+        }
+        // Otherwise, we have priority - start broadcasting
+    }
+
+    // Rate limit: send at ~15Hz (every 4 frames at 60fps)
+    snapshotSendCounter++;
+    if (snapshotSendCounter < 4) return;
+    snapshotSendCounter = 0;
+
     nlohmann::json payload;
     payload["type"] = WORLD_SNAPSHOT;
     payload["sceneNum"] = gPlayState->sceneNum;
     payload["actors"] = nlohmann::json::array();
     payload["quiet"] = true;  // Don't log these frequent packets
 
-    // Iterate through syncable actor categories
+    // Broadcast ALL actors - receivers will decide which state to apply
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
-            // Only send if we own this actor (are closest to it)
-            if (actor->update != NULL && IsActorOwner(actor)) {
+            if (actor->update != NULL) {
                 nlohmann::json actorJson;
 
                 u32 uniqueId = GetActorUniqueId(actor);
@@ -240,7 +277,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                 actorJson["pos"] = actor->world.pos;
                 actorJson["rot"] = actor->shape.rot;
                 actorJson["hp"] = actor->colChkInfo.health;
-                actorJson["dead"] = (actor->update == NULL) ? 1 : 0;
+                actorJson["dead"] = 0;
 
                 // Animation state if available
                 SkelAnime* skelAnime = GetActorSkelAnime(actor);
@@ -271,6 +308,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     // Ignore if not in the same scene
     s16 sceneNum = payload["sceneNum"].get<s16>();
     if (sceneNum != gPlayState->sceneNum) return;
+
+    // Mark that we've received a snapshot - we can now start broadcasting
+    hasReceivedSnapshotThisScene = true;
 
     uint32_t senderClientId = payload["clientId"].get<uint32_t>();
 
