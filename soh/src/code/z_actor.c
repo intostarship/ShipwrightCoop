@@ -3111,8 +3111,13 @@ void func_800315AC(PlayState* play, ActorContext* actorCtx) {
             bool shipShouldDraw = false;
             bool shipShouldUpdate = false;
             if ((HREG(64) != 1) || ((HREG(65) != -1) && (HREG(65) != HREG(66))) || (HREG(70) == 0)) {
+                // Use Ship_CalcShouldDrawAndUpdate when:
+                // 1. Extended draw distance is enabled, OR
+                // 2. Widescreen culling is enabled, OR
+                // 3. Anchor multiplayer is enabled (needs custom ownership-based culling)
                 if (CVarGetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 1) > 1 ||
-                    CVarGetInteger(CVAR_ENHANCEMENT("WidescreenActorCulling"), 0)) {
+                    CVarGetInteger(CVAR_ENHANCEMENT("WidescreenActorCulling"), 0) ||
+                    Anchor_IsEnabled()) {
                     Ship_CalcShouldDrawAndUpdate(play, actor, &actor->projectedPos, actor->projectedW, &shipShouldDraw,
                                                  &shipShouldUpdate);
 
@@ -3229,7 +3234,24 @@ void func_80031B14(PlayState* play, ActorContext* actorCtx) {
         while (actor != NULL) {
             if ((actor->room >= 0) && (actor->room != play->roomCtx.curRoom.num) &&
                 (actor->room != play->roomCtx.prevRoom.num)) {
-                if (!actor->isDrawn) {
+                // In multiplayer, keep syncable actors from other rooms
+                // They might be owned by another player in a different room
+                bool keepForMultiplayer = false;
+                if (Anchor_IsEnabled()) {
+                    s16 cat = actor->category;
+                    if (cat == ACTORCAT_ENEMY || cat == ACTORCAT_BOSS ||
+                        cat == ACTORCAT_NPC || cat == ACTORCAT_PROP ||
+                        cat == ACTORCAT_SWITCH || cat == ACTORCAT_BG ||
+                        cat == ACTORCAT_DOOR || cat == ACTORCAT_CHEST ||
+                        cat == ACTORCAT_EXPLOSIVE || cat == ACTORCAT_ITEMACTION ||
+                        cat == ACTORCAT_MISC) {
+                        keepForMultiplayer = true;
+                    }
+                }
+
+                if (keepForMultiplayer) {
+                    actor = actor->next;
+                } else if (!actor->isDrawn) {
                     actor = Actor_Delete(actorCtx, actor, play);
                 } else {
                     Actor_Kill(actor);
