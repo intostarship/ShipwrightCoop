@@ -173,6 +173,7 @@ class Anchor : public Network {
     Actor* FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos);  // Match by type+position
     void ClearNetworkIds();                       // Clear all networkActorId mappings (on scene change)
     void ProcessPendingActorKills();              // Kill actors queued for deletion
+    bool IsOwnerOnline(u32 networkActorId);       // Check if actor's owner is still online
 
     Actor* FindActorByUniqueId(u32 uniqueId);     // Legacy - keep for compatibility
     void ApplyActorInterpolation();

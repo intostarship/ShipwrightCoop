@@ -2,6 +2,7 @@
 #include "soh/Network/Anchor/AnchorHelpers.h"
 #include "soh/Network/Anchor/JsonConversions.hpp"
 #include "soh/Network/Anchor/ActorSerializer.h"
+#include "soh/ObjectExtension/ActorListIndex.h"
 #include <nlohmann/json.hpp>
 #include <libultraship/libultraship.h>
 #include <set>
@@ -23,6 +24,36 @@ static const std::set<s16> perPlayerActors = {
     ACTOR_EN_ELF,       // Navi - each player has their own fairy
 };
 
+/**
+ * Check if a room is currently loaded.
+ * A room is considered loaded if:
+ * - It's the current room and has a valid segment
+ * - It's the previous room and has a valid segment (during transitions)
+ * - It's room -1 (global/all rooms)
+ *
+ * This is used to prevent spawning actors in unloaded rooms which would crash.
+ */
+static bool IsRoomLoaded(s8 roomNum) {
+    if (gPlayState == nullptr) return false;
+
+    // Room -1 means "all rooms" / global - always valid
+    if (roomNum < 0) return true;
+
+    RoomContext* roomCtx = &gPlayState->roomCtx;
+
+    // Check if it's the current room
+    if (roomCtx->curRoom.num == roomNum && roomCtx->curRoom.segment != nullptr) {
+        return true;
+    }
+
+    // Check if it's the previous room (during room transitions both are loaded)
+    if (roomCtx->prevRoom.num == roomNum && roomCtx->prevRoom.segment != nullptr) {
+        return true;
+    }
+
+    return false;
+}
+
 // List of actor categories to sync - everything with position/rotation
 static const std::set<s16> syncableCategories = {
     ACTORCAT_SWITCH,
@@ -40,42 +71,91 @@ static const std::set<s16> syncableCategories = {
 };
 
 /**
- * Generate a unique ID for an actor based on its initial spawn position and params.
- * This is a LEGACY fallback - prefer network IDs for reliable matching.
+ * Generate a DETERMINISTIC spawn ID for an actor.
+ *
+ * For scene actors (actorListIndex >= 0):
+ *   ID = 0x40000000 | (sceneNum << 23) | (roomNum << 15) | actorListIndex
+ *   Bit 30 is always set to ensure ID is never 0 (scene 0, room 0, spawnIdx 0 would be 0 otherwise)
+ *   This is 100% unique and deterministic - same for all players!
+ *   Each room has its own spawnIdx counter starting at 0, so we MUST include room.
+ *
+ * For dynamic actors (actorListIndex == -1):
+ *   Fallback to hash of (scene, room, actorId, homePos) with bit 31 set.
  */
-u32 Anchor::GetActorUniqueId(Actor* actor) {
-    if (actor == nullptr) return 0;
+static u32 GetDeterministicSpawnId(s16 sceneNum, s16 actorListIndex, s8 roomNum, s16 actorId, Vec3f homePos) {
+    // Scene actors have a perfect unique ID: scene + room + spawn index
+    // IMPORTANT: Each room's spawnIdx starts at 0, so we must include room to avoid collisions!
+    if (actorListIndex >= 0) {
+        // Pack: bit 30 (scene actor marker), scene (7 bits), room (8 bits), spawnIdx (15 bits)
+        // Bit 30 is ALWAYS set for scene actors to ensure ID is never 0
+        // Bit 31 is reserved for dynamic actors (hash-based IDs)
+        u8 room = (roomNum < 0) ? 0xFF : (u8)roomNum;  // -1 (global) maps to 255
+        return 0x40000000u | ((u32)(sceneNum & 0x7F) << 23) | ((u32)room << 15) | (u32)(actorListIndex & 0x7FFF);
+    }
 
-    // Use a hash of actor ID, params, and home position
-    u32 hash = actor->id;
-    hash ^= (actor->params << 16);
-    hash ^= (u32)(actor->home.pos.x * 10.0f) << 8;
-    hash ^= (u32)(actor->home.pos.y * 10.0f) << 4;
-    hash ^= (u32)(actor->home.pos.z * 10.0f);
+    // Dynamic actors (projectiles, dropped items, etc.) - fallback to hash
+    // Use FNV-1a hash for better distribution
+    u32 hash = 2166136261u; // FNV offset basis
 
-    return hash;
+    // Mix in scene and room
+    hash ^= (u32)sceneNum;
+    hash *= 16777619u; // FNV prime
+    hash ^= (u32)(roomNum & 0xFF);
+    hash *= 16777619u;
+
+    // Mix in actor type
+    hash ^= (u32)actorId;
+    hash *= 16777619u;
+
+    // Mix in home position
+    hash ^= (u32)(s32)homePos.x;
+    hash *= 16777619u;
+    hash ^= (u32)(s32)homePos.y;
+    hash *= 16777619u;
+    hash ^= (u32)(s32)homePos.z;
+    hash *= 16777619u;
+
+    // Set high bit to distinguish from scene actors (scene actors have index in low 16 bits)
+    return hash | 0x80000000u;
 }
 
 /**
- * Get or assign a networkActorId for an actor.
- * If we already have an ID for this actor (from a received snapshot), return it.
- * Otherwise, assign a new one (we're the first/owner).
+ * Generate a deterministic spawn ID for an actor.
+ */
+u32 Anchor::GetActorUniqueId(Actor* actor) {
+    if (actor == nullptr || gPlayState == nullptr) return 0;
+
+    s16 actorListIndex = GetActorListIndex(actor);
+
+    return GetDeterministicSpawnId(
+        gPlayState->sceneNum,
+        actorListIndex,
+        actor->room,
+        actor->id,
+        actor->home.pos
+    );
+}
+
+/**
+ * Get the networkActorId for an actor.
+ * Now uses DETERMINISTIC spawn IDs based on scene data, so all players
+ * compute the same ID for the same actor without needing to sync.
+ *
+ * The ID is based on (scene, room, actorId, homePos) - identical for all players.
  */
 u32 Anchor::GetOrAssignNetworkId(Actor* actor) {
-    if (actor == nullptr) return 0;
+    if (actor == nullptr || gPlayState == nullptr) return 0;
 
-    // Check if this actor already has a networkActorId
-    auto it = actorToNetworkId.find(actor);
-    if (it != actorToNetworkId.end()) {
-        return it->second;
+    // Use deterministic spawn ID - same for all players!
+    u32 spawnId = GetActorUniqueId(actor);
+
+    // Cache the mapping for quick lookup
+    if (actorToNetworkId.find(actor) == actorToNetworkId.end()) {
+        actorToNetworkId[actor] = spawnId;
+        networkIdToActor[spawnId] = actor;
     }
 
-    // Assign a new networkActorId (we're the authority)
-    u32 newId = nextNetworkId++;
-    actorToNetworkId[actor] = newId;
-    networkIdToActor[newId] = actor;
-
-    return newId;
+    return spawnId;
 }
 
 /**
@@ -101,16 +181,48 @@ void Anchor::SetActorNetworkId(Actor* actor, u32 networkActorId) {
 
 /**
  * Find an actor by its networkActorId.
+ * For scene actors (bit 30 set, bit 31 clear), extracts scene/room/spawnIdx and searches directly.
+ * For dynamic actors (bit 31 set), uses map lookup.
  */
 Actor* Anchor::FindActorByNetworkId(u32 networkActorId) {
+    if (gPlayState == nullptr || networkActorId == 0) return nullptr;
+
+    // Scene actors have bit 30 set, bit 31 clear
+    // Format: 0x40000000 | (scene << 23) | (room << 15) | spawnIdx
+    if ((networkActorId & 0xC0000000u) == 0x40000000u) {
+        // Extract scene, room, and spawnIdx
+        s16 expectedScene = (networkActorId >> 23) & 0x7F;
+        u8 expectedRoom = (networkActorId >> 15) & 0xFF;
+        s16 expectedSpawnIdx = networkActorId & 0x7FFF;
+
+        // Only search in current scene
+        if (expectedScene != gPlayState->sceneNum) return nullptr;
+
+        // Search all syncable categories for actor with this room + spawnIdx
+        for (int cat : syncableCategories) {
+            Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
+            while (actor != NULL) {
+                // Match by spawnIdx AND room
+                u8 actorRoom = (actor->room < 0) ? 0xFF : (u8)actor->room;
+                if (GetActorListIndex(actor) == expectedSpawnIdx && actorRoom == expectedRoom) {
+                    // Found it! Cache the mapping for future lookups
+                    actorToNetworkId[actor] = networkActorId;
+                    networkIdToActor[networkActorId] = actor;
+                    return actor;
+                }
+                actor = actor->next;
+            }
+        }
+        return nullptr;
+    }
+
+    // Dynamic actor - use map lookup (fallback)
     auto it = networkIdToActor.find(networkActorId);
     if (it != networkIdToActor.end()) {
         Actor* actor = it->second;
-        // Verify actor is still valid (not killed)
         if (actor != nullptr && actor->update != nullptr) {
             return actor;
         }
-        // Actor was killed, clean up mapping
         actorToNetworkId.erase(actor);
         networkIdToActor.erase(networkActorId);
     }
@@ -183,6 +295,24 @@ void Anchor::ProcessPendingActorKills() {
         }
     }
     actorsPendingKill.clear();
+}
+
+/**
+ * Check if the owner of an actor is still online.
+ * Returns false if: no owner, owner not in clients list, or owner is offline.
+ */
+bool Anchor::IsOwnerOnline(u32 networkActorId) {
+    auto it = networkIdToOwner.find(networkActorId);
+    if (it == networkIdToOwner.end()) {
+        return false;  // No owner recorded
+    }
+
+    uint32_t ownerClientId = it->second;
+    if (!clients.contains(ownerClientId)) {
+        return false;  // Owner not in clients list
+    }
+
+    return clients[ownerClientId].online;
 }
 
 /**
@@ -339,9 +469,6 @@ void Anchor::SendPacket_WorldSnapshot() {
         hasReceivedSnapshotThisRoom = true;  // Prevent re-checking priority every frame
     }
 
-    // No rate limiting - sync at same rate as PlayerUpdate (every frame)
-    // This ensures actors move smoothly alongside Link
-
     nlohmann::json payload;
     payload["type"] = WORLD_SNAPSHOT;
     payload["sceneNum"] = gPlayState->sceneNum;
@@ -405,19 +532,25 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
-            // Only send actors in our current room (or room -1 which means "all rooms")
-            s8 curRoom = gPlayState->roomCtx.curRoom.num;
-            if (actor->room >= 0 && actor->room != curRoom) {
+            // ONLY sync scene actors (spawnIdx >= 0)
+            // Dynamic actors (projectiles, dropped items, effects) have spawnIdx == -1
+            // and don't need to be synced - they're handled by player actions
+            s16 spawnIdx = GetActorListIndex(actor);
+            if (spawnIdx < 0) {
                 actor = actor->next;
                 continue;
             }
 
-            // Check if this actor already has a networkActorId
-            bool hasNetworkId = (actorToNetworkId.find(actor) != actorToNetworkId.end());
+            // Only send actors in LOADED rooms (curRoom + prevRoom during transitions)
+            // This allows syncing actors from both rooms during room transitions!
+            if (!IsRoomLoaded(actor->room)) {
+                actor = actor->next;
+                continue;
+            }
 
-            // For actors WITH a networkActorId: use proximity-based ownership
-            // For actors WITHOUT: we claim them (first-to-see owns them)
-            if (hasNetworkId && !IsActorOwner(actor)) {
+            // SIMPLE OWNERSHIP: only send actors we're closest to
+            // With deterministic IDs, we don't need complex tracking - just proximity
+            if (!IsActorOwner(actor)) {
                 actor = actor->next;
                 continue;
             }
@@ -429,11 +562,17 @@ void Anchor::SendPacket_WorldSnapshot() {
                 // Get or assign a networkActorId for this actor
                 // If we get here without an ID, we're claiming this actor
                 u32 networkActorId = GetOrAssignNetworkId(actor);
+
+                // Mark ourselves as the owner if we're claiming/sending this actor
+                // This prevents the other client from thinking we "stopped sending" when we're the authority
+                networkIdToOwner[networkActorId] = ownClientId;
+                ownerToNetworkIds[ownClientId].insert(networkActorId);
                 actorJson["networkActorId"] = networkActorId;
                 actorJson["id"] = actor->id;
                 actorJson["cat"] = actor->category;
                 actorJson["params"] = actor->params;
                 actorJson["room"] = actor->room;
+                actorJson["spawnIdx"] = GetActorListIndex(actor);  // Scene spawn index (-1 for dynamic)
 
                 // Position and rotation (always sync these)
                 actorJson["pos"] = actor->world.pos;
@@ -501,17 +640,12 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         s16 sceneNum = payload["sceneNum"].get<s16>();
         if (sceneNum != gPlayState->sceneNum) return;
 
-        // Get sender's room (if provided) - only sync with players in the same room
+        // Get sender's room (if provided)
         s8 senderRoom = payload.contains("roomNum") ? payload["roomNum"].get<s8>() : -1;
         s8 myRoom = gPlayState->roomCtx.curRoom.num;
 
-        // If sender is in a different room, ignore their snapshot entirely
-        // This prevents issues with room transitions and actors in other rooms
-        if (senderRoom >= 0 && myRoom >= 0 && senderRoom != myRoom) {
-            return;
-        }
-
-        // Mark that we've received a snapshot from someone in our room - we can now start broadcasting
+        // Mark that we've received a snapshot from someone in our scene - we can now start broadcasting
+        // (We no longer filter by room here - we filter per-actor instead)
         hasReceivedSnapshotThisRoom = true;
 
         uint32_t senderClientId = payload["clientId"].get<uint32_t>();
@@ -613,15 +747,22 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             continue;
         }
 
-        // Get networkActorId (or fall back to legacy uid)
-        u32 networkActorId = actorJson.contains("networkActorId")
-            ? actorJson["networkActorId"].get<u32>()
-            : actorJson.contains("uid") ? actorJson["uid"].get<u32>() : 0;
-
         s16 actorId = actorJson["id"].get<s16>();
         s16 category = actorJson.contains("cat") ? actorJson["cat"].get<s16>() : -1;
         s16 params = actorJson["params"].get<s16>();
         Vec3f homePos = actorJson.contains("home") ? actorJson["home"].get<Vec3f>() : Vec3f{0,0,0};
+        s8 actorRoom = actorJson.contains("room") ? actorJson["room"].get<s8>() : -1;
+        s16 spawnIdx = actorJson.contains("spawnIdx") ? actorJson["spawnIdx"].get<s16>() : -1;
+
+        // ONLY process scene actors (spawnIdx >= 0)
+        // Dynamic actors should not be in snapshots anymore, but skip them if present
+        if (spawnIdx < 0) {
+            continue;
+        }
+
+        // Compute the DETERMINISTIC spawn ID locally - should match sender's ID
+        // For scene actors: ID = (scene << 16) | spawnIdx - 100% unique!
+        u32 networkActorId = GetDeterministicSpawnId(sceneNum, spawnIdx, actorRoom, actorId, homePos);
 
         // Skip per-player actors (each player has their own instance, don't sync)
         if (perPlayerActors.count(actorId) > 0) {
@@ -629,6 +770,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
 
         receivedNetworkActorIds.insert(networkActorId);
+
+        // IMPORTANT: Record ownership IMMEDIATELY when we receive this actor in a snapshot
+        // This must happen BEFORE any early returns, otherwise IsOwnerOnline() will return false
+        // because we never recorded who owns this actor
+        if (networkActorId != 0) {
+            auto existingOwner = networkIdToOwner.find(networkActorId);
+            if (existingOwner == networkIdToOwner.end() || existingOwner->second != ownClientId) {
+                // We're not the owner - record that the sender owns it
+                networkIdToOwner[networkActorId] = senderClientId;
+            }
+        }
 
         // Step 1: Try to find actor by networkActorId
         Actor* actor = FindActorByNetworkId(networkActorId);
@@ -644,8 +796,16 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
 
         // Step 3: If still not found, spawn it
+        // CRITICAL: Only spawn actors in LOADED rooms!
+        // Spawning in an unloaded room crashes because graphics resources aren't available
         bool justSpawned = false;
-        if (actor == nullptr) {
+        bool roomIsLoaded = IsRoomLoaded(actorRoom);
+        if (actor == nullptr && !roomIsLoaded) {
+            // Actor's room is not loaded - skip spawning, it will sync when we enter that room
+            SPDLOG_INFO("[Anchor] Skipping spawn for actor id={} (room {} not loaded)",
+                        actorId, actorRoom);
+        }
+        if (actor == nullptr && roomIsLoaded) {
             Vec3f pos = actorJson["pos"].get<Vec3f>();
             Vec3s rot = actorJson.contains("wRot") ? actorJson["wRot"].get<Vec3s>() : actorJson["sRot"].get<Vec3s>();
 
@@ -671,6 +831,11 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             } else {
                 continue;
             }
+        }
+
+        // Skip if actor is still null (couldn't find or spawn it)
+        if (actor == nullptr) {
+            continue;
         }
 
         // Verify actor ID matches
@@ -793,8 +958,8 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             // The actor's own update logic should handle death
         }
 
-        // Track that this sender owns this actor
-        networkIdToOwner[networkActorId] = senderClientId;
+        // Note: Ownership is recorded at the TOP of the loop (before any early returns)
+        // to ensure IsOwnerOnline() works correctly for all actors we receive
     }
 
     // Update the full set of actors owned by this sender
@@ -802,12 +967,34 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
     // Despawn actors that this sender USED to own but no longer sends
     // This handles cases like: player A throws a rock, rock breaks, player B should see it disappear
+    // IMPORTANT: Only despawn if the actor is in the SAME ROOM as the sender!
+    // If sender changed rooms, they'll stop sending old room actors - that doesn't mean they died
     for (u32 oldNetworkId : previouslyOwnedByThisSender) {
         if (receivedNetworkActorIds.count(oldNetworkId) == 0) {
             // This actor was owned by the sender but is no longer in their snapshot
-            // The sender must have killed/despawned it, so we should too
+            // BUT don't despawn if WE are the owner (we might have claimed it)
+            auto ownerIt = networkIdToOwner.find(oldNetworkId);
+            if (ownerIt != networkIdToOwner.end() && ownerIt->second == ownClientId) {
+                // We own this actor - don't despawn it just because someone else stopped sending
+                continue;
+            }
+
+            // Find the actor to check its room
             Actor* actorToKill = FindActorByNetworkId(oldNetworkId);
             if (actorToKill != nullptr && actorToKill->update != nullptr) {
+                // CRITICAL: Only despawn if actor is in the sender's room
+                // If sender is in room 1 but this actor is in room 0, the sender
+                // just changed rooms - the actor is still alive in room 0
+                if (senderRoom >= 0 && actorToKill->room >= 0 && actorToKill->room != senderRoom) {
+                    // Actor is in a different room than sender - don't despawn
+                    // The sender stopped sending it because they left the room, not because it died
+                    SPDLOG_INFO("[Anchor] NOT despawning actor id={} networkActorId={} (actor room {} != sender room {})",
+                                actorToKill->id, oldNetworkId, actorToKill->room, senderRoom);
+                    // Release ownership so someone else can claim it
+                    networkIdToOwner.erase(oldNetworkId);
+                    continue;
+                }
+
                 // Don't kill it immediately during packet processing - defer to next frame
                 // This avoids crashes from killing actors during draw/update loops
                 actorsPendingKill.push_back(actorToKill);
