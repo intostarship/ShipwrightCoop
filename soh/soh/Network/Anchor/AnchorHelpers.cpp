@@ -157,11 +157,13 @@ extern "C" bool Anchor_IsWaitingForInitialSync(void) {
 }
 
 extern "C" bool Anchor_ShouldSkipUpdateForNonOwner(s16 category) {
-    // These categories have AI with proximity-based triggers (actionFunc systems)
-    // Non-owners should not run Update() - they receive state from the owner
+    // These categories should only run Update() for the owner (closest player)
+    // Non-owners receive state from the owner via WorldSnapshot
+    // This prevents duplicate effects (explosions, drops) and AI desync
     return category == ACTORCAT_ENEMY ||
            category == ACTORCAT_BOSS ||
-           category == ACTORCAT_NPC;
+           category == ACTORCAT_NPC ||
+           category == ACTORCAT_PROP;  // Rocks, pots, bushes - owner handles destruction
 }
 
 extern "C" void Anchor_LogInfo(const char* message) {

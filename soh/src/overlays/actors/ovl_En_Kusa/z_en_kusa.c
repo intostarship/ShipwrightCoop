@@ -11,6 +11,7 @@
 #include "objects/object_kusa/object_kusa.h"
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_THROW_ONLY)
 
@@ -126,6 +127,11 @@ s32 EnKusa_SnapToFloor(EnKusa* this, PlayState* play, f32 yOffset) {
 
 void EnKusa_DropCollectible(EnKusa* this, PlayState* play) {
     s16 dropParams;
+
+    // Multiplayer: only the owner (closest player) spawns collectibles
+    if (Anchor_IsEnabled() && !Anchor_IsActorOwner(&this->actor)) {
+        return;
+    }
 
     if (!GameInteractor_Should(VB_GRASS_DROP_ITEM, true, this)) {
         return;

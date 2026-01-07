@@ -8,6 +8,7 @@
 #include "overlays/effects/ovl_Effect_Ss_Kakera/z_eff_ss_kakera.h"
 #include "objects/gameplay_field_keep/gameplay_field_keep.h"
 #include "soh/OTRGlobals.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #include "vt.h"
 
@@ -250,6 +251,12 @@ void EnIshi_SpawnDustLarge(EnIshi* this, PlayState* play) {
 
 void EnIshi_DropCollectible(EnIshi* this, PlayState* play) {
     s16 dropParams;
+
+    // Multiplayer: only the owner (closest player) spawns collectibles
+    // This prevents duplicate rupees when both players' games run the destruction code
+    if (Anchor_IsEnabled() && !Anchor_IsActorOwner(&this->actor)) {
+        return;
+    }
 
     if ((this->actor.params & 1) == ROCK_SMALL) {
         dropParams = (this->actor.params >> 8) & 0xF;

@@ -9,6 +9,7 @@
 #include "objects/gameplay_dangeon_keep/gameplay_dangeon_keep.h"
 #include "objects/object_tsubo/object_tsubo.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_THROW_ONLY)
 
@@ -86,6 +87,11 @@ static InitChainEntry sInitChain[] = {
 
 void ObjTsubo_SpawnCollectible(ObjTsubo* this, PlayState* play) {
     s16 dropParams = this->actor.params & 0x1F;
+
+    // Multiplayer: only the owner (closest player) spawns collectibles
+    if (Anchor_IsEnabled() && !Anchor_IsActorOwner(&this->actor)) {
+        return;
+    }
 
     if (GameInteractor_Should(VB_POT_DROP_ITEM,
                               (dropParams >= ITEM00_RUPEE_GREEN) && (dropParams <= ITEM00_BOMBS_SPECIAL), this)) {
