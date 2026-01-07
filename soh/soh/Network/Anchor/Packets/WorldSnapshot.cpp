@@ -143,11 +143,20 @@ static const std::map<s16, size_t> actorSkelAnimeExtraOffsets = {
     { ACTOR_EN_HS2, 0x4C },         // Carpenter's son
 };
 
-// List of actor categories to sync
+// List of actor categories to sync - everything with position/rotation
 static const std::set<s16> syncableCategories = {
-    ACTORCAT_ENEMY,
-    ACTORCAT_BOSS,
+    ACTORCAT_SWITCH,
+    ACTORCAT_BG,
+    // ACTORCAT_PLAYER - handled separately, don't sync here
+    ACTORCAT_EXPLOSIVE,
     ACTORCAT_NPC,
+    ACTORCAT_ENEMY,
+    ACTORCAT_PROP,
+    ACTORCAT_ITEMACTION,
+    ACTORCAT_MISC,
+    ACTORCAT_BOSS,
+    ACTORCAT_DOOR,
+    ACTORCAT_CHEST,
 };
 
 /**

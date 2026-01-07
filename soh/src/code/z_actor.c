@@ -18,6 +18,7 @@
 
 #include "soh/ActorDB.h"
 #include "soh/OTRGlobals.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -2663,11 +2664,23 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                 }
             } else {
                 Math_Vec3f_Copy(&actor->prevPos, &actor->world.pos);
-                actor->xzDistToPlayer = Actor_WorldDistXZToActor(actor, &player->actor);
-                actor->yDistToPlayer = Actor_HeightDiff(actor, &player->actor);
+
+                // For enemies/bosses/NPCs in multiplayer, calculate distance to closest player (including DummyPlayers)
+                Actor* targetPlayer;
+                if ((actor->category == ACTORCAT_ENEMY || actor->category == ACTORCAT_BOSS || actor->category == ACTORCAT_NPC) && Anchor_IsEnabled()) {
+                    targetPlayer = Anchor_GetClosestPlayerActor(play, actor);
+                    if (targetPlayer == NULL) {
+                        targetPlayer = &player->actor;
+                    }
+                } else {
+                    targetPlayer = &player->actor;
+                }
+
+                actor->xzDistToPlayer = Actor_WorldDistXZToActor(actor, targetPlayer);
+                actor->yDistToPlayer = Actor_HeightDiff(actor, targetPlayer);
                 actor->xyzDistToPlayerSq = SQ(actor->xzDistToPlayer) + SQ(actor->yDistToPlayer);
 
-                actor->yawTowardsPlayer = Actor_WorldYawTowardActor(actor, &player->actor);
+                actor->yawTowardsPlayer = Actor_WorldYawTowardActor(actor, targetPlayer);
                 actor->flags &= ~ACTOR_FLAG_SFX_FOR_PLAYER_BODY_HIT;
 
                 if ((DECR(actor->freezeTimer) == 0) &&
@@ -4532,6 +4545,14 @@ s16 Npc_UpdateAutoTurn(Actor* actor, NpcInteractInfo* interactInfo, f32 distance
  */
 void Npc_TrackPoint(Actor* actor, NpcInteractInfo* interactInfo, s16 presetIndex, s16 trackingMode) {
     NpcTrackingRotLimits rotLimits;
+
+    // In multiplayer, NPCs should track the closest player (local or dummy)
+    if (Anchor_IsEnabled()) {
+        Actor* closestPlayer = Anchor_GetClosestPlayerActor(gPlayState, actor);
+        if (closestPlayer != NULL) {
+            interactInfo->trackPos = closestPlayer->world.pos;
+        }
+    }
 
     interactInfo->trackingMode =
         Npc_UpdateAutoTurn(actor, interactInfo, sNpcTrackingPresets[presetIndex].autoTurnDistanceRange,
