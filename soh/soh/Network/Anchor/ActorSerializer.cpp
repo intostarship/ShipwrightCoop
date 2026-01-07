@@ -6,6 +6,9 @@ extern "C" {
 #include "z64animation.h"
 }
 
+// All offsets from ActorSyncGenerated.inc are computed at COMPILE-TIME via offsetof()
+// No runtime conversion needed - offsets are already correct!
+
 /**
  * Get the actionFunc pointer from an actor using the syncInfo offset.
  */
@@ -39,25 +42,22 @@ static SkelAnime* GetActorSkelAnime(Actor* actor, ActorSyncInfo* syncInfo) {
 }
 
 /**
- * Get the jointTable pointer from an actor.
- * jointTable is typically right after SkelAnime.
+ * Get the jointTable pointer from an actor using the syncInfo offset.
  */
 static Vec3s* GetActorJointTable(Actor* actor, ActorSyncInfo* syncInfo) {
-    if (syncInfo->skelAnimeOffset == 0 || syncInfo->jointCount == 0) return nullptr;
+    if (syncInfo->jointTableOffset == 0 || syncInfo->jointCount == 0) return nullptr;
     return reinterpret_cast<Vec3s*>(
-        reinterpret_cast<uintptr_t>(actor) + syncInfo->skelAnimeOffset + sizeof(SkelAnime)
+        reinterpret_cast<uintptr_t>(actor) + syncInfo->jointTableOffset
     );
 }
 
 /**
- * Get the morphTable pointer from an actor.
- * morphTable is typically right after jointTable.
+ * Get the morphTable pointer from an actor using the syncInfo offset.
  */
 static Vec3s* GetActorMorphTable(Actor* actor, ActorSyncInfo* syncInfo) {
-    if (syncInfo->skelAnimeOffset == 0 || syncInfo->jointCount == 0 || syncInfo->morphCount == 0) return nullptr;
+    if (syncInfo->morphTableOffset == 0 || syncInfo->morphCount == 0) return nullptr;
     return reinterpret_cast<Vec3s*>(
-        reinterpret_cast<uintptr_t>(actor) + syncInfo->skelAnimeOffset + sizeof(SkelAnime)
-        + syncInfo->jointCount * sizeof(Vec3s)
+        reinterpret_cast<uintptr_t>(actor) + syncInfo->morphTableOffset
     );
 }
 
@@ -216,7 +216,7 @@ nlohmann::json SerializeActorState(Actor* actor) {
         state["actionFuncIndex"] = funcIndex;
     }
 
-    // Serialize jointTable if available
+    // Serialize jointTable if available (using actual offset from generated data)
     Vec3s* jointTable = GetActorJointTable(actor, syncInfo);
     if (jointTable != nullptr && syncInfo->jointCount > 0) {
         nlohmann::json joints = nlohmann::json::array();
@@ -230,7 +230,7 @@ nlohmann::json SerializeActorState(Actor* actor) {
         state["jointTable"] = joints;
     }
 
-    // Serialize morphTable if available
+    // Serialize morphTable if available (using actual offset from generated data)
     Vec3s* morphTable = GetActorMorphTable(actor, syncInfo);
     if (morphTable != nullptr && syncInfo->morphCount > 0) {
         nlohmann::json morphs = nlohmann::json::array();
@@ -400,7 +400,7 @@ void DeserializeActorState(Actor* actor, const nlohmann::json& state) {
         }
     }
 
-    // Deserialize jointTable
+    // Deserialize jointTable (using actual offset from generated data)
     if (state.contains("jointTable") && state["jointTable"].is_array()) {
         Vec3s* jointTable = GetActorJointTable(actor, syncInfo);
         if (jointTable != nullptr) {
@@ -416,7 +416,7 @@ void DeserializeActorState(Actor* actor, const nlohmann::json& state) {
         }
     }
 
-    // Deserialize morphTable
+    // Deserialize morphTable (using actual offset from generated data)
     if (state.contains("morphTable") && state["morphTable"].is_array()) {
         Vec3s* morphTable = GetActorMorphTable(actor, syncInfo);
         if (morphTable != nullptr) {

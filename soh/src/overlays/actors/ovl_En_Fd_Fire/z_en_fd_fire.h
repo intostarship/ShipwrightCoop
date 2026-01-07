@@ -6,7 +6,7 @@
 
 struct EnFdFire;
 
-typedef void (*EnFdFireActionFunc)(struct EnFdFire* this, PlayState* play);
+typedef void (*EnFdFireActionFunc)(struct EnFdFire* thisx, PlayState* play);
 
 typedef struct EnFdFire {
     /* 0x0000 */ Actor actor;

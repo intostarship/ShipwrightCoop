@@ -8,6 +8,8 @@ struct EnMa3;
 
 typedef void (*EnMa3ActionFunc)(struct EnMa3*, PlayState*);
 
+#ifndef ADULT_MALON_LIMB_DEFINED
+#define ADULT_MALON_LIMB_DEFINED
 typedef enum {
     /* 0x00 */ MALON_ADULT_LIMB_NONE,
     /* 0x01 */ MALON_ADULT_LIMB_ROOT,
@@ -30,6 +32,7 @@ typedef enum {
     /* 0x12 */ MALON_ADULT_LIMB_HEAD,
     /* 0x13 */ MALON_ADULT_LIMB_MAX
 } AdultMalonLimb;
+#endif
 
 typedef struct EnMa3 {
     /* 0x0000 */ Actor actor;
