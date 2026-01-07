@@ -9,6 +9,7 @@
 #include "objects/object_po_composer/object_po_composer.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_IGNORE_QUAKE)
@@ -524,7 +525,12 @@ void func_80ADEC9C(EnPoh* this, PlayState* play) {
     Player* player;
     s16 facingDiff;
 
-    player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    player = (Player*)targetActor;
+
     SkelAnime_Update(&this->skelAnime);
     if (this->unk_198 != 0) {
         this->unk_198--;
@@ -541,7 +547,7 @@ void func_80ADEC9C(EnPoh* this, PlayState* play) {
     if (this->actor.xzDistToPlayer > 280.0f) {
         EnPoh_SetupIdle(this);
     } else if (this->unk_198 == 0 && this->actor.xzDistToPlayer < 140.0f &&
-               !Player_IsFacingActor(&this->actor, 0x2AAA, play)) {
+               ABS(facingDiff) < 0x2AAA) {
         EnPoh_SetupAttack(this);
     }
     if (this->lightColor.a == 255) {
@@ -1000,6 +1006,15 @@ void EnPoh_UpdateLiving(Actor* thisx, PlayState* play) {
     }
     func_80AE032C(this, play);
     EnPoh_UpdateVisibility(this);
+
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+    }
+
     this->actionFunc(this, play);
     Actor_MoveXZGravity(&this->actor);
     if (this->actionFunc == EnPoh_Attack && this->unk_198 < 10) {

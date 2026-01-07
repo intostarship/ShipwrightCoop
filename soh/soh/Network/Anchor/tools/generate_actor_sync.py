@@ -332,14 +332,24 @@ def parse_source(source_path: Path, actor_info: ActorInfo) -> None:
     # Prefixes that indicate macros, not real functions
     skip_prefixes = ('SKJ_ACTION_',)
 
+    def is_valid_func_name(name: str) -> bool:
+        """Check if a name is a valid C function identifier"""
+        if not name:
+            return False
+        # Must start with letter or underscore
+        if name[0].isdigit():
+            return False
+        # Must be a valid C identifier
+        return all(c.isalnum() or c == '_' for c in name)
+
     for match in setup_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes):
+        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes) and is_valid_func_name(func_name):
             action_funcs.add(func_name)
 
     for match in direct_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes):
+        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes) and is_valid_func_name(func_name):
             action_funcs.add(func_name)
 
     actor_info.action_funcs = sorted(list(action_funcs))
@@ -371,8 +381,12 @@ def scan_actors() -> List[ActorInfo]:
 
         # Parse header
         actor_info = parse_header(header_files[0])
-        if actor_info is None or not actor_info.has_skel_anime:
-            continue  # Skip actors without SkelAnime (not syncable)
+        if actor_info is None:
+            continue
+        # Include actors that have EITHER SkelAnime OR actionFunc
+        # This allows syncing props like rocks (En_Ishi), doors, etc.
+        if not actor_info.has_skel_anime and actor_info.action_func_offset == 0:
+            continue  # Skip actors without SkelAnime AND without actionFunc
 
         # Store the actual header path for includes (relative to src/)
         header_rel = header_files[0].relative_to(BASE_DIR / "src")
@@ -408,28 +422,31 @@ def generate_c_code(actors: List[ActorInfo]) -> str:
     lines.append("#include <stdint.h>")
     lines.append("")
 
-    # Forward declare action functions FIRST with extern "C"
-    # This establishes C linkage before headers potentially re-declare them
-    lines.append("// Forward declarations for action functions (defined in C files)")
+    # Forward declare action functions BEFORE including headers
+    # This establishes C linkage FIRST, avoiding conflicts with header declarations
     lines.append("extern \"C\" {")
-
-    # Forward declare all actor structs first (needed for function signatures)
+    lines.append("")
+    lines.append("// Forward declarations for action functions")
+    lines.append("// These come BEFORE headers to establish C linkage first")
+    lines.append("struct PlayState;")
     for actor in actors:
         lines.append(f"struct {actor.name};")
     lines.append("")
-
-    # Forward declare all action functions
     for actor in actors:
         for func in actor.action_funcs:
-            lines.append(f"void {func}({actor.name}*, PlayState*);")
-    lines.append("}")
+            lines.append(f"void {func}({actor.name}*, struct PlayState*);")
+    lines.append("")
+    lines.append("}  // extern \"C\" for forward declarations")
     lines.append("")
 
-    # Include actor headers for offsetof() compile-time resolution
-    # Headers have been fixed for C++ compatibility (this->thisx, guard for duplicates)
+    # Include actor headers (they may re-declare some functions, which is fine)
     lines.append("// Include actor headers for offsetof() compile-time resolution")
     for actor in actors:
         lines.append(f'#include "{actor.header_path}"')
+    lines.append("")
+
+    # Function tables inside extern "C"
+    lines.append("extern \"C\" {")
     lines.append("")
 
     # Function tables
@@ -442,6 +459,10 @@ def generate_c_code(actors: List[ActorInfo]) -> str:
             lines.append("    NULL  // Terminator")
             lines.append("};")
             lines.append("")
+
+    # Close extern "C" after function tables (rest is C++ compatible data/functions)
+    lines.append("}  // extern \"C\"")
+    lines.append("")
 
     # Field type enum
     lines.append("// Field types for serialization")

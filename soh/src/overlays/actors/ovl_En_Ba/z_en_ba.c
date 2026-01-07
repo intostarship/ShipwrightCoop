@@ -8,6 +8,7 @@
 #include "objects/object_bxa/object_bxa.h"
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -142,7 +143,11 @@ void EnBa_SetupIdle(EnBa* this) {
 }
 
 void EnBa_Idle(EnBa* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s32 i;
     s32 pad;
     Vec3s sp5C;
@@ -232,7 +237,11 @@ void EnBa_SetupSwingAtPlayer(EnBa* this) {
 }
 
 void EnBa_SwingAtPlayer(EnBa* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s16 temp;
     s16 i;
     Vec3s sp58;
@@ -461,6 +470,15 @@ void EnBa_Update(Actor* thisx, PlayState* play) {
             func_809B7174(this);
         }
     }
+
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+    }
+
     this->actionFunc(this, play);
     if (this->actor.params < EN_BA_DEAD_BLOB) {
         this->actor.focus.pos = this->unk_158[6];

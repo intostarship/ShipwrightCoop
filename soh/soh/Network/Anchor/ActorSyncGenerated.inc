@@ -8,32 +8,153 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// Forward declarations for action functions (defined in C files)
 extern "C" {
+
+// Forward declarations for action functions
+// These come BEFORE headers to establish C linkage first
+struct PlayState;
+struct ArmsHook;
+struct ArrowFire;
+struct ArrowIce;
+struct ArrowLight;
+struct BgBdanObjects;
+struct BgBdanSwitch;
+struct BgBomGuard;
+struct BgBombwall;
+struct BgBowlWall;
+struct BgBreakwall;
+struct BgDdanJd;
+struct BgDdanKd;
+struct BgDodoago;
 struct BgDyYoseizo;
+struct BgGanonOtyuka;
+struct BgGateShutter;
+struct BgGjyoBridge;
+struct BgGndFiremeiro;
+struct BgGndIceblock;
+struct BgGndSoulmeiro;
+struct BgHaka;
+struct BgHakaGate;
+struct BgHakaHuta;
+struct BgHakaMegane;
+struct BgHakaMeganeBG;
+struct BgHakaSgami;
+struct BgHakaShip;
+struct BgHakaTrap;
+struct BgHakaTubo;
+struct BgHakaWater;
+struct BgHakaZou;
+struct BgHeavyBlock;
+struct BgHidanCurtain;
+struct BgHidanDalm;
+struct BgHidanFirewall;
+struct BgHidanFslift;
+struct BgHidanFwbig;
+struct BgHidanHrock;
+struct BgHidanKousi;
+struct BgHidanRock;
+struct BgHidanSima;
+struct BgHidanSyoku;
+struct BgIceObjects;
+struct BgIceShelter;
+struct BgIceShutter;
+struct BgIceTurara;
+struct BgInGate;
+struct BgJya1flift;
+struct BgJyaAmishutter;
+struct BgJyaBombchuiwa;
+struct BgJyaCobra;
+struct BgJyaHaheniron;
+struct BgJyaIronobj;
+struct BgJyaKanaami;
+struct BgJyaLift;
+struct BgJyaMegami;
+struct BgJyaZurerukabe;
+struct BgMizuBwall;
+struct BgMizuShutter;
+struct BgMizuUzu;
+struct BgMizuWater;
+struct BgMjin;
+struct BgMoriBigst;
+struct BgMoriElevator;
+struct BgMoriHashigo;
+struct BgMoriHashira4;
+struct BgMoriHineri;
+struct BgMoriIdomizu;
+struct BgMoriKaitenkabe;
+struct BgMoriRakkatenjo;
+struct BgPoEvent;
+struct BgPushbox;
+struct BgRelayObjects;
+struct BgSpot00Hanebasi;
+struct BgSpot01Fusya;
+struct BgSpot01Idomizu;
+struct BgSpot01Idosoko;
+struct BgSpot01Objects2;
+struct BgSpot02Objects;
+struct BgSpot03Taki;
+struct BgSpot05Soko;
+struct BgSpot06Objects;
+struct BgSpot07Taki;
+struct BgSpot08Iceblock;
+struct BgSpot11Oasis;
+struct BgSpot12Gate;
+struct BgSpot12Saku;
+struct BgSpot15Rrbox;
+struct BgSpot15Saku;
+struct BgSpot16Bombstone;
+struct BgSpot18Basket;
+struct BgSpot18Obj;
+struct BgSpot18Shutter;
+struct BgTokiHikari;
+struct BgYdanHasi;
+struct BgYdanMaruta;
+struct BgYdanSp;
 struct BossFd2;
 struct BossGanon;
 struct BossGanon2;
 struct BossGanondrof;
 struct BossGoma;
+struct BossMo;
 struct BossTw;
 struct BossVa;
+struct Demo6K;
+struct DemoShd;
+struct DoorAna;
+struct DoorGerudo;
 struct DoorKiller;
+struct DoorShutter;
 struct DoorWarp1;
+struct EfcErupc;
+struct EffDust;
+struct ElfMsg;
+struct ElfMsg2;
 struct EnAm;
 struct EnAni;
 struct EnAnubice;
+struct EnAnubiceFire;
+struct EnAnubiceTag;
 struct EnArrow;
 struct EnAttackNiw;
+struct EnBa;
 struct EnBb;
+struct EnBdfire;
 struct EnBigokuta;
 struct EnBili;
 struct EnBird;
+struct EnBlkobj;
+struct EnBom;
 struct EnBomBowlMan;
+struct EnBomBowlPit;
+struct EnBomChu;
+struct EnBombf;
+struct EnBoom;
 struct EnBox;
 struct EnBrob;
+struct EnBubble;
 struct EnButte;
 struct EnBw;
+struct EnChanger;
 struct EnCow;
 struct EnCrow;
 struct EnCs;
@@ -45,6 +166,7 @@ struct EnDh;
 struct EnDha;
 struct EnDivingGame;
 struct EnDns;
+struct EnDntDemo;
 struct EnDntJiji;
 struct EnDntNomal;
 struct EnDodojr;
@@ -53,14 +175,22 @@ struct EnDog;
 struct EnDoor;
 struct EnDs;
 struct EnDu;
+struct EnDyExtra;
 struct EnEiyer;
 struct EnElf;
+struct EnEncount2;
+struct EnExItem;
+struct EnExRuppy;
 struct EnFd;
+struct EnFdFire;
+struct EnFireRock;
 struct EnFirefly;
 struct EnFish;
 struct EnFr;
 struct EnFu;
 struct EnFw;
+struct EnFz;
+struct EnGSwitch;
 struct EnGb;
 struct EnGe1;
 struct EnGe2;
@@ -71,22 +201,29 @@ struct EnGm;
 struct EnGo;
 struct EnGo2;
 struct EnGoma;
+struct EnGoroiwa;
+struct EnGs;
 struct EnGuest;
 struct EnHeishi2;
 struct EnHeishi3;
 struct EnHeishi4;
 struct EnHintnuts;
+struct EnHoll;
+struct EnHonotrap;
 struct EnHs2;
 struct EnHy;
+struct EnIceHono;
 struct EnIk;
 struct EnIn;
 struct EnInsect;
+struct EnIshi;
 struct EnJj;
 struct EnKakasi;
 struct EnKakasi2;
 struct EnKakasi3;
 struct EnKarebaba;
 struct EnKo;
+struct EnKusa;
 struct EnKz;
 struct EnMa1;
 struct EnMa2;
@@ -101,6 +238,10 @@ struct EnMu;
 struct EnNiw;
 struct EnNiwGirl;
 struct EnNiwLady;
+struct EnNutsball;
+struct EnNy;
+struct EnOE2;
+struct EnOkarinaEffect;
 struct EnOkuta;
 struct EnOssan;
 struct EnOwl;
@@ -111,15 +252,21 @@ struct EnPoRelay;
 struct EnPoSisters;
 struct EnPoh;
 struct EnRd;
+struct EnRr;
 struct EnSa;
 struct EnSb;
+struct EnSceneChange;
 struct EnShopnuts;
+struct EnSi;
+struct EnSiofuki;
 struct EnSkb;
 struct EnSkj;
 struct EnSsh;
 struct EnSt;
 struct EnSth;
+struct EnStream;
 struct EnSw;
+struct EnSyatekiItm;
 struct EnSyatekiMan;
 struct EnSyatekiNiw;
 struct EnTa;
@@ -128,1319 +275,2191 @@ struct EnTest;
 struct EnTg;
 struct EnTite;
 struct EnToryo;
+struct EnTp;
 struct EnTr;
+struct EnTuboTrap;
 struct EnVali;
+struct EnViewer;
 struct EnVm;
+struct EnWallTubo;
 struct EnWallmas;
+struct EnWeatherTag;
 struct EnWeiyer;
 struct EnWf;
+struct EnYabusameMark;
 struct EnZf;
 struct EnZl4;
 struct EnZo;
+struct EnfHG;
+struct ItemEtcetera;
+struct ItemInbox;
+struct ItemOcarina;
+struct ItemShield;
+struct ObjBean;
+struct ObjComb;
+struct ObjElevator;
+struct ObjHsblock;
+struct ObjIcePoly;
+struct ObjKibako;
+struct ObjKibako2;
+struct ObjLift;
+struct ObjLightswitch;
+struct ObjMakekinsuta;
+struct ObjMure;
+struct ObjMure2;
+struct ObjMure3;
+struct ObjOshihiki;
+struct ObjRoomtimer;
+struct ObjTimeblock;
+struct ObjTsubo;
+struct ObjWarp2block;
+struct OceffSpot;
+struct OceffStorm;
+struct ShotSun;
 
-void BgDyYoseizo_CheckMagicAcquired(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_ChooseType(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_CompleteSpinGrow_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_Give_Reward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_GreetPlayer_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_HealPlayer_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SayFarewell_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SetupGreetPlayer_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SetupHealPlayer_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SetupSpinGrow_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SetupSpinGrow_Reward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SetupSpinShrink(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SpinGrowSetupGive_Reward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SpinGrow_NoReward(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_SpinShrink(BgDyYoseizo*, PlayState*);
-void BgDyYoseizo_Vanish(BgDyYoseizo*, PlayState*);
-void BossFd2_BreatheFire(BossFd2*, PlayState*);
-void BossFd2_Burrow(BossFd2*, PlayState*);
-void BossFd2_ClawSwipe(BossFd2*, PlayState*);
-void BossFd2_Damaged(BossFd2*, PlayState*);
-void BossFd2_Death(BossFd2*, PlayState*);
-void BossFd2_Emerge(BossFd2*, PlayState*);
-void BossFd2_Idle(BossFd2*, PlayState*);
-void BossFd2_Vulnerable(BossFd2*, PlayState*);
-void BossFd2_Wait(BossFd2*, PlayState*);
-void BossGanon_Block(BossGanon*, PlayState*);
-void BossGanon_ChargeBigMagic(BossGanon*, PlayState*);
-void BossGanon_ChargeLightBall(BossGanon*, PlayState*);
-void BossGanon_Damaged(BossGanon*, PlayState*);
-void BossGanon_DeathAndTowerCutscene(BossGanon*, PlayState*);
-void BossGanon_HitByLightBall(BossGanon*, PlayState*);
-void BossGanon_IntroCutscene(BossGanon*, PlayState*);
-void BossGanon_PlayTennis(BossGanon*, PlayState*);
-void BossGanon_PoundFloor(BossGanon*, PlayState*);
-void BossGanon_SetupIntroCutscene(BossGanon*, PlayState*);
-void BossGanon_SetupTowerCutscene(BossGanon*, PlayState*);
-void BossGanon_Vulnerable(BossGanon*, PlayState*);
-void BossGanon_Wait(BossGanon*, PlayState*);
-void func_808FD5F4(BossGanon2*, PlayState*);
-void func_808FFDB0(BossGanon2*, PlayState*);
-void func_808FFEBC(BossGanon2*, PlayState*);
-void func_808FFFE0(BossGanon2*, PlayState*);
-void func_80900104(BossGanon2*, PlayState*);
-void func_8090026C(BossGanon2*, PlayState*);
-void func_80900344(BossGanon2*, PlayState*);
-void func_80900650(BossGanon2*, PlayState*);
-void func_80900890(BossGanon2*, PlayState*);
-void func_8090120C(BossGanon2*, PlayState*);
-void BossGanondrof_Block(BossGanondrof*, PlayState*);
-void BossGanondrof_Charge(BossGanondrof*, PlayState*);
-void BossGanondrof_Death(BossGanondrof*, PlayState*);
-void BossGanondrof_Intro(BossGanondrof*, PlayState*);
-void BossGanondrof_Neutral(BossGanondrof*, PlayState*);
-void BossGanondrof_Paintings(BossGanondrof*, PlayState*);
-void BossGanondrof_Return(BossGanondrof*, PlayState*);
-void BossGanondrof_Stunned(BossGanondrof*, PlayState*);
-void BossGanondrof_Throw(BossGanondrof*, PlayState*);
-void BossGoma_CeilingIdle(BossGoma*, PlayState*);
-void BossGoma_CeilingMoveToCenter(BossGoma*, PlayState*);
-void BossGoma_CeilingPrepareSpawnGohmas(BossGoma*, PlayState*);
-void BossGoma_CeilingSpawnGohmas(BossGoma*, PlayState*);
-void BossGoma_Defeated(BossGoma*, PlayState*);
-void BossGoma_Encounter(BossGoma*, PlayState*);
-void BossGoma_FallJump(BossGoma*, PlayState*);
-void BossGoma_FallStruckDown(BossGoma*, PlayState*);
-void BossGoma_FloorAttack(BossGoma*, PlayState*);
-void BossGoma_FloorAttackPosture(BossGoma*, PlayState*);
-void BossGoma_FloorDamaged(BossGoma*, PlayState*);
-void BossGoma_FloorIdle(BossGoma*, PlayState*);
-void BossGoma_FloorLand(BossGoma*, PlayState*);
-void BossGoma_FloorLandStruckDown(BossGoma*, PlayState*);
-void BossGoma_FloorMain(BossGoma*, PlayState*);
-void BossGoma_FloorPrepareAttack(BossGoma*, PlayState*);
-void BossGoma_FloorStunned(BossGoma*, PlayState*);
-void BossGoma_WallClimb(BossGoma*, PlayState*);
-void BossTw_BlastFire(BossTw*, PlayState*);
-void BossTw_BlastIce(BossTw*, PlayState*);
-void BossTw_CSWait(BossTw*, PlayState*);
-void BossTw_DeathBall(BossTw*, PlayState*);
-void BossTw_DeathCS(BossTw*, PlayState*);
-void BossTw_FinishBeamShoot(BossTw*, PlayState*);
-void BossTw_FlyTo(BossTw*, PlayState*);
-void BossTw_HitByBeam(BossTw*, PlayState*);
-void BossTw_Laugh(BossTw*, PlayState*);
-void BossTw_MergeCS(BossTw*, PlayState*);
-void BossTw_ShootBeam(BossTw*, PlayState*);
-void BossTw_Spin(BossTw*, PlayState*);
-void BossTw_TurnToPlayer(BossTw*, PlayState*);
-void BossTw_TwinrovaArriveAtTarget(BossTw*, PlayState*);
-void BossTw_TwinrovaChargeBlast(BossTw*, PlayState*);
-void BossTw_TwinrovaDeathCS(BossTw*, PlayState*);
-void BossTw_TwinrovaDoneBlastShoot(BossTw*, PlayState*);
-void BossTw_TwinrovaFly(BossTw*, PlayState*);
-void BossTw_TwinrovaGetUp(BossTw*, PlayState*);
-void BossTw_TwinrovaIntroCS(BossTw*, PlayState*);
-void BossTw_TwinrovaLaugh(BossTw*, PlayState*);
-void BossTw_TwinrovaMergeCS(BossTw*, PlayState*);
-void BossTw_TwinrovaShootBlast(BossTw*, PlayState*);
-void BossTw_TwinrovaSpin(BossTw*, PlayState*);
-void BossTw_TwinrovaStun(BossTw*, PlayState*);
-void BossTw_Wait(BossTw*, PlayState*);
-void BossVa_BariDeath(BossVa*, PlayState*);
-void BossVa_BariIntro(BossVa*, PlayState*);
-void BossVa_BariPhase2Attack(BossVa*, PlayState*);
-void BossVa_BariPhase3Attack(BossVa*, PlayState*);
-void BossVa_BariPhase3Stunned(BossVa*, PlayState*);
-void BossVa_BodyDeath(BossVa*, PlayState*);
-void BossVa_BodyIntro(BossVa*, PlayState*);
-void BossVa_BodyPhase1(BossVa*, PlayState*);
-void BossVa_BodyPhase2(BossVa*, PlayState*);
-void BossVa_BodyPhase3(BossVa*, PlayState*);
-void BossVa_BodyPhase4(BossVa*, PlayState*);
-void BossVa_Door(BossVa*, PlayState*);
-void BossVa_Stump(BossVa*, PlayState*);
-void BossVa_SupportAttached(BossVa*, PlayState*);
-void BossVa_SupportCut(BossVa*, PlayState*);
-void BossVa_SupportIntro(BossVa*, PlayState*);
-void BossVa_ZapperAttack(BossVa*, PlayState*);
-void BossVa_ZapperDamaged(BossVa*, PlayState*);
-void BossVa_ZapperDeath(BossVa*, PlayState*);
-void BossVa_ZapperEnraged(BossVa*, PlayState*);
-void BossVa_ZapperHold(BossVa*, PlayState*);
-void BossVa_ZapperIntro(BossVa*, PlayState*);
-void DoorKiller_Die(DoorKiller*, PlayState*);
-void DoorKiller_FallAsRubble(DoorKiller*, PlayState*);
-void DoorKiller_FallOver(DoorKiller*, PlayState*);
-void DoorKiller_RiseBackUp(DoorKiller*, PlayState*);
-void DoorKiller_SetProperties(DoorKiller*, PlayState*);
-void DoorKiller_Wait(DoorKiller*, PlayState*);
-void DoorKiller_WaitBeforeWobble(DoorKiller*, PlayState*);
-void DoorKiller_Wobble(DoorKiller*, PlayState*);
-void DoorWarp1_AdultWarpIdle(DoorWarp1*, PlayState*);
-void DoorWarp1_AdultWarpOut(DoorWarp1*, PlayState*);
-void DoorWarp1_AwaitClearFlag(DoorWarp1*, PlayState*);
-void DoorWarp1_BlueCrystal(DoorWarp1*, PlayState*);
-void DoorWarp1_ChildWarpIdle(DoorWarp1*, PlayState*);
-void DoorWarp1_ChildWarpOut(DoorWarp1*, PlayState*);
-void DoorWarp1_Destination(DoorWarp1*, PlayState*);
-void DoorWarp1_DoNothing(DoorWarp1*, PlayState*);
-void DoorWarp1_FloatPlayer(DoorWarp1*, PlayState*);
-void DoorWarp1_PurpleCrystal(DoorWarp1*, PlayState*);
-void DoorWarp1_RutoWarpIdle(DoorWarp1*, PlayState*);
-void DoorWarp1_RutoWarpOut(DoorWarp1*, PlayState*);
-void DoorWarp1_WarpAppear(DoorWarp1*, PlayState*);
-void func_80999214(DoorWarp1*, PlayState*);
-void func_80999348(DoorWarp1*, PlayState*);
-void func_809995D4(DoorWarp1*, PlayState*);
-void func_809998A4(DoorWarp1*, PlayState*);
-void func_80999EE0(DoorWarp1*, PlayState*);
-void func_80999FE4(DoorWarp1*, PlayState*);
-void func_8099A3A4(DoorWarp1*, PlayState*);
-void func_8099A508(DoorWarp1*, PlayState*);
-void func_8099B020(DoorWarp1*, PlayState*);
-void EnAm_Cooldown(EnAm*, PlayState*);
-void EnAm_Lunge(EnAm*, PlayState*);
-void EnAm_MoveToHome(EnAm*, PlayState*);
-void EnAm_RecoilFromDamage(EnAm*, PlayState*);
-void EnAm_Ricochet(EnAm*, PlayState*);
-void EnAm_RotateToHome(EnAm*, PlayState*);
-void EnAm_RotateToInit(EnAm*, PlayState*);
-void EnAm_Sleep(EnAm*, PlayState*);
-void EnAm_Statue(EnAm*, PlayState*);
-void EnAm_Stunned(EnAm*, PlayState*);
-void func_809B04F0(EnAni*, PlayState*);
-void func_809B0524(EnAni*, PlayState*);
-void func_809B0558(EnAni*, PlayState*);
-void func_809B05F0(EnAni*, PlayState*);
-void func_809B064C(EnAni*, PlayState*);
-void func_809B07F8(EnAni*, PlayState*);
-void EnAnubice_Die(EnAnubice*, PlayState*);
-void EnAnubice_FindFlameCircles(EnAnubice*, PlayState*);
-void EnAnubice_GoToHome(EnAnubice*, PlayState*);
-void EnAnubice_Idle(EnAnubice*, PlayState*);
-void EnAnubice_SetupDie(EnAnubice*, PlayState*);
-void EnAnubice_SetupIdle(EnAnubice*, PlayState*);
-void EnAnubice_SetupShootFireball(EnAnubice*, PlayState*);
-void EnAnubice_ShootFireball(EnAnubice*, PlayState*);
-void EnArrow_Fly(EnArrow*, PlayState*);
-void EnArrow_Shoot(EnArrow*, PlayState*);
-void func_809B45E0(EnArrow*, PlayState*);
-void func_809B4640(EnArrow*, PlayState*);
-void func_809B5670(EnAttackNiw*, PlayState*);
-void func_809B59B0(EnAttackNiw*, PlayState*);
-void func_809B5C18(EnAttackNiw*, PlayState*);
-void EnBb_Blue(EnBb*, PlayState*);
-void EnBb_Damage(EnBb*, PlayState*);
-void EnBb_Death(EnBb*, PlayState*);
-void EnBb_Down(EnBb*, PlayState*);
-void EnBb_FlameTrail(EnBb*, PlayState*);
-void EnBb_Green(EnBb*, PlayState*);
-void EnBb_Red(EnBb*, PlayState*);
-void EnBb_Stunned(EnBb*, PlayState*);
-void EnBb_White(EnBb*, PlayState*);
-void func_809BD84C(EnBigokuta*, PlayState*);
-void func_809BD8DC(EnBigokuta*, PlayState*);
-void func_809BDAE8(EnBigokuta*, PlayState*);
-void func_809BDB90(EnBigokuta*, PlayState*);
-void func_809BDC08(EnBigokuta*, PlayState*);
-void func_809BDF34(EnBigokuta*, PlayState*);
-void func_809BDFC8(EnBigokuta*, PlayState*);
-void func_809BE058(EnBigokuta*, PlayState*);
-void func_809BE180(EnBigokuta*, PlayState*);
-void func_809BE26C(EnBigokuta*, PlayState*);
-void func_809BE3E4(EnBigokuta*, PlayState*);
-void func_809BE4A4(EnBigokuta*, PlayState*);
-void func_809BE518(EnBigokuta*, PlayState*);
-void EnBili_ApproachPlayer(EnBili*, PlayState*);
-void EnBili_Burnt(EnBili*, PlayState*);
-void EnBili_Climb(EnBili*, PlayState*);
-void EnBili_Die(EnBili*, PlayState*);
-void EnBili_DischargeLightning(EnBili*, PlayState*);
-void EnBili_FloatIdle(EnBili*, PlayState*);
-void EnBili_Frozen(EnBili*, PlayState*);
-void EnBili_Recoil(EnBili*, PlayState*);
-void EnBili_SetNewHomeHeight(EnBili*, PlayState*);
-void EnBili_SpawnedFlyApart(EnBili*, PlayState*);
-void EnBili_Stunned(EnBili*, PlayState*);
-void func_809C1D60(EnBird*, PlayState*);
-void func_809C1E40(EnBird*, PlayState*);
-void EnBomBowMan_BlinkAwake(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_CheckBeatenDC(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_ChooseShowPrize(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_RunGame(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_SetupChooseShowPrize(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_SetupRunGame(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_SetupWaitAsleep(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_TalkAsleep(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_TalkNotBeatenDC(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_WaitAsleep(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_WaitNotBeatenDC(EnBomBowlMan*, PlayState*);
-void EnBomBowMan_WakeUp(EnBomBowlMan*, PlayState*);
-void EnBomBowlMan_BeginPlayGame(EnBomBowlMan*, PlayState*);
-void EnBomBowlMan_HandlePlayChoice(EnBomBowlMan*, PlayState*);
-void func_809C41FC(EnBomBowlMan*, PlayState*);
-void EnBox_AppearAnimation(EnBox*, PlayState*);
-void EnBox_AppearInit(EnBox*, PlayState*);
-void EnBox_AppearOnRoomClear(EnBox*, PlayState*);
-void EnBox_AppearOnSwitchFlag(EnBox*, PlayState*);
-void EnBox_Fall(EnBox*, PlayState*);
-void EnBox_FallOnSwitchFlag(EnBox*, PlayState*);
-void EnBox_Open(EnBox*, PlayState*);
-void EnBox_WaitOpen(EnBox*, PlayState*);
-void func_809C9700(EnBox*, PlayState*);
-void func_809CB054(EnBrob*, PlayState*);
-void func_809CB114(EnBrob*, PlayState*);
-void func_809CB218(EnBrob*, PlayState*);
-void func_809CB2B8(EnBrob*, PlayState*);
-void func_809CB354(EnBrob*, PlayState*);
-void func_809CB458(EnBrob*, PlayState*);
-void EnButte_FlyAround(EnButte*, PlayState*);
-void EnButte_FollowLink(EnButte*, PlayState*);
-void EnButte_TransformIntoFairy(EnButte*, PlayState*);
-void EnButte_WaitToDie(EnButte*, PlayState*);
-void func_809CE884(EnBw*, PlayState*);
-void func_809CEA24(EnBw*, PlayState*);
-void func_809CF7AC(EnBw*, PlayState*);
-void func_809CF984(EnBw*, PlayState*);
-void func_809CFC4C(EnBw*, PlayState*);
-void func_809CFF98(EnBw*, PlayState*);
-void func_809D014C(EnBw*, PlayState*);
-void func_809D0268(EnBw*, PlayState*);
-void func_809D0424(EnBw*, PlayState*);
-void func_809DF6BC(EnCow*, PlayState*);
-void func_809DF730(EnCow*, PlayState*);
-void func_809DF778(EnCow*, PlayState*);
-void func_809DF7D8(EnCow*, PlayState*);
-void func_809DF870(EnCow*, PlayState*);
-void func_809DF8FC(EnCow*, PlayState*);
-void func_809DF96C(EnCow*, PlayState*);
-void func_809DFA84(EnCow*, PlayState*);
-void EnCrow_Damaged(EnCrow*, PlayState*);
-void EnCrow_Die(EnCrow*, PlayState*);
-void EnCrow_DiveAttack(EnCrow*, PlayState*);
-void EnCrow_FlyIdle(EnCrow*, PlayState*);
-void EnCrow_Respawn(EnCrow*, PlayState*);
-void EnCrow_TurnAway(EnCrow*, PlayState*);
-void EnCs_Talk(EnCs*, PlayState*);
-void EnCs_Wait(EnCs*, PlayState*);
-void EnCs_Walk(EnCs*, PlayState*);
-void EnDaiku_EscapeRotate(EnDaiku*, PlayState*);
-void EnDaiku_EscapeRun(EnDaiku*, PlayState*);
-void EnDaiku_InitEscape(EnDaiku*, PlayState*);
-void EnDaiku_Jailed(EnDaiku*, PlayState*);
-void EnDaiku_TentIdle(EnDaiku*, PlayState*);
-void EnDaiku_WaitFreedom(EnDaiku*, PlayState*);
-void EnDaikuKakariko_Run(EnDaikuKakariko*, PlayState*);
-void EnDaikuKakariko_StopRunning(EnDaikuKakariko*, PlayState*);
-void EnDaikuKakariko_Talk(EnDaikuKakariko*, PlayState*);
-void EnDaikuKakariko_Wait(EnDaikuKakariko*, PlayState*);
-void EnDekubaba_DeadStickDrop(EnDekubaba*, PlayState*);
-void EnDekubaba_DecideLunge(EnDekubaba*, PlayState*);
-void EnDekubaba_Grow(EnDekubaba*, PlayState*);
-void EnDekubaba_Hit(EnDekubaba*, PlayState*);
-void EnDekubaba_Lunge(EnDekubaba*, PlayState*);
-void EnDekubaba_PrepareLunge(EnDekubaba*, PlayState*);
-void EnDekubaba_PrunedSomersault(EnDekubaba*, PlayState*);
-void EnDekubaba_PullBack(EnDekubaba*, PlayState*);
-void EnDekubaba_Recover(EnDekubaba*, PlayState*);
-void EnDekubaba_Retract(EnDekubaba*, PlayState*);
-void EnDekubaba_ShrinkDie(EnDekubaba*, PlayState*);
-void EnDekubaba_StunnedVertical(EnDekubaba*, PlayState*);
-void EnDekubaba_Sway(EnDekubaba*, PlayState*);
-void EnDekubaba_Wait(EnDekubaba*, PlayState*);
-void EnDekunuts_BeDamaged(EnDekunuts*, PlayState*);
-void EnDekunuts_BeStunned(EnDekunuts*, PlayState*);
-void EnDekunuts_BeginRun(EnDekunuts*, PlayState*);
-void EnDekunuts_Burrow(EnDekunuts*, PlayState*);
-void EnDekunuts_Die(EnDekunuts*, PlayState*);
-void EnDekunuts_Gasp(EnDekunuts*, PlayState*);
-void EnDekunuts_LookAround(EnDekunuts*, PlayState*);
-void EnDekunuts_Run(EnDekunuts*, PlayState*);
-void EnDekunuts_Stand(EnDekunuts*, PlayState*);
-void EnDekunuts_ThrowNut(EnDekunuts*, PlayState*);
-void EnDekunuts_Wait(EnDekunuts*, PlayState*);
-void EnDh_Attack(EnDh*, PlayState*);
-void EnDh_Burrow(EnDh*, PlayState*);
-void EnDh_Damage(EnDh*, PlayState*);
-void EnDh_Death(EnDh*, PlayState*);
-void EnDh_Retreat(EnDh*, PlayState*);
-void EnDh_Wait(EnDh*, PlayState*);
-void EnDh_Walk(EnDh*, PlayState*);
-void EnDha_Die(EnDha*, PlayState*);
-void EnDha_TakeDamage(EnDha*, PlayState*);
-void EnDha_Wait(EnDha*, PlayState*);
-void EnDivingGame_HandlePlayChoice(EnDivingGame*, PlayState*);
-void EnDivingGame_RupeeThrow(EnDivingGame*, PlayState*);
-void EnDivingGame_SetupRupeeThrow(EnDivingGame*, PlayState*);
-void EnDivingGame_SetupUnderwaterViewCs(EnDivingGame*, PlayState*);
-void EnDivingGame_Talk(EnDivingGame*, PlayState*);
-void func_809EDCB0(EnDivingGame*, PlayState*);
-void func_809EE048(EnDivingGame*, PlayState*);
-void func_809EE0FC(EnDivingGame*, PlayState*);
-void func_809EE194(EnDivingGame*, PlayState*);
-void func_809EE780(EnDivingGame*, PlayState*);
-void func_809EE800(EnDivingGame*, PlayState*);
-void func_809EE8F0(EnDivingGame*, PlayState*);
-void func_809EE96C(EnDivingGame*, PlayState*);
-void func_809EEA00(EnDivingGame*, PlayState*);
-void func_809EEA90(EnDivingGame*, PlayState*);
-void func_809EEAF8(EnDivingGame*, PlayState*);
-void EnDns_Burrow(EnDns*, PlayState*);
-void EnDns_Idle(EnDns*, PlayState*);
-void EnDns_PostBurrow(EnDns*, PlayState*);
-void EnDns_Sale(EnDns*, PlayState*);
-void EnDns_SetupBurrow(EnDns*, PlayState*);
-void EnDns_SetupIdle(EnDns*, PlayState*);
-void EnDns_SetupNoSaleBurrow(EnDns*, PlayState*);
-void EnDns_SetupSale(EnDns*, PlayState*);
-void EnDns_Talk(EnDns*, PlayState*);
-void EnDntJiji_Burrow(EnDntJiji*, PlayState*);
-void EnDntJiji_Cower(EnDntJiji*, PlayState*);
-void EnDntJiji_GivePrize(EnDntJiji*, PlayState*);
-void EnDntJiji_Hide(EnDntJiji*, PlayState*);
-void EnDntJiji_Return(EnDntJiji*, PlayState*);
-void EnDntJiji_SetFlower(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupBurrow(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupCower(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupGivePrize(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupHide(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupReturn(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupTalk(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupUnburrow(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupUp(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupWait(EnDntJiji*, PlayState*);
-void EnDntJiji_SetupWalk(EnDntJiji*, PlayState*);
-void EnDntJiji_Talk(EnDntJiji*, PlayState*);
-void EnDntJiji_Unburrow(EnDntJiji*, PlayState*);
-void EnDntJiji_Up(EnDntJiji*, PlayState*);
-void EnDntJiji_Wait(EnDntJiji*, PlayState*);
-void EnDntJiji_Walk(EnDntJiji*, PlayState*);
-void EnDntNomal_SetFlower(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageAttack(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageCelebrate(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageDance(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageHide(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageUnburrow(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageUp(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupStageWait(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupTargetGivePrize(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupTargetTalk(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupTargetUnburrow(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupTargetWait(EnDntNomal*, PlayState*);
-void EnDntNomal_SetupTargetWalk(EnDntNomal*, PlayState*);
-void EnDntNomal_StageAttack(EnDntNomal*, PlayState*);
-void EnDntNomal_StageAttackHide(EnDntNomal*, PlayState*);
-void EnDntNomal_StageCelebrate(EnDntNomal*, PlayState*);
-void EnDntNomal_StageDance(EnDntNomal*, PlayState*);
-void EnDntNomal_StageHide(EnDntNomal*, PlayState*);
-void EnDntNomal_StageReturn(EnDntNomal*, PlayState*);
-void EnDntNomal_StageSetupReturn(EnDntNomal*, PlayState*);
-void EnDntNomal_StageUnburrow(EnDntNomal*, PlayState*);
-void EnDntNomal_StageUp(EnDntNomal*, PlayState*);
-void EnDntNomal_StageWait(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetBurrow(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetFacePlayer(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetGivePrize(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetReturn(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetTalk(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetUnburrow(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetWait(EnDntNomal*, PlayState*);
-void EnDntNomal_TargetWalk(EnDntNomal*, PlayState*);
-void EnDntNomal_WaitForObject(EnDntNomal*, PlayState*);
-void func_809F73AC(EnDodojr*, PlayState*);
-void func_809F74C4(EnDodojr*, PlayState*);
-void func_809F758C(EnDodojr*, PlayState*);
-void func_809F768C(EnDodojr*, PlayState*);
-void func_809F773C(EnDodojr*, PlayState*);
-void func_809F77AC(EnDodojr*, PlayState*);
-void func_809F784C(EnDodojr*, PlayState*);
-void func_809F786C(EnDodojr*, PlayState*);
-void func_809F78EC(EnDodojr*, PlayState*);
-void func_809F799C(EnDodojr*, PlayState*);
-void func_809F7A00(EnDodojr*, PlayState*);
-void func_809F7AB8(EnDodojr*, PlayState*);
-void func_809F7B3C(EnDodojr*, PlayState*);
-void func_809F7BE4(EnDodojr*, PlayState*);
-void func_809F7C48(EnDodojr*, PlayState*);
-void EnDodongo_BreatheFire(EnDodongo*, PlayState*);
-void EnDodongo_Death(EnDodongo*, PlayState*);
-void EnDodongo_EndBreatheFire(EnDodongo*, PlayState*);
-void EnDodongo_Idle(EnDodongo*, PlayState*);
-void EnDodongo_Stunned(EnDodongo*, PlayState*);
-void EnDodongo_SwallowBomb(EnDodongo*, PlayState*);
-void EnDodongo_SweepTail(EnDodongo*, PlayState*);
-void EnDodongo_Walk(EnDodongo*, PlayState*);
-void EnDog_ChooseMovement(EnDog*, PlayState*);
-void EnDog_FaceLink(EnDog*, PlayState*);
-void EnDog_FollowPath(EnDog*, PlayState*);
-void EnDog_FollowPlayer(EnDog*, PlayState*);
-void EnDog_RunAway(EnDog*, PlayState*);
-void EnDog_Wait(EnDog*, PlayState*);
-void EnDoor_AjarClose(EnDoor*, PlayState*);
-void EnDoor_AjarOpen(EnDoor*, PlayState*);
-void EnDoor_AjarWait(EnDoor*, PlayState*);
-void EnDoor_Check(EnDoor*, PlayState*);
-void EnDoor_Idle(EnDoor*, PlayState*);
-void EnDoor_Open(EnDoor*, PlayState*);
-void EnDoor_SetupType(EnDoor*, PlayState*);
-void EnDoor_WaitForCheck(EnDoor*, PlayState*);
-void EnDs_BrewOddPotion1(EnDs*, PlayState*);
-void EnDs_BrewOddPotion2(EnDs*, PlayState*);
-void EnDs_BrewOddPotion3(EnDs*, PlayState*);
-void EnDs_DisplayOddPotionText(EnDs*, PlayState*);
-void EnDs_GiveBluePotion(EnDs*, PlayState*);
-void EnDs_GiveOddPotion(EnDs*, PlayState*);
-void EnDs_OfferBluePotion(EnDs*, PlayState*);
-void EnDs_OfferOddPotion(EnDs*, PlayState*);
-void EnDs_Talk(EnDs*, PlayState*);
-void EnDs_TalkAfterBrewOddPotion(EnDs*, PlayState*);
-void EnDs_TalkAfterGiveOddPotion(EnDs*, PlayState*);
-void EnDs_TalkNoEmptyBottle(EnDs*, PlayState*);
-void EnDs_Wait(EnDs*, PlayState*);
-void func_809FE3B4(EnDu*, PlayState*);
-void func_809FE3C0(EnDu*, PlayState*);
-void func_809FE4A4(EnDu*, PlayState*);
-void func_809FE638(EnDu*, PlayState*);
-void func_809FE6CC(EnDu*, PlayState*);
-void func_809FE740(EnDu*, PlayState*);
-void func_809FE798(EnDu*, PlayState*);
-void func_809FE890(EnDu*, PlayState*);
-void func_809FEB08(EnDu*, PlayState*);
-void func_809FEC14(EnDu*, PlayState*);
-void func_809FEC70(EnDu*, PlayState*);
-void func_809FECE4(EnDu*, PlayState*);
-void EnEiyer_Ambush(EnEiyer*, PlayState*);
-void EnEiyer_AppearFromGround(EnEiyer*, PlayState*);
-void EnEiyer_CircleUnderground(EnEiyer*, PlayState*);
-void EnEiyer_Dead(EnEiyer*, PlayState*);
-void EnEiyer_Die(EnEiyer*, PlayState*);
-void EnEiyer_DiveAttack(EnEiyer*, PlayState*);
-void EnEiyer_Glide(EnEiyer*, PlayState*);
-void EnEiyer_Hurt(EnEiyer*, PlayState*);
-void EnEiyer_Inactive(EnEiyer*, PlayState*);
-void EnEiyer_Land(EnEiyer*, PlayState*);
-void EnEiyer_StartAttack(EnEiyer*, PlayState*);
-void EnEiyer_Stunned(EnEiyer*, PlayState*);
-void EnEiyer_WanderUnderground(EnEiyer*, PlayState*);
-void func_80A0329C(EnElf*, PlayState*);
-void func_80A0353C(EnElf*, PlayState*);
-void func_80A03604(EnElf*, PlayState*);
-void func_80A03610(EnElf*, PlayState*);
-void func_80A03814(EnElf*, PlayState*);
-void func_80A03990(EnElf*, PlayState*);
-void func_80A03CF8(EnElf*, PlayState*);
-void EnFd_JumpToGround(EnFd*, PlayState*);
-void EnFd_Land(EnFd*, PlayState*);
-void EnFd_Reappear(EnFd*, PlayState*);
-void EnFd_Run(EnFd*, PlayState*);
-void EnFd_SpinAndGrow(EnFd*, PlayState*);
-void EnFd_SpinAndSpawnFire(EnFd*, PlayState*);
-void EnFd_WaitForCore(EnFd*, PlayState*);
-void EnFirefly_Die(EnFirefly*, PlayState*);
-void EnFirefly_DisturbDiveAttack(EnFirefly*, PlayState*);
-void EnFirefly_DiveAttack(EnFirefly*, PlayState*);
-void EnFirefly_Fall(EnFirefly*, PlayState*);
-void EnFirefly_FlyAway(EnFirefly*, PlayState*);
-void EnFirefly_FlyIdle(EnFirefly*, PlayState*);
-void EnFirefly_FrozenFall(EnFirefly*, PlayState*);
-void EnFirefly_Perch(EnFirefly*, PlayState*);
-void EnFirefly_Rebound(EnFirefly*, PlayState*);
-void EnFirefly_Stunned(EnFirefly*, PlayState*);
-void EnFish_Dropped_Fall(EnFish*, PlayState*);
-void EnFish_Dropped_FlopOnGround(EnFish*, PlayState*);
-void EnFish_Dropped_SwimAway(EnFish*, PlayState*);
-void EnFish_Respawning_ApproachPlayer(EnFish*, PlayState*);
-void EnFish_Respawning_FleePlayer(EnFish*, PlayState*);
-void EnFish_Respawning_FollowChild(EnFish*, PlayState*);
-void EnFish_Respawning_SlowDown(EnFish*, PlayState*);
-void EnFish_Unique_SwimIdle(EnFish*, PlayState*);
-void EnFr_Activate(EnFr*, PlayState*);
-void EnFr_ActivateCheckFrogSong(EnFr*, PlayState*);
-void EnFr_ChildSong(EnFr*, PlayState*);
-void EnFr_ChildSongFirstTime(EnFr*, PlayState*);
-void EnFr_ChooseJumpFromLogSpot(EnFr*, PlayState*);
-void EnFr_ContinueFrogSong(EnFr*, PlayState*);
-void EnFr_Deactivate(EnFr*, PlayState*);
-void EnFr_GiveReward(EnFr*, PlayState*);
-void EnFr_Idle(EnFr*, PlayState*);
-void EnFr_JumpingBackIntoWater(EnFr*, PlayState*);
-void EnFr_JumpingOutOfWater(EnFr*, PlayState*);
-void EnFr_JumpingUp(EnFr*, PlayState*);
-void EnFr_ListeningToOcarinaNotes(EnFr*, PlayState*);
-void EnFr_OrientOnLogSpot(EnFr*, PlayState*);
-void EnFr_PrintTextBox(EnFr*, PlayState*);
-void EnFr_SetIdle(EnFr*, PlayState*);
-void EnFr_SetReward(EnFr*, PlayState*);
-void EnFr_SetupFrogSong(EnFr*, PlayState*);
-void EnFr_SetupJumpingOutOfWater(EnFr*, PlayState*);
-void EnFr_TalkBeforeFrogSong(EnFr*, PlayState*);
-void EnFr_TalkBeforeReward(EnFr*, PlayState*);
-void func_80A1BE98(EnFr*, PlayState*);
-void EnFu_TeachSong(EnFu*, PlayState*);
-void EnFu_WaitAdult(EnFu*, PlayState*);
-void EnFu_WaitChild(EnFu*, PlayState*);
-void EnFu_WaitForPlayback(EnFu*, PlayState*);
-void func_80A1DB60(EnFu*, PlayState*);
-void func_80A1DBA0(EnFu*, PlayState*);
-void func_80A1DBD4(EnFu*, PlayState*);
-void EnFw_Bounce(EnFw*, PlayState*);
-void EnFw_JumpToParentInitPos(EnFw*, PlayState*);
-void EnFw_Run(EnFw*, PlayState*);
-void EnFw_TurnToParentInitPos(EnFw*, PlayState*);
-void func_80A2F83C(EnGb*, PlayState*);
-void func_80A2F94C(EnGb*, PlayState*);
-void func_80A2F9C0(EnGb*, PlayState*);
-void func_80A2FA50(EnGb*, PlayState*);
-void func_80A2FB40(EnGb*, PlayState*);
-void func_80A2FBB0(EnGb*, PlayState*);
-void func_80A2FC0C(EnGb*, PlayState*);
-void func_80A2FC70(EnGb*, PlayState*);
-void EnGe1_BeginGame_Archery(EnGe1*, PlayState*);
-void EnGe1_BeginGiveItem_Archery(EnGe1*, PlayState*);
-void EnGe1_CheckForCard_GTGGuard(EnGe1*, PlayState*);
-void EnGe1_CheckGate_GateOp(EnGe1*, PlayState*);
-void EnGe1_GetReaction_GateGuard(EnGe1*, PlayState*);
-void EnGe1_GetReaction_ValleyFloor(EnGe1*, PlayState*);
-void EnGe1_KickPlayer(EnGe1*, PlayState*);
-void EnGe1_OpenGate_GateOp(EnGe1*, PlayState*);
-void EnGe1_Open_GTGGuard(EnGe1*, PlayState*);
-void EnGe1_RefuseEntryTooPoor_GTGGuard(EnGe1*, PlayState*);
-void EnGe1_SetNormalText(EnGe1*, PlayState*);
-void EnGe1_SetupOpen_GTGGuard(EnGe1*, PlayState*);
-void EnGe1_SetupWait_Archery(EnGe1*, PlayState*);
-void EnGe1_TalkAfterGame_Archery(EnGe1*, PlayState*);
-void EnGe1_TalkNoPrize_Archery(EnGe1*, PlayState*);
-void EnGe1_TalkOfferPlay_Archery(EnGe1*, PlayState*);
-void EnGe1_TalkTooPoor_Archery(EnGe1*, PlayState*);
-void EnGe1_TalkWinPrize_Archery(EnGe1*, PlayState*);
-void EnGe1_WaitDoNothing(EnGe1*, PlayState*);
-void EnGe1_WaitTillItemGiven_Archery(EnGe1*, PlayState*);
-void EnGe1_WaitTillOpened_GTGGuard(EnGe1*, PlayState*);
-void EnGe1_WaitUntilGateOpened_GateOp(EnGe1*, PlayState*);
-void EnGe1_Wait_Archery(EnGe1*, PlayState*);
-void EnGe1_WatchForAndSensePlayer(EnGe1*, PlayState*);
-void EnGe1_WatchForPlayerFrontOnly(EnGe1*, PlayState*);
-void EnGe2_ForceTalk(EnGe2*, PlayState*);
-void EnGe2_GiveCard(EnGe2*, PlayState*);
-void EnGe2_SetActionAfterTalk(EnGe2*, PlayState*);
-void EnGe2_WaitLookAtPlayer(EnGe2*, PlayState*);
-void EnGe2_WaitTillCardGiven(EnGe2*, PlayState*);
-void EnGe3_ForceTalk(EnGe3*, PlayState*);
-void EnGe3_GiveCard(EnGe3*, PlayState*);
-void EnGe3_Wait(EnGe3*, PlayState*);
-void EnGe3_WaitLookAtPlayer(EnGe3*, PlayState*);
-void EnGe3_WaitTillCardGiven(EnGe3*, PlayState*);
-void EnGeldB_Advance(EnGeldB*, PlayState*);
-void EnGeldB_Block(EnGeldB*, PlayState*);
-void EnGeldB_Circle(EnGeldB*, PlayState*);
-void EnGeldB_Damaged(EnGeldB*, PlayState*);
-void EnGeldB_Defeated(EnGeldB*, PlayState*);
-void EnGeldB_Flee(EnGeldB*, PlayState*);
-void EnGeldB_Jump(EnGeldB*, PlayState*);
-void EnGeldB_Pivot(EnGeldB*, PlayState*);
-void EnGeldB_Ready(EnGeldB*, PlayState*);
-void EnGeldB_RollBack(EnGeldB*, PlayState*);
-void EnGeldB_RollForward(EnGeldB*, PlayState*);
-void EnGeldB_Sidestep(EnGeldB*, PlayState*);
-void EnGeldB_Slash(EnGeldB*, PlayState*);
-void EnGeldB_SpinAttack(EnGeldB*, PlayState*);
-void EnGeldB_SpinDodge(EnGeldB*, PlayState*);
-void EnGeldB_Stunned(EnGeldB*, PlayState*);
-void EnGeldB_Wait(EnGeldB*, PlayState*);
-void EnGirlA_Noop(EnGirlA*, PlayState*);
-void EnGm_ProcessChoiceIndex(EnGm*, PlayState*);
-void func_80A3DB04(EnGm*, PlayState*);
-void func_80A3DBF4(EnGm*, PlayState*);
-void func_80A3DC44(EnGm*, PlayState*);
-void func_80A3DD7C(EnGm*, PlayState*);
-void func_80A3DF00(EnGm*, PlayState*);
-void func_80A3DF60(EnGm*, PlayState*);
-void EnGo_BiggoronActionFunc(EnGo*, PlayState*);
-void EnGo_CurledUp(EnGo*, PlayState*);
-void EnGo_Eyedrops(EnGo*, PlayState*);
-void EnGo_FireGenericActionFunc(EnGo*, PlayState*);
-void EnGo_GetItem(EnGo*, PlayState*);
-void EnGo_GoronLinkRolling(EnGo*, PlayState*);
-void EnGo_StopRolling(EnGo*, PlayState*);
-void EnGo_WakeUp(EnGo*, PlayState*);
-void func_80A3FEB4(EnGo*, PlayState*);
-void func_80A4008C(EnGo*, PlayState*);
-void func_80A40494(EnGo*, PlayState*);
-void func_80A405CC(EnGo*, PlayState*);
-void func_80A408D8(EnGo*, PlayState*);
-void func_80A40A54(EnGo*, PlayState*);
-void func_80A40B1C(EnGo*, PlayState*);
-void func_80A40C78(EnGo*, PlayState*);
-void func_80A40DCC(EnGo*, PlayState*);
-void EnGo2_BiggoronEyedrops(EnGo2*, PlayState*);
-void EnGo2_ContinueRolling(EnGo2*, PlayState*);
-void EnGo2_CurledUp(EnGo2*, PlayState*);
-void EnGo2_GoronDmtBombFlowerAnimation(EnGo2*, PlayState*);
-void EnGo2_GoronFireGenericAction(EnGo2*, PlayState*);
-void EnGo2_GoronLinkStopRolling(EnGo2*, PlayState*);
-void EnGo2_GoronRollingBigContinueRolling(EnGo2*, PlayState*);
-void EnGo2_GroundRolling(EnGo2*, PlayState*);
-void EnGo2_ReverseRolling(EnGo2*, PlayState*);
-void EnGo2_SetGetItem(EnGo2*, PlayState*);
-void EnGo2_SetupGetItem(EnGo2*, PlayState*);
-void EnGo2_SlowRolling(EnGo2*, PlayState*);
-void func_80A46B40(EnGo2*, PlayState*);
-void EnGoma_BossLimb(EnGoma*, PlayState*);
-void EnGoma_ChasePlayer(EnGoma*, PlayState*);
-void EnGoma_Dead(EnGoma*, PlayState*);
-void EnGoma_Debris(EnGoma*, PlayState*);
-void EnGoma_Die(EnGoma*, PlayState*);
-void EnGoma_Egg(EnGoma*, PlayState*);
-void EnGoma_EggFallToGround(EnGoma*, PlayState*);
-void EnGoma_Flee(EnGoma*, PlayState*);
-void EnGoma_Hatch(EnGoma*, PlayState*);
-void EnGoma_Hurt(EnGoma*, PlayState*);
-void EnGoma_Jump(EnGoma*, PlayState*);
-void EnGoma_Land(EnGoma*, PlayState*);
-void EnGoma_PrepareJump(EnGoma*, PlayState*);
-void EnGoma_Stand(EnGoma*, PlayState*);
-void EnGoma_Stunned(EnGoma*, PlayState*);
-void func_80A50518(EnGuest*, PlayState*);
-void func_80A5057C(EnGuest*, PlayState*);
-void EnHeishi2_DoNothing1(EnHeishi2*, PlayState*);
-void EnHeishi_DoNothing2(EnHeishi2*, PlayState*);
-void func_80A531E4(EnHeishi2*, PlayState*);
-void func_80A53278(EnHeishi2*, PlayState*);
-void func_80A5344C(EnHeishi2*, PlayState*);
-void func_80A53538(EnHeishi2*, PlayState*);
-void func_80A535BC(EnHeishi2*, PlayState*);
-void func_80A53638(EnHeishi2*, PlayState*);
-void func_80A5372C(EnHeishi2*, PlayState*);
-void func_80A53850(EnHeishi2*, PlayState*);
-void func_80A53908(EnHeishi2*, PlayState*);
-void func_80A5399C(EnHeishi2*, PlayState*);
-void func_80A53AD4(EnHeishi2*, PlayState*);
-void func_80A53C0C(EnHeishi2*, PlayState*);
-void func_80A53C90(EnHeishi2*, PlayState*);
-void func_80A53D0C(EnHeishi2*, PlayState*);
-void func_80A53DF8(EnHeishi2*, PlayState*);
-void func_80A53F30(EnHeishi2*, PlayState*);
-void func_80A54038(EnHeishi2*, PlayState*);
-void func_80A540C0(EnHeishi2*, PlayState*);
-void func_80A541FC(EnHeishi2*, PlayState*);
-void func_80A5427C(EnHeishi2*, PlayState*);
-void func_80A54320(EnHeishi2*, PlayState*);
-void func_80A543A0(EnHeishi2*, PlayState*);
-void func_80A544AC(EnHeishi2*, PlayState*);
-void func_80A5455C(EnHeishi2*, PlayState*);
-void func_80A546DC(EnHeishi2*, PlayState*);
-void func_80A5475C(EnHeishi2*, PlayState*);
-void func_80A54954(EnHeishi2*, PlayState*);
-void func_80A549E8(EnHeishi2*, PlayState*);
-void EnHeishi3_CatchStart(EnHeishi3*, PlayState*);
-void EnHeishi3_ResetAnimationToIdle(EnHeishi3*, PlayState*);
-void EnHeishi3_SetupGuardType(EnHeishi3*, PlayState*);
-void EnHeishi3_StandSentinelInCastle(EnHeishi3*, PlayState*);
-void EnHeishi3_StandSentinelInGrounds(EnHeishi3*, PlayState*);
-void func_80A55BD4(EnHeishi3*, PlayState*);
-void func_80A55D00(EnHeishi3*, PlayState*);
-void EnHeishi4_MarketSneak(EnHeishi4*, PlayState*);
-void func_80A56328(EnHeishi4*, PlayState*);
-void func_80A563BC(EnHeishi4*, PlayState*);
-void func_80A56544(EnHeishi4*, PlayState*);
-void func_80A56614(EnHeishi4*, PlayState*);
-void func_80A5673C(EnHeishi4*, PlayState*);
-void func_80A56874(EnHeishi4*, PlayState*);
-void func_80A56900(EnHeishi4*, PlayState*);
-void func_80A56994(EnHeishi4*, PlayState*);
-void func_80A56A50(EnHeishi4*, PlayState*);
-void func_80A56ACC(EnHeishi4*, PlayState*);
-void func_80A56B40(EnHeishi4*, PlayState*);
-void EnHintnuts_BeginFreeze(EnHintnuts*, PlayState*);
-void EnHintnuts_BeginRun(EnHintnuts*, PlayState*);
-void EnHintnuts_Burrow(EnHintnuts*, PlayState*);
-void EnHintnuts_Freeze(EnHintnuts*, PlayState*);
-void EnHintnuts_Leave(EnHintnuts*, PlayState*);
-void EnHintnuts_LookAround(EnHintnuts*, PlayState*);
-void EnHintnuts_Run(EnHintnuts*, PlayState*);
-void EnHintnuts_Stand(EnHintnuts*, PlayState*);
-void EnHintnuts_Talk(EnHintnuts*, PlayState*);
-void EnHintnuts_ThrowNut(EnHintnuts*, PlayState*);
-void EnHintnuts_Wait(EnHintnuts*, PlayState*);
-void func_80A6F1A4(EnHs2*, PlayState*);
-void EnHy_DoNothing(EnHy*, PlayState*);
-void EnHy_InitImpl(EnHy*, PlayState*);
-void func_80A710F8(EnHy*, PlayState*);
-void func_80A711B4(EnHy*, PlayState*);
-void func_80A7127C(EnHy*, PlayState*);
-void func_80A712C0(EnHy*, PlayState*);
-void func_80A7134C(EnHy*, PlayState*);
-void func_80A714C4(EnHy*, PlayState*);
-void func_80A71530(EnHy*, PlayState*);
-void func_80A747C0(EnIk*, PlayState*);
-void func_80A7492C(EnIk*, PlayState*);
-void func_80A74BA4(EnIk*, PlayState*);
-void func_80A74EBC(EnIk*, PlayState*);
-void func_80A7510C(EnIk*, PlayState*);
-void func_80A75260(EnIk*, PlayState*);
-void func_80A7545C(EnIk*, PlayState*);
-void func_80A75530(EnIk*, PlayState*);
-void func_80A7567C(EnIk*, PlayState*);
-void func_80A758B0(EnIk*, PlayState*);
-void func_80A75A38(EnIk*, PlayState*);
-void func_80A79FB0(EnIn*, PlayState*);
-void func_80A7A304(EnIn*, PlayState*);
-void func_80A7A4BC(EnIn*, PlayState*);
-void func_80A7A4C8(EnIn*, PlayState*);
-void func_80A7A568(EnIn*, PlayState*);
-void func_80A7A770(EnIn*, PlayState*);
-void func_80A7A848(EnIn*, PlayState*);
-void func_80A7A940(EnIn*, PlayState*);
-void func_80A7AA40(EnIn*, PlayState*);
-void func_80A7ABD4(EnIn*, PlayState*);
-void func_80A7AE84(EnIn*, PlayState*);
-void func_80A7AEF0(EnIn*, PlayState*);
-void func_80A7B018(EnIn*, PlayState*);
-void func_80A7B024(EnIn*, PlayState*);
-void func_80A7C3F4(EnInsect*, PlayState*);
-void func_80A7C5EC(EnInsect*, PlayState*);
-void func_80A7C86C(EnInsect*, PlayState*);
-void func_80A7CAD0(EnInsect*, PlayState*);
-void func_80A7CC3C(EnInsect*, PlayState*);
-void func_80A7CEC0(EnInsect*, PlayState*);
-void func_80A7D26C(EnInsect*, PlayState*);
-void func_80A7D460(EnInsect*, PlayState*);
-void EnJj_BeginCutscene(EnJj*, PlayState*);
-void EnJj_OpenMouth(EnJj*, PlayState*);
-void EnJj_RemoveDust(EnJj*, PlayState*);
-void EnJj_WaitForFish(EnJj*, PlayState*);
-void EnJj_WaitToOpenMouth(EnJj*, PlayState*);
-void func_80A8F660(EnKakasi*, PlayState*);
-void func_80A8F75C(EnKakasi*, PlayState*);
-void func_80A8F8D0(EnKakasi*, PlayState*);
-void func_80A8F9C8(EnKakasi*, PlayState*);
-void func_80A8FAA4(EnKakasi*, PlayState*);
-void func_80A8FBB8(EnKakasi*, PlayState*);
-void func_80A90264(EnKakasi2*, PlayState*);
-void func_80A904D8(EnKakasi2*, PlayState*);
-void func_80A90578(EnKakasi2*, PlayState*);
-void func_80A9062C(EnKakasi2*, PlayState*);
-void func_80A906C4(EnKakasi2*, PlayState*);
-void func_80A911F0(EnKakasi3*, PlayState*);
-void func_80A91284(EnKakasi3*, PlayState*);
-void func_80A91348(EnKakasi3*, PlayState*);
-void func_80A915B8(EnKakasi3*, PlayState*);
-void func_80A91620(EnKakasi3*, PlayState*);
-void func_80A91760(EnKakasi3*, PlayState*);
-void func_80A917FC(EnKakasi3*, PlayState*);
-void func_80A9187C(EnKakasi3*, PlayState*);
-void func_80A918E4(EnKakasi3*, PlayState*);
-void func_80A91A90(EnKakasi3*, PlayState*);
-void EnKarebaba_Awaken(EnKarebaba*, PlayState*);
-void EnKarebaba_Dead(EnKarebaba*, PlayState*);
-void EnKarebaba_DeadItemDrop(EnKarebaba*, PlayState*);
-void EnKarebaba_Dying(EnKarebaba*, PlayState*);
-void EnKarebaba_Grow(EnKarebaba*, PlayState*);
-void EnKarebaba_Idle(EnKarebaba*, PlayState*);
-void EnKarebaba_Regrow(EnKarebaba*, PlayState*);
-void EnKarebaba_Retract(EnKarebaba*, PlayState*);
-void EnKarebaba_Spin(EnKarebaba*, PlayState*);
-void EnKarebaba_Upright(EnKarebaba*, PlayState*);
-void func_80A99048(EnKo*, PlayState*);
-void func_80A99384(EnKo*, PlayState*);
-void func_80A99438(EnKo*, PlayState*);
-void func_80A99504(EnKo*, PlayState*);
-void func_80A99560(EnKo*, PlayState*);
-void func_80A995CC(EnKo*, PlayState*);
-void EnKz_Mweep(EnKz*, PlayState*);
-void EnKz_PreMweepWait(EnKz*, PlayState*);
-void EnKz_SetupGetItem(EnKz*, PlayState*);
-void EnKz_SetupMweep(EnKz*, PlayState*);
-void EnKz_StartTimer(EnKz*, PlayState*);
-void EnKz_StopMweep(EnKz*, PlayState*);
-void EnKz_Wait(EnKz*, PlayState*);
-void EnMa1_DoNothing(EnMa1*, PlayState*);
-void func_80AA0D88(EnMa1*, PlayState*);
-void func_80AA0EA0(EnMa1*, PlayState*);
-void func_80AA0EFC(EnMa1*, PlayState*);
-void func_80AA0F44(EnMa1*, PlayState*);
-void func_80AA106C(EnMa1*, PlayState*);
-void func_80AA10EC(EnMa1*, PlayState*);
-void func_80AA1150(EnMa1*, PlayState*);
-void func_80AA2018(EnMa2*, PlayState*);
-void func_80AA204C(EnMa2*, PlayState*);
-void func_80AA20E4(EnMa2*, PlayState*);
-void func_80AA21C8(EnMa2*, PlayState*);
-void func_80AA3200(EnMa3*, PlayState*);
-void EnMb_ClubAttack(EnMb*, PlayState*);
-void EnMb_ClubDamaged(EnMb*, PlayState*);
-void EnMb_ClubDamagedWhileKneeling(EnMb*, PlayState*);
-void EnMb_ClubDead(EnMb*, PlayState*);
-void EnMb_ClubWaitAfterAttack(EnMb*, PlayState*);
-void EnMb_ClubWaitPlayerNear(EnMb*, PlayState*);
-void EnMb_SpearDamaged(EnMb*, PlayState*);
-void EnMb_SpearDead(EnMb*, PlayState*);
-void EnMb_SpearEndChargeQuick(EnMb*, PlayState*);
-void EnMb_SpearGuardLookAround(EnMb*, PlayState*);
-void EnMb_SpearGuardPrepareAndCharge(EnMb*, PlayState*);
-void EnMb_SpearGuardWalk(EnMb*, PlayState*);
-void EnMb_SpearPatrolEndCharge(EnMb*, PlayState*);
-void EnMb_SpearPatrolImmediateCharge(EnMb*, PlayState*);
-void EnMb_SpearPatrolPrepareAndCharge(EnMb*, PlayState*);
-void EnMb_SpearPatrolTurnTowardsWaypoint(EnMb*, PlayState*);
-void EnMb_SpearPatrolWalkTowardsWaypoint(EnMb*, PlayState*);
-void EnMb_Stunned(EnMb*, PlayState*);
-void func_80AAB874(EnMd*, PlayState*);
-void func_80AAB8F8(EnMd*, PlayState*);
-void func_80AAB948(EnMd*, PlayState*);
-void func_80AABC10(EnMd*, PlayState*);
-void func_80AABD0C(EnMd*, PlayState*);
-void EnMk_Wait(EnMk*, PlayState*);
-void func_80AACA40(EnMk*, PlayState*);
-void func_80AACA94(EnMk*, PlayState*);
-void func_80AACB14(EnMk*, PlayState*);
-void func_80AACB6C(EnMk*, PlayState*);
-void func_80AACBAC(EnMk*, PlayState*);
-void func_80AACC04(EnMk*, PlayState*);
-void func_80AACCA0(EnMk*, PlayState*);
-void func_80AACD48(EnMk*, PlayState*);
-void func_80AACE2C(EnMk*, PlayState*);
-void func_80AACEE8(EnMk*, PlayState*);
-void func_80AACFA0(EnMk*, PlayState*);
-void func_80AAD014(EnMk*, PlayState*);
-void func_80AAE224(EnMm*, PlayState*);
-void func_80AAE294(EnMm*, PlayState*);
-void func_80AAE50C(EnMm*, PlayState*);
-void func_80AAE598(EnMm*, PlayState*);
-void func_80AAF2BC(EnMm2*, PlayState*);
-void func_80AAF330(EnMm2*, PlayState*);
-void func_80AAF57C(EnMm2*, PlayState*);
-void func_80AAF668(EnMm2*, PlayState*);
-void EnMs_Sell(EnMs*, PlayState*);
-void EnMs_Talk(EnMs*, PlayState*);
-void EnMs_TalkAfterPurchase(EnMs*, PlayState*);
-void EnMs_Wait(EnMs*, PlayState*);
-void EnMu_Pose(EnMu*, PlayState*);
-void EnNiw_ResetAction(EnNiw*, PlayState*);
-void func_80AB6324(EnNiw*, PlayState*);
-void func_80AB63A8(EnNiw*, PlayState*);
-void func_80AB6450(EnNiw*, PlayState*);
-void func_80AB6570(EnNiw*, PlayState*);
-void func_80AB6A38(EnNiw*, PlayState*);
-void func_80AB6BF8(EnNiw*, PlayState*);
-void func_80AB6D08(EnNiw*, PlayState*);
-void func_80AB6EB4(EnNiw*, PlayState*);
-void func_80AB6F04(EnNiw*, PlayState*);
-void func_80AB70A0(EnNiw*, PlayState*);
-void func_80AB70F8(EnNiw*, PlayState*);
-void func_80AB714C(EnNiw*, PlayState*);
-void func_80AB7204(EnNiw*, PlayState*);
-void func_80AB7290(EnNiw*, PlayState*);
-void func_80AB7328(EnNiw*, PlayState*);
-void func_80AB7420(EnNiw*, PlayState*);
-void EnNiwGirl_Jump(EnNiwGirl*, PlayState*);
-void EnNiwGirl_Talk(EnNiwGirl*, PlayState*);
-void func_80AB9210(EnNiwGirl*, PlayState*);
-void func_80AB94D0(EnNiwGirl*, PlayState*);
-void func_80AB9F24(EnNiwLady*, PlayState*);
-void func_80ABA21C(EnNiwLady*, PlayState*);
-void func_80ABA244(EnNiwLady*, PlayState*);
-void func_80ABA654(EnNiwLady*, PlayState*);
-void func_80ABA778(EnNiwLady*, PlayState*);
-void func_80ABA878(EnNiwLady*, PlayState*);
-void func_80ABAA9C(EnNiwLady*, PlayState*);
-void func_80ABAB08(EnNiwLady*, PlayState*);
-void func_80ABAC00(EnNiwLady*, PlayState*);
-void func_80ABAC84(EnNiwLady*, PlayState*);
-void func_80ABAD38(EnNiwLady*, PlayState*);
-void func_80ABAD7C(EnNiwLady*, PlayState*);
-void EnOkuta_Appear(EnOkuta*, PlayState*);
-void EnOkuta_Die(EnOkuta*, PlayState*);
-void EnOkuta_Freeze(EnOkuta*, PlayState*);
-void EnOkuta_Hide(EnOkuta*, PlayState*);
-void EnOkuta_ProjectileFly(EnOkuta*, PlayState*);
-void EnOkuta_Shoot(EnOkuta*, PlayState*);
-void EnOkuta_WaitToAppear(EnOkuta*, PlayState*);
-void EnOkuta_WaitToDie(EnOkuta*, PlayState*);
-void EnOkuta_WaitToShoot(EnOkuta*, PlayState*);
-void EnOssan_InitActionFunc(EnOssan*, PlayState*);
-void EnOssan_MainActionFunc(EnOssan*, PlayState*);
-void EnOwl_ConfirmKokiriMessage(EnOwl*, PlayState*);
-void EnOwl_WaitDeathMountainShortcut(EnOwl*, PlayState*);
-void EnOwl_WaitDefault(EnOwl*, PlayState*);
-void EnOwl_WaitGerudo(EnOwl*, PlayState*);
-void EnOwl_WaitHyliaShortcut(EnOwl*, PlayState*);
-void EnOwl_WaitHyruleCastle(EnOwl*, PlayState*);
-void EnOwl_WaitKakariko(EnOwl*, PlayState*);
-void EnOwl_WaitLWPostSaria(EnOwl*, PlayState*);
-void EnOwl_WaitLWPreSaria(EnOwl*, PlayState*);
-void EnOwl_WaitLakeHylia(EnOwl*, PlayState*);
-void EnOwl_WaitOutsideKokiri(EnOwl*, PlayState*);
-void EnOwl_WaitZoraRiver(EnOwl*, PlayState*);
-void func_80ACA690(EnOwl*, PlayState*);
-void func_80ACA76C(EnOwl*, PlayState*);
-void func_80ACA7E0(EnOwl*, PlayState*);
-void func_80ACA998(EnOwl*, PlayState*);
-void func_80ACAA54(EnOwl*, PlayState*);
-void func_80ACAAC0(EnOwl*, PlayState*);
-void func_80ACAB88(EnOwl*, PlayState*);
-void func_80ACAC6C(EnOwl*, PlayState*);
-void func_80ACAD34(EnOwl*, PlayState*);
-void func_80ACADF0(EnOwl*, PlayState*);
-void func_80ACAEB8(EnOwl*, PlayState*);
-void func_80ACAF74(EnOwl*, PlayState*);
-void func_80ACB03C(EnOwl*, PlayState*);
-void func_80ACB148(EnOwl*, PlayState*);
-void func_80ACB22C(EnOwl*, PlayState*);
-void func_80ACB274(EnOwl*, PlayState*);
-void func_80ACB344(EnOwl*, PlayState*);
-void func_80ACB3E0(EnOwl*, PlayState*);
-void func_80ACB440(EnOwl*, PlayState*);
-void func_80ACB4FC(EnOwl*, PlayState*);
-void func_80ACB5C4(EnOwl*, PlayState*);
-void func_80ACB680(EnOwl*, PlayState*);
-void func_80ACBF50(EnOwl*, PlayState*);
-void func_80ACC00C(EnOwl*, PlayState*);
-void func_80ACC30C(EnOwl*, PlayState*);
-void EnPeehat_Adult_StateDie(EnPeehat*, PlayState*);
-void EnPeehat_Flying_StateFly(EnPeehat*, PlayState*);
-void EnPeehat_Flying_StateGrounded(EnPeehat*, PlayState*);
-void EnPeehat_Flying_StateLanding(EnPeehat*, PlayState*);
-void EnPeehat_Flying_StateRise(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateGround(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateHover(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateLanding(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateReturnHome(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateRise(EnPeehat*, PlayState*);
-void EnPeehat_Ground_StateSeekPlayer(EnPeehat*, PlayState*);
-void EnPeehat_Larva_StateSeekPlayer(EnPeehat*, PlayState*);
-void EnPeehat_StateAttackRecoil(EnPeehat*, PlayState*);
-void EnPeehat_StateBoomerangStunned(EnPeehat*, PlayState*);
-void EnPeehat_StateExplode(EnPeehat*, PlayState*);
-void EnPoDesert_Disappear(EnPoDesert*, PlayState*);
-void EnPoDesert_MoveToNextPoint(EnPoDesert*, PlayState*);
-void EnPoDesert_WaitForPlayer(EnPoDesert*, PlayState*);
-void EnPoField_Appear(EnPoField*, PlayState*);
-void EnPoField_CirclePlayer(EnPoField*, PlayState*);
-void EnPoField_Damage(EnPoField*, PlayState*);
-void EnPoField_Death(EnPoField*, PlayState*);
-void EnPoField_Disappear(EnPoField*, PlayState*);
-void EnPoField_Flee(EnPoField*, PlayState*);
-void EnPoField_SoulDisappear(EnPoField*, PlayState*);
-void EnPoField_SoulIdle(EnPoField*, PlayState*);
-void EnPoField_SoulInteract(EnPoField*, PlayState*);
-void EnPoField_WaitForSpawn(EnPoField*, PlayState*);
-void func_80AD587C(EnPoField*, PlayState*);
-void func_80AD58D4(EnPoField*, PlayState*);
-void EnPoRelay_DisappearAndReward(EnPoRelay*, PlayState*);
-void EnPoRelay_EndRace(EnPoRelay*, PlayState*);
-void EnPoRelay_Idle(EnPoRelay*, PlayState*);
-void EnPoRelay_Race(EnPoRelay*, PlayState*);
-void EnPoRelay_Talk(EnPoRelay*, PlayState*);
-void EnPoRelay_Talk2(EnPoRelay*, PlayState*);
-void func_80ADA4A8(EnPoSisters*, PlayState*);
-void func_80ADA530(EnPoSisters*, PlayState*);
-void func_80ADA6A0(EnPoSisters*, PlayState*);
-void func_80ADA7F0(EnPoSisters*, PlayState*);
-void func_80ADA8C0(EnPoSisters*, PlayState*);
-void func_80ADA9E8(EnPoSisters*, PlayState*);
-void func_80ADAAA4(EnPoSisters*, PlayState*);
-void func_80ADAC70(EnPoSisters*, PlayState*);
-void func_80ADAD54(EnPoSisters*, PlayState*);
-void func_80ADAE6C(EnPoSisters*, PlayState*);
-void func_80ADAFC0(EnPoSisters*, PlayState*);
-void func_80ADB17C(EnPoSisters*, PlayState*);
-void func_80ADB2B8(EnPoSisters*, PlayState*);
-void func_80ADB338(EnPoSisters*, PlayState*);
-void func_80ADB4B0(EnPoSisters*, PlayState*);
-void func_80ADB51C(EnPoSisters*, PlayState*);
-void func_80ADB770(EnPoSisters*, PlayState*);
-void func_80ADB9F0(EnPoSisters*, PlayState*);
-void func_80ADBB6C(EnPoSisters*, PlayState*);
-void func_80ADBBF4(EnPoSisters*, PlayState*);
-void func_80ADBC88(EnPoSisters*, PlayState*);
-void func_80ADBD38(EnPoSisters*, PlayState*);
-void func_80ADBD8C(EnPoSisters*, PlayState*);
-void func_80ADBEE8(EnPoSisters*, PlayState*);
-void func_80ADBF58(EnPoSisters*, PlayState*);
-void EnPoh_Appear(EnPoh*, PlayState*);
-void EnPoh_Attack(EnPoh*, PlayState*);
-void EnPoh_ComposerAppear(EnPoh*, PlayState*);
-void EnPoh_Death(EnPoh*, PlayState*);
-void EnPoh_Disappear(EnPoh*, PlayState*);
-void EnPoh_Idle(EnPoh*, PlayState*);
-void EnPoh_TalkComposer(EnPoh*, PlayState*);
-void EnPoh_TalkRegular(EnPoh*, PlayState*);
-void func_80ADEAC4(EnPoh*, PlayState*);
-void func_80ADEC9C(EnPoh*, PlayState*);
-void func_80ADEECC(EnPoh*, PlayState*);
-void func_80ADEF38(EnPoh*, PlayState*);
-void func_80ADF15C(EnPoh*, PlayState*);
-void func_80ADF574(EnPoh*, PlayState*);
-void func_80ADF5E0(EnPoh*, PlayState*);
-void func_80ADF894(EnPoh*, PlayState*);
-void func_80ADFE28(EnPoh*, PlayState*);
-void func_80ADFE80(EnPoh*, PlayState*);
-void func_80AE009C(EnPoh*, PlayState*);
-void func_80AE2744(EnRd*, PlayState*);
-void func_80AE2A10(EnRd*, PlayState*);
-void func_80AE2C1C(EnRd*, PlayState*);
-void func_80AE2FD0(EnRd*, PlayState*);
-void func_80AE3260(EnRd*, PlayState*);
-void func_80AE3454(EnRd*, PlayState*);
-void func_80AE3834(EnRd*, PlayState*);
-void func_80AE3978(EnRd*, PlayState*);
-void func_80AE3A54(EnRd*, PlayState*);
-void func_80AE3B18(EnRd*, PlayState*);
-void func_80AE3C98(EnRd*, PlayState*);
-void func_80AE3ECC(EnRd*, PlayState*);
-void func_80AF6448(EnSa*, PlayState*);
-void func_80AF67D0(EnSa*, PlayState*);
-void func_80AF683C(EnSa*, PlayState*);
-void func_80AF68E4(EnSa*, PlayState*);
-void func_80AF6B20(EnSa*, PlayState*);
-void EnSb_Bounce(EnSb*, PlayState*);
-void EnSb_Cooldown(EnSb*, PlayState*);
-void EnSb_Lunge(EnSb*, PlayState*);
-void EnSb_Open(EnSb*, PlayState*);
-void EnSb_TurnAround(EnSb*, PlayState*);
-void EnSb_WaitClosed(EnSb*, PlayState*);
-void EnSb_WaitOpen(EnSb*, PlayState*);
-void EnShopnuts_Burrow(EnShopnuts*, PlayState*);
-void EnShopnuts_LookAround(EnShopnuts*, PlayState*);
-void EnShopnuts_SpawnSalesman(EnShopnuts*, PlayState*);
-void EnShopnuts_Stand(EnShopnuts*, PlayState*);
-void EnShopnuts_ThrowNut(EnShopnuts*, PlayState*);
-void EnShopnuts_Wait(EnShopnuts*, PlayState*);
-void EnSkb_Advance(EnSkb*, PlayState*);
-void EnSkb_SetupAttack(EnSkb*, PlayState*);
-void func_80AFCE5C(EnSkb*, PlayState*);
-void func_80AFCFF0(EnSkb*, PlayState*);
-void func_80AFD508(EnSkb*, PlayState*);
-void func_80AFD59C(EnSkb*, PlayState*);
-void func_80AFD6CC(EnSkb*, PlayState*);
-void func_80AFD880(EnSkb*, PlayState*);
-void EnSkj_CleanupOcarinaGame(EnSkj*, PlayState*);
-void EnSkj_FailedMiniGame(EnSkj*, PlayState*);
-void EnSkj_FinishOcarinaGameRound(EnSkj*, PlayState*);
-void EnSkj_GiveOcarinaGameReward(EnSkj*, PlayState*);
-void EnSkj_SetupWaitForOcarina(EnSkj*, PlayState*);
-void EnSkj_StartOcarinaMinigame(EnSkj*, PlayState*);
-void EnSkj_WaitForNextRound(EnSkj*, PlayState*);
-void EnSkj_WaitForOcarina(EnSkj*, PlayState*);
-void EnSkj_WaitForOfferResponse(EnSkj*, PlayState*);
-void EnSkj_WaitForPlayback(EnSkj*, PlayState*);
-void EnSkj_WaitToGiveReward(EnSkj*, PlayState*);
-void EnSkj_WonOcarinaMiniGame(EnSkj*, PlayState*);
-void EnSsh_Drop(EnSsh*, PlayState*);
-void EnSsh_Idle(EnSsh*, PlayState*);
-void EnSsh_Land(EnSsh*, PlayState*);
-void EnSsh_Return(EnSsh*, PlayState*);
-void EnSsh_Start(EnSsh*, PlayState*);
-void EnSsh_Talk(EnSsh*, PlayState*);
-void EnSsh_Wait(EnSsh*, PlayState*);
-void EnSt_BounceAround(EnSt*, PlayState*);
-void EnSt_Die(EnSt*, PlayState*);
-void EnSt_FinishBouncing(EnSt*, PlayState*);
-void EnSt_LandOnGround(EnSt*, PlayState*);
-void EnSt_MoveToGround(EnSt*, PlayState*);
-void EnSt_ReturnToCeiling(EnSt*, PlayState*);
-void EnSt_StartOnCeilingOrGround(EnSt*, PlayState*);
-void EnSt_WaitOnCeiling(EnSt*, PlayState*);
-void EnSt_WaitOnGround(EnSt*, PlayState*);
-void EnSth_ChildRewardObtainedWait(EnSth*, PlayState*);
-void EnSth_GiveReward(EnSth*, PlayState*);
-void EnSth_ParentRewardObtainedWait(EnSth*, PlayState*);
-void EnSth_RewardObtainedTalk(EnSth*, PlayState*);
-void EnSth_RewardUnobtainedTalk(EnSth*, PlayState*);
-void EnSth_RewardUnobtainedWait(EnSth*, PlayState*);
-void EnSth_SetupAfterObjectLoaded(EnSth*, PlayState*);
-void EnSth_WaitForObjectLoaded(EnSth*, PlayState*);
-void func_80B0D364(EnSw*, PlayState*);
-void func_80B0D3AC(EnSw*, PlayState*);
-void func_80B0D590(EnSw*, PlayState*);
-void func_80B0D878(EnSw*, PlayState*);
-void func_80B0DB00(EnSw*, PlayState*);
-void func_80B0DC7C(EnSw*, PlayState*);
-void func_80B0E5E0(EnSw*, PlayState*);
-void func_80B0E728(EnSw*, PlayState*);
-void func_80B0E90C(EnSw*, PlayState*);
-void func_80B0E9BC(EnSw*, PlayState*);
-void EnSyatekiMan_EndGame(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_FinishPrize(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_GivePrize(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_Idle(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_RestartGame(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_SetupIdle(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_Start(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_StartGame(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_StopTalk(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_Talk(EnSyatekiMan*, PlayState*);
-void EnSyatekiMan_WaitForGame(EnSyatekiMan*, PlayState*);
-void func_80B11DEC(EnSyatekiNiw*, PlayState*);
-void func_80B11E78(EnSyatekiNiw*, PlayState*);
-void func_80B123A8(EnSyatekiNiw*, PlayState*);
-void func_80B12460(EnSyatekiNiw*, PlayState*);
-void func_80B128D8(EnSyatekiNiw*, PlayState*);
-void func_80B129EC(EnSyatekiNiw*, PlayState*);
-void EnTa_RunCuccoGame(EnTa*, PlayState*);
-void EnTa_TalkGeneralInLonLonHouse(EnTa*, PlayState*);
-void func_80B15100(EnTa*, PlayState*);
-void func_80B15260(EnTa*, PlayState*);
-void func_80B153D4(EnTa*, PlayState*);
-void func_80B15424(EnTa*, PlayState*);
-void func_80B161C0(EnTa*, PlayState*);
-void func_80B162E8(EnTa*, PlayState*);
-void func_80B1642C(EnTa*, PlayState*);
-void func_80B176E0(EnTakaraMan*, PlayState*);
-void func_80B1778C(EnTakaraMan*, PlayState*);
-void func_80B17934(EnTakaraMan*, PlayState*);
-void func_80B17A6C(EnTakaraMan*, PlayState*);
-void func_80B17AC4(EnTakaraMan*, PlayState*);
-void func_80B17B14(EnTakaraMan*, PlayState*);
-void EnTest_Fall(EnTest*, PlayState*);
-void EnTest_Idle(EnTest*, PlayState*);
-void EnTest_IdleFromBlock(EnTest*, PlayState*);
-void EnTest_JumpBack(EnTest*, PlayState*);
-void EnTest_JumpUp(EnTest*, PlayState*);
-void EnTest_Jumpslash(EnTest*, PlayState*);
-void EnTest_Land(EnTest*, PlayState*);
-void EnTest_Recoil(EnTest*, PlayState*);
-void EnTest_Rise(EnTest*, PlayState*);
-void EnTest_SlashDown(EnTest*, PlayState*);
-void EnTest_SlashDownEnd(EnTest*, PlayState*);
-void EnTest_SlashUp(EnTest*, PlayState*);
-void EnTest_StopAndBlock(EnTest*, PlayState*);
-void EnTest_Stunned(EnTest*, PlayState*);
-void EnTest_WaitAbove(EnTest*, PlayState*);
-void EnTest_WaitGround(EnTest*, PlayState*);
-void EnTest_WalkAndBlock(EnTest*, PlayState*);
-void func_80860C24(EnTest*, PlayState*);
-void func_80860F84(EnTest*, PlayState*);
-void func_808621D4(EnTest*, PlayState*);
-void func_80862418(EnTest*, PlayState*);
-void func_808628C8(EnTest*, PlayState*);
-void func_80862E6C(EnTest*, PlayState*);
-void func_80863044(EnTest*, PlayState*);
-void func_8086318C(EnTest*, PlayState*);
-void func_808633E8(EnTest*, PlayState*);
-void EnTg_SpinIfNotTalking(EnTg*, PlayState*);
-void EnTite_Attack(EnTite*, PlayState*);
-void EnTite_DeathCry(EnTite*, PlayState*);
-void EnTite_FallApart(EnTite*, PlayState*);
-void EnTite_FlipOnBack(EnTite*, PlayState*);
-void EnTite_FlipUpright(EnTite*, PlayState*);
-void EnTite_Idle(EnTite*, PlayState*);
-void EnTite_MoveTowardPlayer(EnTite*, PlayState*);
-void EnTite_Recoil(EnTite*, PlayState*);
-void EnTite_Stunned(EnTite*, PlayState*);
-void EnTite_TurnTowardPlayer(EnTite*, PlayState*);
-void func_80B20914(EnToryo*, PlayState*);
-void EnTr_ChooseAction1(EnTr*, PlayState*);
-void EnTr_ChooseAction2(EnTr*, PlayState*);
-void EnTr_CrySpellcast(EnTr*, PlayState*);
-void EnTr_DoNothing(EnTr*, PlayState*);
-void EnTr_FlyKidnapCutscene(EnTr*, PlayState*);
-void EnTr_Reappear(EnTr*, PlayState*);
-void EnTr_ShrinkVanish(EnTr*, PlayState*);
-void EnTr_TakeOff(EnTr*, PlayState*);
-void EnTr_TurnLookOverShoulder(EnTr*, PlayState*);
-void EnTr_WaitToReappear(EnTr*, PlayState*);
-void EnVali_Attacked(EnVali*, PlayState*);
-void EnVali_Burnt(EnVali*, PlayState*);
-void EnVali_DivideAndDie(EnVali*, PlayState*);
-void EnVali_DropAppear(EnVali*, PlayState*);
-void EnVali_FloatIdle(EnVali*, PlayState*);
-void EnVali_Frozen(EnVali*, PlayState*);
-void EnVali_Lurk(EnVali*, PlayState*);
-void EnVali_MoveArmsDown(EnVali*, PlayState*);
-void EnVali_Retaliate(EnVali*, PlayState*);
-void EnVali_ReturnToLurk(EnVali*, PlayState*);
-void EnVali_Stunned(EnVali*, PlayState*);
-void EnVm_Attack(EnVm*, PlayState*);
-void EnVm_Die(EnVm*, PlayState*);
-void EnVm_Stun(EnVm*, PlayState*);
-void EnVm_Wait(EnVm*, PlayState*);
-void EnWallmas_Cooldown(EnWallmas*, PlayState*);
-void EnWallmas_Die(EnWallmas*, PlayState*);
-void EnWallmas_Drop(EnWallmas*, PlayState*);
-void EnWallmas_JumpToCeiling(EnWallmas*, PlayState*);
-void EnWallmas_Land(EnWallmas*, PlayState*);
-void EnWallmas_ReturnToCeiling(EnWallmas*, PlayState*);
-void EnWallmas_Stand(EnWallmas*, PlayState*);
-void EnWallmas_Stun(EnWallmas*, PlayState*);
-void EnWallmas_TakeDamage(EnWallmas*, PlayState*);
-void EnWallmas_TakePlayer(EnWallmas*, PlayState*);
-void EnWallmas_WaitForProximity(EnWallmas*, PlayState*);
-void EnWallmas_WaitForSwitchFlag(EnWallmas*, PlayState*);
-void EnWallmas_WaitToDrop(EnWallmas*, PlayState*);
-void EnWallmas_Walk(EnWallmas*, PlayState*);
-void func_80B32804(EnWeiyer*, PlayState*);
-void func_80B328E8(EnWeiyer*, PlayState*);
-void func_80B32C2C(EnWeiyer*, PlayState*);
-void func_80B32D30(EnWeiyer*, PlayState*);
-void func_80B32E34(EnWeiyer*, PlayState*);
-void func_80B33018(EnWeiyer*, PlayState*);
-void func_80B331CC(EnWeiyer*, PlayState*);
-void func_80B332B4(EnWeiyer*, PlayState*);
-void func_80B33338(EnWeiyer*, PlayState*);
-void func_80B333B8(EnWeiyer*, PlayState*);
-void func_80B3349C(EnWeiyer*, PlayState*);
-void EnWf_BackflipAway(EnWf*, PlayState*);
-void EnWf_Blocking(EnWf*, PlayState*);
-void EnWf_Damaged(EnWf*, PlayState*);
-void EnWf_Die(EnWf*, PlayState*);
-void EnWf_RecoilFromBlockedSlash(EnWf*, PlayState*);
-void EnWf_RunAroundPlayer(EnWf*, PlayState*);
-void EnWf_RunAtPlayer(EnWf*, PlayState*);
-void EnWf_SearchForPlayer(EnWf*, PlayState*);
-void EnWf_Sidestep(EnWf*, PlayState*);
-void EnWf_Slash(EnWf*, PlayState*);
-void EnWf_SomersaultAndAttack(EnWf*, PlayState*);
-void EnWf_Stunned(EnWf*, PlayState*);
-void EnWf_Wait(EnWf*, PlayState*);
-void EnWf_WaitToAppear(EnWf*, PlayState*);
-void EnZf_ApproachPlayer(EnZf*, PlayState*);
-void EnZf_CircleAroundPlayer(EnZf*, PlayState*);
-void EnZf_Damaged(EnZf*, PlayState*);
-void EnZf_Die(EnZf*, PlayState*);
-void EnZf_DrawSword(EnZf*, PlayState*);
-void EnZf_DropIn(EnZf*, PlayState*);
-void EnZf_HopAndTaunt(EnZf*, PlayState*);
-void EnZf_HopAway(EnZf*, PlayState*);
-void EnZf_JumpBack(EnZf*, PlayState*);
-void EnZf_JumpForward(EnZf*, PlayState*);
-void EnZf_JumpUp(EnZf*, PlayState*);
-void EnZf_RecoilFromBlockedSlash(EnZf*, PlayState*);
-void EnZf_SheatheSword(EnZf*, PlayState*);
-void EnZf_Slash(EnZf*, PlayState*);
-void EnZf_Stunned(EnZf*, PlayState*);
-void func_80B4543C(EnZf*, PlayState*);
-void func_80B46098(EnZf*, PlayState*);
-void func_80B463E4(EnZf*, PlayState*);
-void EnZl4_Cutscene(EnZl4*, PlayState*);
-void EnZl4_Idle(EnZl4*, PlayState*);
-void EnZl4_TheEnd(EnZl4*, PlayState*);
-void EnZo_Dive(EnZo*, PlayState*);
-void EnZo_Standing(EnZo*, PlayState*);
-void EnZo_Submerged(EnZo*, PlayState*);
-void EnZo_Surface(EnZo*, PlayState*);
-void EnZo_TreadWater(EnZo*, PlayState*);
-}
+void ArmsHook_Shoot(ArmsHook*, struct PlayState*);
+void ArmsHook_Wait(ArmsHook*, struct PlayState*);
+void ArrowFire_Charge(ArrowFire*, struct PlayState*);
+void ArrowFire_Fly(ArrowFire*, struct PlayState*);
+void ArrowFire_Hit(ArrowFire*, struct PlayState*);
+void ArrowIce_Charge(ArrowIce*, struct PlayState*);
+void ArrowIce_Fly(ArrowIce*, struct PlayState*);
+void ArrowIce_Hit(ArrowIce*, struct PlayState*);
+void ArrowLight_Charge(ArrowLight*, struct PlayState*);
+void ArrowLight_Fly(ArrowLight*, struct PlayState*);
+void ArrowLight_Hit(ArrowLight*, struct PlayState*);
+void BgBdanObjects_DoNothing(BgBdanObjects*, struct PlayState*);
+void func_8086C054(BgBdanObjects*, struct PlayState*);
+void func_8086C1A0(BgBdanObjects*, struct PlayState*);
+void func_8086C29C(BgBdanObjects*, struct PlayState*);
+void func_8086C3D8(BgBdanObjects*, struct PlayState*);
+void func_8086C55C(BgBdanObjects*, struct PlayState*);
+void func_8086C5BC(BgBdanObjects*, struct PlayState*);
+void func_8086C618(BgBdanObjects*, struct PlayState*);
+void func_8086C6EC(BgBdanObjects*, struct PlayState*);
+void func_8086C76C(BgBdanObjects*, struct PlayState*);
+void func_8086C7D0(BgBdanObjects*, struct PlayState*);
+void func_8086C874(BgBdanObjects*, struct PlayState*);
+void func_8086C9A8(BgBdanObjects*, struct PlayState*);
+void func_8086C9F0(BgBdanObjects*, struct PlayState*);
+void func_8086CABC(BgBdanObjects*, struct PlayState*);
+void func_8086CB10(BgBdanObjects*, struct PlayState*);
+void func_8086CB8C(BgBdanObjects*, struct PlayState*);
+void func_8086D5E0(BgBdanSwitch*, struct PlayState*);
+void func_8086D694(BgBdanSwitch*, struct PlayState*);
+void func_8086D754(BgBdanSwitch*, struct PlayState*);
+void func_8086D80C(BgBdanSwitch*, struct PlayState*);
+void func_8086D888(BgBdanSwitch*, struct PlayState*);
+void func_8086D8CC(BgBdanSwitch*, struct PlayState*);
+void func_8086D95C(BgBdanSwitch*, struct PlayState*);
+void func_8086DA1C(BgBdanSwitch*, struct PlayState*);
+void func_8086DAC4(BgBdanSwitch*, struct PlayState*);
+void func_8086DB40(BgBdanSwitch*, struct PlayState*);
+void func_8086DB68(BgBdanSwitch*, struct PlayState*);
+void func_8086DC48(BgBdanSwitch*, struct PlayState*);
+void func_8086DCE8(BgBdanSwitch*, struct PlayState*);
+void func_8086DDC0(BgBdanSwitch*, struct PlayState*);
+void func_8086E638(BgBomGuard*, struct PlayState*);
+void func_8086ED70(BgBombwall*, struct PlayState*);
+void func_8086EE40(BgBombwall*, struct PlayState*);
+void BgBowlWall_FallDoEffects(BgBowlWall*, struct PlayState*);
+void BgBowlWall_FinishFall(BgBowlWall*, struct PlayState*);
+void BgBowlWall_Reset(BgBowlWall*, struct PlayState*);
+void BgBowlWall_SpawnBullseyes(BgBowlWall*, struct PlayState*);
+void BgBowlWall_WaitForHit(BgBowlWall*, struct PlayState*);
+void BgBreakwall_LavaCoverMove(BgBreakwall*, struct PlayState*);
+void BgBreakwall_Wait(BgBreakwall*, struct PlayState*);
+void BgBreakwall_WaitForObject(BgBreakwall*, struct PlayState*);
+void BgDdanJd_Idle(BgDdanJd*, struct PlayState*);
+void BgDdanJd_Move(BgDdanJd*, struct PlayState*);
+void BgDdanKd_CheckForExplosions(BgDdanKd*, struct PlayState*);
+void BgDdanKd_DoNothing(BgDdanKd*, struct PlayState*);
+void BgDdanKd_LowerStairs(BgDdanKd*, struct PlayState*);
+void BgDodoago_DoNothing(BgDodoago*, struct PlayState*);
+void BgDodoago_LightOneEye(BgDodoago*, struct PlayState*);
+void BgDodoago_OpenJaw(BgDodoago*, struct PlayState*);
+void BgDodoago_WaitExplosives(BgDodoago*, struct PlayState*);
+void BgDyYoseizo_CheckMagicAcquired(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_ChooseType(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_CompleteSpinGrow_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_Give_Reward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_GreetPlayer_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_HealPlayer_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SayFarewell_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SetupGreetPlayer_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SetupHealPlayer_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SetupSpinGrow_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SetupSpinGrow_Reward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SetupSpinShrink(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SpinGrowSetupGive_Reward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SpinGrow_NoReward(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_SpinShrink(BgDyYoseizo*, struct PlayState*);
+void BgDyYoseizo_Vanish(BgDyYoseizo*, struct PlayState*);
+void BgGanonOtyuka_Fall(BgGanonOtyuka*, struct PlayState*);
+void BgGanonOtyuka_WaitToFall(BgGanonOtyuka*, struct PlayState*);
+void func_8087828C(BgGateShutter*, struct PlayState*);
+void func_80878300(BgGateShutter*, struct PlayState*);
+void func_808783AC(BgGateShutter*, struct PlayState*);
+void func_808783D4(BgGateShutter*, struct PlayState*);
+void BgGjyoBridge_SpawnBridge(BgGjyoBridge*, struct PlayState*);
+void BgGjyoBridge_TriggerCutscene(BgGjyoBridge*, struct PlayState*);
+void func_808787A4(BgGjyoBridge*, struct PlayState*);
+void BgGndFiremeiro_Rise(BgGndFiremeiro*, struct PlayState*);
+void BgGndFiremeiro_Shake(BgGndFiremeiro*, struct PlayState*);
+void BgGndFiremeiro_Sink(BgGndFiremeiro*, struct PlayState*);
+void BgGndIceblock_Fall(BgGndIceblock*, struct PlayState*);
+void BgGndIceblock_Hole(BgGndIceblock*, struct PlayState*);
+void BgGndIceblock_Idle(BgGndIceblock*, struct PlayState*);
+void BgGndIceblock_Reset(BgGndIceblock*, struct PlayState*);
+void BgGndIceblock_Slide(BgGndIceblock*, struct PlayState*);
+void func_8087AF38(BgGndSoulmeiro*, struct PlayState*);
+void func_8087B284(BgGndSoulmeiro*, struct PlayState*);
+void func_8087B350(BgGndSoulmeiro*, struct PlayState*);
+void func_8087B7E8(BgHaka*, struct PlayState*);
+void func_8087B938(BgHaka*, struct PlayState*);
+void func_8087BAAC(BgHaka*, struct PlayState*);
+void func_8087BAE4(BgHaka*, struct PlayState*);
+void BgHakaGate_DoNothing(BgHakaGate*, struct PlayState*);
+void BgHakaGate_FalseSkull(BgHakaGate*, struct PlayState*);
+void BgHakaGate_FloorClosed(BgHakaGate*, struct PlayState*);
+void BgHakaGate_FloorOpen(BgHakaGate*, struct PlayState*);
+void BgHakaGate_GateOpen(BgHakaGate*, struct PlayState*);
+void BgHakaGate_GateWait(BgHakaGate*, struct PlayState*);
+void BgHakaGate_SkullOfTruth(BgHakaGate*, struct PlayState*);
+void BgHakaGate_StatueIdle(BgHakaGate*, struct PlayState*);
+void BgHakaGate_StatueInactive(BgHakaGate*, struct PlayState*);
+void BgHakaGate_StatueTurn(BgHakaGate*, struct PlayState*);
+void BgHakaHuta_DoNothing(BgHakaHuta*, struct PlayState*);
+void BgHakaHuta_Open(BgHakaHuta*, struct PlayState*);
+void BgHakaHuta_SlideOpen(BgHakaHuta*, struct PlayState*);
+void BgHakaHuta_SpawnEnemies(BgHakaHuta*, struct PlayState*);
+void func_8087D720(BgHakaHuta*, struct PlayState*);
+void BgHakaMegane_DoNothing(BgHakaMegane*, struct PlayState*);
+void func_8087DB24(BgHakaMegane*, struct PlayState*);
+void func_8087DBF0(BgHakaMegane*, struct PlayState*);
+void func_8087DFF8(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E040(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E10C(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E1E0(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E258(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E288(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E2D8(BgHakaMeganeBG*, struct PlayState*);
+void func_8087E34C(BgHakaMeganeBG*, struct PlayState*);
+void BgHakaSgami_SetupSpin(BgHakaSgami*, struct PlayState*);
+void BgHakaSgami_Spin(BgHakaSgami*, struct PlayState*);
+void BgHakaShip_ChildUpdatePosition(BgHakaShip*, struct PlayState*);
+void BgHakaShip_CrashFall(BgHakaShip*, struct PlayState*);
+void BgHakaShip_CrashShake(BgHakaShip*, struct PlayState*);
+void BgHakaShip_CutsceneStationary(BgHakaShip*, struct PlayState*);
+void BgHakaShip_Move(BgHakaShip*, struct PlayState*);
+void BgHakaShip_SetupCrash(BgHakaShip*, struct PlayState*);
+void BgHakaShip_WaitForSong(BgHakaShip*, struct PlayState*);
+void func_808801B8(BgHakaTrap*, struct PlayState*);
+void func_808802D8(BgHakaTrap*, struct PlayState*);
+void func_80880484(BgHakaTrap*, struct PlayState*);
+void func_808805C0(BgHakaTrap*, struct PlayState*);
+void func_808806BC(BgHakaTrap*, struct PlayState*);
+void func_808808F4(BgHakaTrap*, struct PlayState*);
+void func_808809B0(BgHakaTrap*, struct PlayState*);
+void func_80880AE8(BgHakaTrap*, struct PlayState*);
+void func_80880C0C(BgHakaTrap*, struct PlayState*);
+void BgHakaTubo_DropCollectible(BgHakaTubo*, struct PlayState*);
+void BgHakaTubo_Idle(BgHakaTubo*, struct PlayState*);
+void BgHakaWater_ChangeWaterLevel(BgHakaWater*, struct PlayState*);
+void BgHakaWater_Wait(BgHakaWater*, struct PlayState*);
+void BgHakaZou_DoNothing(BgHakaZou*, struct PlayState*);
+void BgHakaZou_Wait(BgHakaZou*, struct PlayState*);
+void func_80882BDC(BgHakaZou*, struct PlayState*);
+void func_80883000(BgHakaZou*, struct PlayState*);
+void func_80883104(BgHakaZou*, struct PlayState*);
+void func_80883144(BgHakaZou*, struct PlayState*);
+void func_80883254(BgHakaZou*, struct PlayState*);
+void func_80883328(BgHakaZou*, struct PlayState*);
+void func_808834D8(BgHakaZou*, struct PlayState*);
+void BgHeavyBlock_DoNothing(BgHeavyBlock*, struct PlayState*);
+void BgHeavyBlock_Fly(BgHeavyBlock*, struct PlayState*);
+void BgHeavyBlock_Land(BgHeavyBlock*, struct PlayState*);
+void BgHeavyBlock_LiftedUp(BgHeavyBlock*, struct PlayState*);
+void BgHeavyBlock_MovePiece(BgHeavyBlock*, struct PlayState*);
+void BgHeavyBlock_Wait(BgHeavyBlock*, struct PlayState*);
+void BgHidanCurtain_TurnOff(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_TurnOn(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_WaitForClear(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_WaitForCutscene(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_WaitForSwitchOff(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_WaitForSwitchOn(BgHidanCurtain*, struct PlayState*);
+void BgHidanCurtain_WaitForTimer(BgHidanCurtain*, struct PlayState*);
+void BgHidanDalm_Shrink(BgHidanDalm*, struct PlayState*);
+void BgHidanDalm_Wait(BgHidanDalm*, struct PlayState*);
+void BgHidanFirewall_Countdown(BgHidanFirewall*, struct PlayState*);
+void BgHidanFirewall_Erupt(BgHidanFirewall*, struct PlayState*);
+void BgHidanFirewall_Wait(BgHidanFirewall*, struct PlayState*);
+void func_80886FCC(BgHidanFslift*, struct PlayState*);
+void func_8088706C(BgHidanFslift*, struct PlayState*);
+void func_808870D8(BgHidanFslift*, struct PlayState*);
+void BgHidanFwbig_Lower(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_Move(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_Rise(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_WaitForCs(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_WaitForPlayer(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_WaitForSwitch(BgHidanFwbig*, struct PlayState*);
+void BgHidanFwbig_WaitForTimer(BgHidanFwbig*, struct PlayState*);
+void func_808894A4(BgHidanHrock*, struct PlayState*);
+void func_808894B0(BgHidanHrock*, struct PlayState*);
+void func_8088960C(BgHidanHrock*, struct PlayState*);
+void func_808896B8(BgHidanHrock*, struct PlayState*);
+void func_80889B5C(BgHidanKousi*, struct PlayState*);
+void func_80889BC0(BgHidanKousi*, struct PlayState*);
+void func_80889C18(BgHidanKousi*, struct PlayState*);
+void func_80889C90(BgHidanKousi*, struct PlayState*);
+void func_80889D28(BgHidanKousi*, struct PlayState*);
+void func_8088B268(BgHidanRock*, struct PlayState*);
+void func_8088B5F4(BgHidanRock*, struct PlayState*);
+void func_8088B634(BgHidanRock*, struct PlayState*);
+void func_8088B69C(BgHidanRock*, struct PlayState*);
+void func_8088B79C(BgHidanRock*, struct PlayState*);
+void func_8088B90C(BgHidanRock*, struct PlayState*);
+void func_8088B954(BgHidanRock*, struct PlayState*);
+void func_8088B990(BgHidanRock*, struct PlayState*);
+void func_8088E518(BgHidanSima*, struct PlayState*);
+void func_8088E5D0(BgHidanSima*, struct PlayState*);
+void func_8088E6D0(BgHidanSima*, struct PlayState*);
+void func_8088E760(BgHidanSima*, struct PlayState*);
+void func_8088E7A8(BgHidanSima*, struct PlayState*);
+void func_8088F4B8(BgHidanSyoku*, struct PlayState*);
+void func_8088F514(BgHidanSyoku*, struct PlayState*);
+void func_8088F5A0(BgHidanSyoku*, struct PlayState*);
+void func_8088F62C(BgHidanSyoku*, struct PlayState*);
+void BgIceObjects_Idle(BgIceObjects*, struct PlayState*);
+void BgIceObjects_Reset(BgIceObjects*, struct PlayState*);
+void BgIceObjects_Slide(BgIceObjects*, struct PlayState*);
+void BgIceObjects_Stuck(BgIceObjects*, struct PlayState*);
+void func_8089107C(BgIceShelter*, struct PlayState*);
+void func_808911D4(BgIceShelter*, struct PlayState*);
+void func_80891CF4(BgIceShutter*, struct PlayState*);
+void func_80891D6C(BgIceShutter*, struct PlayState*);
+void func_80891DD4(BgIceShutter*, struct PlayState*);
+void BgIceTurara_Fall(BgIceTurara*, struct PlayState*);
+void BgIceTurara_Regrow(BgIceTurara*, struct PlayState*);
+void BgIceTurara_Shiver(BgIceTurara*, struct PlayState*);
+void BgIceTurara_Stalagmite(BgIceTurara*, struct PlayState*);
+void BgIceTurara_Wait(BgIceTurara*, struct PlayState*);
+void BgInGate_DoNothing(BgInGate*, struct PlayState*);
+void func_80892890(BgInGate*, struct PlayState*);
+void BgJya1flift_DelayMove(BgJya1flift*, struct PlayState*);
+void BgJya1flift_DoNothing(BgJya1flift*, struct PlayState*);
+void BgJya1flift_Move(BgJya1flift*, struct PlayState*);
+void BgJya1flift_WaitForSwitch(BgJya1flift*, struct PlayState*);
+void BgJyaAmishutter_WaitForPlayer(BgJyaAmishutter*, struct PlayState*);
+void func_80893438(BgJyaAmishutter*, struct PlayState*);
+void func_808934C0(BgJyaAmishutter*, struct PlayState*);
+void func_8089350C(BgJyaAmishutter*, struct PlayState*);
+void BgJyaBombchuiwa_WaitForExplosion(BgJyaBombchuiwa*, struct PlayState*);
+void func_808949B8(BgJyaBombchuiwa*, struct PlayState*);
+void func_80896950(BgJyaCobra*, struct PlayState*);
+void func_80896ABC(BgJyaCobra*, struct PlayState*);
+void BgJyaHaheniron_ChairCrumble(BgJyaHaheniron*, struct PlayState*);
+void BgJyaHaheniron_PillarCrumble(BgJyaHaheniron*, struct PlayState*);
+void BgJyaHaheniron_RubbleCollide(BgJyaHaheniron*, struct PlayState*);
+void func_808992E8(BgJyaIronobj*, struct PlayState*);
+void func_80899894(BgJyaKanaami*, struct PlayState*);
+void func_80899950(BgJyaKanaami*, struct PlayState*);
+void BgJyaLift_DelayMove(BgJyaLift*, struct PlayState*);
+void BgJyaLift_Move(BgJyaLift*, struct PlayState*);
+void BgJyaMegami_DetectLight(BgJyaMegami*, struct PlayState*);
+void BgJyaMegami_Explode(BgJyaMegami*, struct PlayState*);
+void func_8089B7C4(BgJyaZurerukabe*, struct PlayState*);
+void func_8089B870(BgJyaZurerukabe*, struct PlayState*);
+void BgMizuBwall_Break(BgMizuBwall*, struct PlayState*);
+void BgMizuBwall_DoNothing(BgMizuBwall*, struct PlayState*);
+void BgMizuBwall_Idle(BgMizuBwall*, struct PlayState*);
+void BgMizuShutter_Move(BgMizuShutter*, struct PlayState*);
+void BgMizuShutter_WaitForCutscene(BgMizuShutter*, struct PlayState*);
+void BgMizuShutter_WaitForSwitch(BgMizuShutter*, struct PlayState*);
+void BgMizuShutter_WaitForTimer(BgMizuShutter*, struct PlayState*);
+void func_8089F788(BgMizuUzu*, struct PlayState*);
+void BgMizuWater_ChangeWaterLevel(BgMizuWater*, struct PlayState*);
+void BgMizuWater_WaitForAction(BgMizuWater*, struct PlayState*);
+void BgMjin_DoNothing(BgMjin*, struct PlayState*);
+void func_808A0850(BgMjin*, struct PlayState*);
+void BgMoriBigst_Fall(BgMoriBigst*, struct PlayState*);
+void BgMoriBigst_Landing(BgMoriBigst*, struct PlayState*);
+void BgMoriBigst_StalfosFight(BgMoriBigst*, struct PlayState*);
+void BgMoriBigst_StalfosPairFight(BgMoriBigst*, struct PlayState*);
+void BgMoriBigst_WaitForMoriTex(BgMoriBigst*, struct PlayState*);
+void BgMoriElevator_MoveAboveGround(BgMoriElevator*, struct PlayState*);
+void BgMoriElevator_MoveIntoGround(BgMoriElevator*, struct PlayState*);
+void BgMoriElevator_SetPosition(BgMoriElevator*, struct PlayState*);
+void BgMoriElevator_WaitAfterInit(BgMoriElevator*, struct PlayState*);
+void func_808A2008(BgMoriElevator*, struct PlayState*);
+void BgMoriHashigo_Clasp(BgMoriHashigo*, struct PlayState*);
+void BgMoriHashigo_LadderFall(BgMoriHashigo*, struct PlayState*);
+void BgMoriHashigo_LadderWait(BgMoriHashigo*, struct PlayState*);
+void BgMoriHashigo_WaitForMoriTex(BgMoriHashigo*, struct PlayState*);
+void BgMoriHashira4_GateOpen(BgMoriHashira4*, struct PlayState*);
+void BgMoriHashira4_GateWait(BgMoriHashira4*, struct PlayState*);
+void BgMoriHashira4_PillarsRotate(BgMoriHashira4*, struct PlayState*);
+void BgMoriHashira4_WaitForMoriTex(BgMoriHashira4*, struct PlayState*);
+void BgMoriHineri_DoNothing(BgMoriHineri*, struct PlayState*);
+void BgMoriHineri_SpawnBossKeyChest(BgMoriHineri*, struct PlayState*);
+void func_808A39FC(BgMoriHineri*, struct PlayState*);
+void func_808A3C8C(BgMoriHineri*, struct PlayState*);
+void func_808A3D58(BgMoriHineri*, struct PlayState*);
+void func_808A3E54(BgMoriHineri*, struct PlayState*);
+void BgMoriIdomizu_Main(BgMoriIdomizu*, struct PlayState*);
+void BgMoriIdomizu_WaitForMoriTex(BgMoriIdomizu*, struct PlayState*);
+void BgMoriKaitenkabe_Rotate(BgMoriKaitenkabe*, struct PlayState*);
+void BgMoriKaitenkabe_Wait(BgMoriKaitenkabe*, struct PlayState*);
+void BgMoriKaitenkabe_WaitForMoriTex(BgMoriKaitenkabe*, struct PlayState*);
+void BgMoriRakkatenjo_Fall(BgMoriRakkatenjo*, struct PlayState*);
+void BgMoriRakkatenjo_Rest(BgMoriRakkatenjo*, struct PlayState*);
+void BgMoriRakkatenjo_Rise(BgMoriRakkatenjo*, struct PlayState*);
+void BgMoriRakkatenjo_Wait(BgMoriRakkatenjo*, struct PlayState*);
+void BgMoriRakkatenjo_WaitForMoriTex(BgMoriRakkatenjo*, struct PlayState*);
+void BgPoEvent_AmyPuzzle(BgPoEvent*, struct PlayState*);
+void BgPoEvent_AmyWait(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockFall(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockIdle(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockPush(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockReset(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockShake(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockSolved(BgPoEvent*, struct PlayState*);
+void BgPoEvent_BlockWait(BgPoEvent*, struct PlayState*);
+void BgPoEvent_PaintingAppear(BgPoEvent*, struct PlayState*);
+void BgPoEvent_PaintingBurn(BgPoEvent*, struct PlayState*);
+void BgPoEvent_PaintingEmpty(BgPoEvent*, struct PlayState*);
+void BgPoEvent_PaintingPresent(BgPoEvent*, struct PlayState*);
+void BgPoEvent_PaintingVanish(BgPoEvent*, struct PlayState*);
+void BgPushbox_UpdateImpl(BgPushbox*, struct PlayState*);
+void BgRelayObjects_DoNothing(BgRelayObjects*, struct PlayState*);
+void func_808A90F4(BgRelayObjects*, struct PlayState*);
+void func_808A91AC(BgRelayObjects*, struct PlayState*);
+void func_808A9234(BgRelayObjects*, struct PlayState*);
+void func_808A932C(BgRelayObjects*, struct PlayState*);
+void func_808A939C(BgRelayObjects*, struct PlayState*);
+void BgSpot00Hanebasi_DoNothing(BgSpot00Hanebasi*, struct PlayState*);
+void BgSpot00Hanebasi_DrawbridgeRiseAndFall(BgSpot00Hanebasi*, struct PlayState*);
+void BgSpot00Hanebasi_DrawbridgeWait(BgSpot00Hanebasi*, struct PlayState*);
+void BgSpot00Hanebasi_SetTorchLightInfo(BgSpot00Hanebasi*, struct PlayState*);
+void func_808AAA50(BgSpot01Fusya*, struct PlayState*);
+void BgSpot01Idomizu_UpdateWaterLevel(BgSpot01Idomizu*, struct PlayState*);
+void func_808ABF54(BgSpot01Idosoko*, struct PlayState*);
+void func_808AC2BC(BgSpot01Objects2*, struct PlayState*);
+void func_808AC474(BgSpot01Objects2*, struct PlayState*);
+void func_808AC8FC(BgSpot02Objects*, struct PlayState*);
+void func_808AC908(BgSpot02Objects*, struct PlayState*);
+void func_808ACA08(BgSpot02Objects*, struct PlayState*);
+void func_808ACAFC(BgSpot02Objects*, struct PlayState*);
+void func_808ACB58(BgSpot02Objects*, struct PlayState*);
+void func_808ACC34(BgSpot02Objects*, struct PlayState*);
+void func_808AD3D4(BgSpot02Objects*, struct PlayState*);
+void BgSpot03Taki_HandleWaterfallState(BgSpot03Taki*, struct PlayState*);
+void func_808AE5A8(BgSpot05Soko*, struct PlayState*);
+void func_808AE5B4(BgSpot05Soko*, struct PlayState*);
+void func_808AE630(BgSpot05Soko*, struct PlayState*);
+void BgSpot06Objects_DoNothing(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_GateOpen(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_GateWaitForSwitch(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_GateWaitToOpen(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_LockFloat(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_LockPullOutward(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_LockSwimToSurface(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_LockWait(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_WaterPlaneCutsceneLower(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_WaterPlaneCutsceneRise(BgSpot06Objects*, struct PlayState*);
+void BgSpot06Objects_WaterPlaneCutsceneWait(BgSpot06Objects*, struct PlayState*);
+void BgSpot07Taki_DoNothing(BgSpot07Taki*, struct PlayState*);
+void BgSpot08Iceblock_FloatNonrotating(BgSpot08Iceblock*, struct PlayState*);
+void BgSpot08Iceblock_FloatOrbitingTwins(BgSpot08Iceblock*, struct PlayState*);
+void BgSpot08Iceblock_FloatRotating(BgSpot08Iceblock*, struct PlayState*);
+void func_808B2980(BgSpot11Oasis*, struct PlayState*);
+void func_808B29F0(BgSpot11Oasis*, struct PlayState*);
+void func_808B2AB8(BgSpot11Oasis*, struct PlayState*);
+void func_808B30D8(BgSpot12Gate*, struct PlayState*);
+void func_808B314C(BgSpot12Gate*, struct PlayState*);
+void func_808B318C(BgSpot12Gate*, struct PlayState*);
+void func_808B3298(BgSpot12Gate*, struct PlayState*);
+void func_808B357C(BgSpot12Saku*, struct PlayState*);
+void func_808B3604(BgSpot12Saku*, struct PlayState*);
+void func_808B37AC(BgSpot12Saku*, struct PlayState*);
+void func_808B40AC(BgSpot15Rrbox*, struct PlayState*);
+void func_808B4194(BgSpot15Rrbox*, struct PlayState*);
+void func_808B43D0(BgSpot15Rrbox*, struct PlayState*);
+void func_808B44CC(BgSpot15Rrbox*, struct PlayState*);
+void func_808B4930(BgSpot15Saku*, struct PlayState*);
+void func_808B4978(BgSpot15Saku*, struct PlayState*);
+void func_808B4A04(BgSpot15Saku*, struct PlayState*);
+void func_808B5950(BgSpot16Bombstone*, struct PlayState*);
+void func_808B5A94(BgSpot16Bombstone*, struct PlayState*);
+void func_808B5B04(BgSpot16Bombstone*, struct PlayState*);
+void func_808B5B6C(BgSpot16Bombstone*, struct PlayState*);
+void func_808B7AFC(BgSpot18Basket*, struct PlayState*);
+void func_808B7B6C(BgSpot18Basket*, struct PlayState*);
+void func_808B7BCC(BgSpot18Basket*, struct PlayState*);
+void func_808B7D50(BgSpot18Basket*, struct PlayState*);
+void func_808B7FC0(BgSpot18Basket*, struct PlayState*);
+void func_808B81A0(BgSpot18Basket*, struct PlayState*);
+void func_808B8DD0(BgSpot18Obj*, struct PlayState*);
+void func_808B8E7C(BgSpot18Obj*, struct PlayState*);
+void func_808B8F08(BgSpot18Obj*, struct PlayState*);
+void func_808B9040(BgSpot18Obj*, struct PlayState*);
+void func_808B95AC(BgSpot18Shutter*, struct PlayState*);
+void func_808B95B8(BgSpot18Shutter*, struct PlayState*);
+void func_808B9618(BgSpot18Shutter*, struct PlayState*);
+void func_808B9698(BgSpot18Shutter*, struct PlayState*);
+void func_808B971C(BgSpot18Shutter*, struct PlayState*);
+void BgTokiHikari_DoNothing(BgTokiHikari*, struct PlayState*);
+void func_808BA204(BgTokiHikari*, struct PlayState*);
+void func_808BA22C(BgTokiHikari*, struct PlayState*);
+void func_808BA274(BgTokiHikari*, struct PlayState*);
+void BgYdanHasi_DecWaterTimer(BgYdanHasi*, struct PlayState*);
+void BgYdanHasi_InitWater(BgYdanHasi*, struct PlayState*);
+void BgYdanHasi_MoveWater(BgYdanHasi*, struct PlayState*);
+void BgYdanHasi_SetupThreeBlocks(BgYdanHasi*, struct PlayState*);
+void BgYdanHasi_UpdateFloatingBlock(BgYdanHasi*, struct PlayState*);
+void BgYdanHasi_UpdateThreeBlocks(BgYdanHasi*, struct PlayState*);
+void BgYdanMaruta_DoNothing(BgYdanMaruta*, struct PlayState*);
+void func_808BEFF4(BgYdanMaruta*, struct PlayState*);
+void func_808BF078(BgYdanMaruta*, struct PlayState*);
+void func_808BF108(BgYdanMaruta*, struct PlayState*);
+void func_808BF1EC(BgYdanMaruta*, struct PlayState*);
+void BgYdanSp_BurnFloorWeb(BgYdanSp*, struct PlayState*);
+void BgYdanSp_BurnWallWeb(BgYdanSp*, struct PlayState*);
+void BgYdanSp_FloorWebBreaking(BgYdanSp*, struct PlayState*);
+void BgYdanSp_FloorWebBroken(BgYdanSp*, struct PlayState*);
+void BgYdanSp_FloorWebIdle(BgYdanSp*, struct PlayState*);
+void BgYdanSp_WallWebIdle(BgYdanSp*, struct PlayState*);
+void BossFd2_BreatheFire(BossFd2*, struct PlayState*);
+void BossFd2_Burrow(BossFd2*, struct PlayState*);
+void BossFd2_ClawSwipe(BossFd2*, struct PlayState*);
+void BossFd2_Damaged(BossFd2*, struct PlayState*);
+void BossFd2_Death(BossFd2*, struct PlayState*);
+void BossFd2_Emerge(BossFd2*, struct PlayState*);
+void BossFd2_Idle(BossFd2*, struct PlayState*);
+void BossFd2_Vulnerable(BossFd2*, struct PlayState*);
+void BossFd2_Wait(BossFd2*, struct PlayState*);
+void BossGanon_Block(BossGanon*, struct PlayState*);
+void BossGanon_ChargeBigMagic(BossGanon*, struct PlayState*);
+void BossGanon_ChargeLightBall(BossGanon*, struct PlayState*);
+void BossGanon_Damaged(BossGanon*, struct PlayState*);
+void BossGanon_DeathAndTowerCutscene(BossGanon*, struct PlayState*);
+void BossGanon_HitByLightBall(BossGanon*, struct PlayState*);
+void BossGanon_IntroCutscene(BossGanon*, struct PlayState*);
+void BossGanon_PlayTennis(BossGanon*, struct PlayState*);
+void BossGanon_PoundFloor(BossGanon*, struct PlayState*);
+void BossGanon_SetupIntroCutscene(BossGanon*, struct PlayState*);
+void BossGanon_SetupTowerCutscene(BossGanon*, struct PlayState*);
+void BossGanon_Vulnerable(BossGanon*, struct PlayState*);
+void BossGanon_Wait(BossGanon*, struct PlayState*);
+void func_808FD5F4(BossGanon2*, struct PlayState*);
+void func_808FFDB0(BossGanon2*, struct PlayState*);
+void func_808FFEBC(BossGanon2*, struct PlayState*);
+void func_808FFFE0(BossGanon2*, struct PlayState*);
+void func_80900104(BossGanon2*, struct PlayState*);
+void func_8090026C(BossGanon2*, struct PlayState*);
+void func_80900344(BossGanon2*, struct PlayState*);
+void func_80900650(BossGanon2*, struct PlayState*);
+void func_80900890(BossGanon2*, struct PlayState*);
+void func_8090120C(BossGanon2*, struct PlayState*);
+void BossGanondrof_Block(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Charge(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Death(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Intro(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Neutral(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Paintings(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Return(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Stunned(BossGanondrof*, struct PlayState*);
+void BossGanondrof_Throw(BossGanondrof*, struct PlayState*);
+void BossGoma_CeilingIdle(BossGoma*, struct PlayState*);
+void BossGoma_CeilingMoveToCenter(BossGoma*, struct PlayState*);
+void BossGoma_CeilingPrepareSpawnGohmas(BossGoma*, struct PlayState*);
+void BossGoma_CeilingSpawnGohmas(BossGoma*, struct PlayState*);
+void BossGoma_Defeated(BossGoma*, struct PlayState*);
+void BossGoma_Encounter(BossGoma*, struct PlayState*);
+void BossGoma_FallJump(BossGoma*, struct PlayState*);
+void BossGoma_FallStruckDown(BossGoma*, struct PlayState*);
+void BossGoma_FloorAttack(BossGoma*, struct PlayState*);
+void BossGoma_FloorAttackPosture(BossGoma*, struct PlayState*);
+void BossGoma_FloorDamaged(BossGoma*, struct PlayState*);
+void BossGoma_FloorIdle(BossGoma*, struct PlayState*);
+void BossGoma_FloorLand(BossGoma*, struct PlayState*);
+void BossGoma_FloorLandStruckDown(BossGoma*, struct PlayState*);
+void BossGoma_FloorMain(BossGoma*, struct PlayState*);
+void BossGoma_FloorPrepareAttack(BossGoma*, struct PlayState*);
+void BossGoma_FloorStunned(BossGoma*, struct PlayState*);
+void BossGoma_WallClimb(BossGoma*, struct PlayState*);
+void BossMo_Tentacle(BossMo*, struct PlayState*);
+void BossTw_BlastFire(BossTw*, struct PlayState*);
+void BossTw_BlastIce(BossTw*, struct PlayState*);
+void BossTw_CSWait(BossTw*, struct PlayState*);
+void BossTw_DeathBall(BossTw*, struct PlayState*);
+void BossTw_DeathCS(BossTw*, struct PlayState*);
+void BossTw_FinishBeamShoot(BossTw*, struct PlayState*);
+void BossTw_FlyTo(BossTw*, struct PlayState*);
+void BossTw_HitByBeam(BossTw*, struct PlayState*);
+void BossTw_Laugh(BossTw*, struct PlayState*);
+void BossTw_MergeCS(BossTw*, struct PlayState*);
+void BossTw_ShootBeam(BossTw*, struct PlayState*);
+void BossTw_Spin(BossTw*, struct PlayState*);
+void BossTw_TurnToPlayer(BossTw*, struct PlayState*);
+void BossTw_TwinrovaArriveAtTarget(BossTw*, struct PlayState*);
+void BossTw_TwinrovaChargeBlast(BossTw*, struct PlayState*);
+void BossTw_TwinrovaDeathCS(BossTw*, struct PlayState*);
+void BossTw_TwinrovaDoneBlastShoot(BossTw*, struct PlayState*);
+void BossTw_TwinrovaFly(BossTw*, struct PlayState*);
+void BossTw_TwinrovaGetUp(BossTw*, struct PlayState*);
+void BossTw_TwinrovaIntroCS(BossTw*, struct PlayState*);
+void BossTw_TwinrovaLaugh(BossTw*, struct PlayState*);
+void BossTw_TwinrovaMergeCS(BossTw*, struct PlayState*);
+void BossTw_TwinrovaShootBlast(BossTw*, struct PlayState*);
+void BossTw_TwinrovaSpin(BossTw*, struct PlayState*);
+void BossTw_TwinrovaStun(BossTw*, struct PlayState*);
+void BossTw_Wait(BossTw*, struct PlayState*);
+void BossVa_BariDeath(BossVa*, struct PlayState*);
+void BossVa_BariIntro(BossVa*, struct PlayState*);
+void BossVa_BariPhase2Attack(BossVa*, struct PlayState*);
+void BossVa_BariPhase3Attack(BossVa*, struct PlayState*);
+void BossVa_BariPhase3Stunned(BossVa*, struct PlayState*);
+void BossVa_BodyDeath(BossVa*, struct PlayState*);
+void BossVa_BodyIntro(BossVa*, struct PlayState*);
+void BossVa_BodyPhase1(BossVa*, struct PlayState*);
+void BossVa_BodyPhase2(BossVa*, struct PlayState*);
+void BossVa_BodyPhase3(BossVa*, struct PlayState*);
+void BossVa_BodyPhase4(BossVa*, struct PlayState*);
+void BossVa_Door(BossVa*, struct PlayState*);
+void BossVa_Stump(BossVa*, struct PlayState*);
+void BossVa_SupportAttached(BossVa*, struct PlayState*);
+void BossVa_SupportCut(BossVa*, struct PlayState*);
+void BossVa_SupportIntro(BossVa*, struct PlayState*);
+void BossVa_ZapperAttack(BossVa*, struct PlayState*);
+void BossVa_ZapperDamaged(BossVa*, struct PlayState*);
+void BossVa_ZapperDeath(BossVa*, struct PlayState*);
+void BossVa_ZapperEnraged(BossVa*, struct PlayState*);
+void BossVa_ZapperHold(BossVa*, struct PlayState*);
+void BossVa_ZapperIntro(BossVa*, struct PlayState*);
+void func_80966DB0(Demo6K*, struct PlayState*);
+void func_80966E98(Demo6K*, struct PlayState*);
+void func_809670AC(Demo6K*, struct PlayState*);
+void func_80967DBC(Demo6K*, struct PlayState*);
+void func_80991298(DemoShd*, struct PlayState*);
+void DoorAna_GrabPlayer(DoorAna*, struct PlayState*);
+void DoorAna_WaitClosed(DoorAna*, struct PlayState*);
+void DoorAna_WaitOpen(DoorAna*, struct PlayState*);
+void func_8099485C(DoorGerudo*, struct PlayState*);
+void func_8099496C(DoorGerudo*, struct PlayState*);
+void func_809949C8(DoorGerudo*, struct PlayState*);
+void DoorKiller_Die(DoorKiller*, struct PlayState*);
+void DoorKiller_FallAsRubble(DoorKiller*, struct PlayState*);
+void DoorKiller_FallOver(DoorKiller*, struct PlayState*);
+void DoorKiller_RiseBackUp(DoorKiller*, struct PlayState*);
+void DoorKiller_SetProperties(DoorKiller*, struct PlayState*);
+void DoorKiller_Wait(DoorKiller*, struct PlayState*);
+void DoorKiller_WaitBeforeWobble(DoorKiller*, struct PlayState*);
+void DoorKiller_Wobble(DoorKiller*, struct PlayState*);
+void DoorShutter_SetupType(DoorShutter*, struct PlayState*);
+void func_80996A54(DoorShutter*, struct PlayState*);
+void func_80996B00(DoorShutter*, struct PlayState*);
+void func_80996B0C(DoorShutter*, struct PlayState*);
+void func_80996EE8(DoorShutter*, struct PlayState*);
+void func_80996F98(DoorShutter*, struct PlayState*);
+void func_80997004(DoorShutter*, struct PlayState*);
+void func_80997150(DoorShutter*, struct PlayState*);
+void func_809973E8(DoorShutter*, struct PlayState*);
+void func_80997528(DoorShutter*, struct PlayState*);
+void func_80997568(DoorShutter*, struct PlayState*);
+void func_809975C0(DoorShutter*, struct PlayState*);
+void func_809976B8(DoorShutter*, struct PlayState*);
+void func_80997744(DoorShutter*, struct PlayState*);
+void DoorWarp1_AdultWarpIdle(DoorWarp1*, struct PlayState*);
+void DoorWarp1_AdultWarpOut(DoorWarp1*, struct PlayState*);
+void DoorWarp1_AwaitClearFlag(DoorWarp1*, struct PlayState*);
+void DoorWarp1_BlueCrystal(DoorWarp1*, struct PlayState*);
+void DoorWarp1_ChildWarpIdle(DoorWarp1*, struct PlayState*);
+void DoorWarp1_ChildWarpOut(DoorWarp1*, struct PlayState*);
+void DoorWarp1_Destination(DoorWarp1*, struct PlayState*);
+void DoorWarp1_DoNothing(DoorWarp1*, struct PlayState*);
+void DoorWarp1_FloatPlayer(DoorWarp1*, struct PlayState*);
+void DoorWarp1_PurpleCrystal(DoorWarp1*, struct PlayState*);
+void DoorWarp1_RutoWarpIdle(DoorWarp1*, struct PlayState*);
+void DoorWarp1_RutoWarpOut(DoorWarp1*, struct PlayState*);
+void DoorWarp1_WarpAppear(DoorWarp1*, struct PlayState*);
+void func_80999214(DoorWarp1*, struct PlayState*);
+void func_80999348(DoorWarp1*, struct PlayState*);
+void func_809995D4(DoorWarp1*, struct PlayState*);
+void func_809998A4(DoorWarp1*, struct PlayState*);
+void func_80999EE0(DoorWarp1*, struct PlayState*);
+void func_80999FE4(DoorWarp1*, struct PlayState*);
+void func_8099A3A4(DoorWarp1*, struct PlayState*);
+void func_8099A508(DoorWarp1*, struct PlayState*);
+void func_8099B020(DoorWarp1*, struct PlayState*);
+void EfcErupc_UpdateAction(EfcErupc*, struct PlayState*);
+void EffDust_UpdateFunc_8099DB28(EffDust*, struct PlayState*);
+void EffDust_UpdateFunc_8099DD74(EffDust*, struct PlayState*);
+void EffDust_UpdateFunc_8099DFC0(EffDust*, struct PlayState*);
+void ElfMsg_CallNaviCuboid(ElfMsg*, struct PlayState*);
+void ElfMsg_CallNaviCylinder(ElfMsg*, struct PlayState*);
+void ElfMsg2_WaitForTextClose(ElfMsg2*, struct PlayState*);
+void ElfMsg2_WaitForTextRead(ElfMsg2*, struct PlayState*);
+void ElfMsg2_WaitUntilActivated(ElfMsg2*, struct PlayState*);
+void EnAm_Cooldown(EnAm*, struct PlayState*);
+void EnAm_Lunge(EnAm*, struct PlayState*);
+void EnAm_MoveToHome(EnAm*, struct PlayState*);
+void EnAm_RecoilFromDamage(EnAm*, struct PlayState*);
+void EnAm_Ricochet(EnAm*, struct PlayState*);
+void EnAm_RotateToHome(EnAm*, struct PlayState*);
+void EnAm_RotateToInit(EnAm*, struct PlayState*);
+void EnAm_Sleep(EnAm*, struct PlayState*);
+void EnAm_Statue(EnAm*, struct PlayState*);
+void EnAm_Stunned(EnAm*, struct PlayState*);
+void func_809B04F0(EnAni*, struct PlayState*);
+void func_809B0524(EnAni*, struct PlayState*);
+void func_809B0558(EnAni*, struct PlayState*);
+void func_809B05F0(EnAni*, struct PlayState*);
+void func_809B064C(EnAni*, struct PlayState*);
+void func_809B07F8(EnAni*, struct PlayState*);
+void EnAnubice_Die(EnAnubice*, struct PlayState*);
+void EnAnubice_FindFlameCircles(EnAnubice*, struct PlayState*);
+void EnAnubice_GoToHome(EnAnubice*, struct PlayState*);
+void EnAnubice_Idle(EnAnubice*, struct PlayState*);
+void EnAnubice_SetupDie(EnAnubice*, struct PlayState*);
+void EnAnubice_SetupIdle(EnAnubice*, struct PlayState*);
+void EnAnubice_SetupShootFireball(EnAnubice*, struct PlayState*);
+void EnAnubice_ShootFireball(EnAnubice*, struct PlayState*);
+void func_809B26EC(EnAnubiceFire*, struct PlayState*);
+void func_809B27D8(EnAnubiceFire*, struct PlayState*);
+void func_809B2B48(EnAnubiceFire*, struct PlayState*);
+void EnAnubiceTag_ManageAnubis(EnAnubiceTag*, struct PlayState*);
+void EnAnubiceTag_SpawnAnubis(EnAnubiceTag*, struct PlayState*);
+void EnArrow_Fly(EnArrow*, struct PlayState*);
+void EnArrow_Shoot(EnArrow*, struct PlayState*);
+void func_809B45E0(EnArrow*, struct PlayState*);
+void func_809B4640(EnArrow*, struct PlayState*);
+void func_809B5670(EnAttackNiw*, struct PlayState*);
+void func_809B59B0(EnAttackNiw*, struct PlayState*);
+void func_809B5C18(EnAttackNiw*, struct PlayState*);
+void EnBa_Die(EnBa*, struct PlayState*);
+void EnBa_FallAsBlob(EnBa*, struct PlayState*);
+void EnBa_Idle(EnBa*, struct PlayState*);
+void EnBa_RecoilFromDamage(EnBa*, struct PlayState*);
+void EnBa_SwingAtPlayer(EnBa*, struct PlayState*);
+void EnBb_Blue(EnBb*, struct PlayState*);
+void EnBb_Damage(EnBb*, struct PlayState*);
+void EnBb_Death(EnBb*, struct PlayState*);
+void EnBb_Down(EnBb*, struct PlayState*);
+void EnBb_FlameTrail(EnBb*, struct PlayState*);
+void EnBb_Green(EnBb*, struct PlayState*);
+void EnBb_Red(EnBb*, struct PlayState*);
+void EnBb_Stunned(EnBb*, struct PlayState*);
+void EnBb_White(EnBb*, struct PlayState*);
+void func_809BC2A4(EnBdfire*, struct PlayState*);
+void func_809BC598(EnBdfire*, struct PlayState*);
+void func_809BD84C(EnBigokuta*, struct PlayState*);
+void func_809BD8DC(EnBigokuta*, struct PlayState*);
+void func_809BDAE8(EnBigokuta*, struct PlayState*);
+void func_809BDB90(EnBigokuta*, struct PlayState*);
+void func_809BDC08(EnBigokuta*, struct PlayState*);
+void func_809BDF34(EnBigokuta*, struct PlayState*);
+void func_809BDFC8(EnBigokuta*, struct PlayState*);
+void func_809BE058(EnBigokuta*, struct PlayState*);
+void func_809BE180(EnBigokuta*, struct PlayState*);
+void func_809BE26C(EnBigokuta*, struct PlayState*);
+void func_809BE3E4(EnBigokuta*, struct PlayState*);
+void func_809BE4A4(EnBigokuta*, struct PlayState*);
+void func_809BE518(EnBigokuta*, struct PlayState*);
+void EnBili_ApproachPlayer(EnBili*, struct PlayState*);
+void EnBili_Burnt(EnBili*, struct PlayState*);
+void EnBili_Climb(EnBili*, struct PlayState*);
+void EnBili_Die(EnBili*, struct PlayState*);
+void EnBili_DischargeLightning(EnBili*, struct PlayState*);
+void EnBili_FloatIdle(EnBili*, struct PlayState*);
+void EnBili_Frozen(EnBili*, struct PlayState*);
+void EnBili_Recoil(EnBili*, struct PlayState*);
+void EnBili_SetNewHomeHeight(EnBili*, struct PlayState*);
+void EnBili_SpawnedFlyApart(EnBili*, struct PlayState*);
+void EnBili_Stunned(EnBili*, struct PlayState*);
+void func_809C1D60(EnBird*, struct PlayState*);
+void func_809C1E40(EnBird*, struct PlayState*);
+void EnBlkobj_DarkLinkFight(EnBlkobj*, struct PlayState*);
+void EnBlkobj_DoNothing(EnBlkobj*, struct PlayState*);
+void EnBlkobj_SpawnDarkLink(EnBlkobj*, struct PlayState*);
+void EnBlkobj_Wait(EnBlkobj*, struct PlayState*);
+void EnBom_Explode(EnBom*, struct PlayState*);
+void EnBom_Move(EnBom*, struct PlayState*);
+void EnBom_WaitForRelease(EnBom*, struct PlayState*);
+void EnBomBowMan_BlinkAwake(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_CheckBeatenDC(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_ChooseShowPrize(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_RunGame(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_SetupChooseShowPrize(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_SetupRunGame(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_SetupWaitAsleep(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_TalkAsleep(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_TalkNotBeatenDC(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_WaitAsleep(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_WaitNotBeatenDC(EnBomBowlMan*, struct PlayState*);
+void EnBomBowMan_WakeUp(EnBomBowlMan*, struct PlayState*);
+void EnBomBowlMan_BeginPlayGame(EnBomBowlMan*, struct PlayState*);
+void EnBomBowlMan_HandlePlayChoice(EnBomBowlMan*, struct PlayState*);
+void func_809C41FC(EnBomBowlMan*, struct PlayState*);
+void EnBomBowlPit_CameraDollyIn(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_DetectHit(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_GivePrize(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_Reset(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_SetupDetectHit(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_SetupGivePrize(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_SpawnPrize(EnBomBowlPit*, struct PlayState*);
+void EnBomBowlPit_WaitTillPrizeGiven(EnBomBowlPit*, struct PlayState*);
+void EnBomChu_Move(EnBomChu*, struct PlayState*);
+void EnBomChu_WaitForKill(EnBomChu*, struct PlayState*);
+void EnBomChu_WaitForRelease(EnBomChu*, struct PlayState*);
+void EnBombf_Explode(EnBombf*, struct PlayState*);
+void EnBombf_GrowBomb(EnBombf*, struct PlayState*);
+void EnBombf_Move(EnBombf*, struct PlayState*);
+void EnBombf_WaitForRelease(EnBombf*, struct PlayState*);
+void EnBoom_Fly(EnBoom*, struct PlayState*);
+void EnBox_AppearAnimation(EnBox*, struct PlayState*);
+void EnBox_AppearInit(EnBox*, struct PlayState*);
+void EnBox_AppearOnRoomClear(EnBox*, struct PlayState*);
+void EnBox_AppearOnSwitchFlag(EnBox*, struct PlayState*);
+void EnBox_Fall(EnBox*, struct PlayState*);
+void EnBox_FallOnSwitchFlag(EnBox*, struct PlayState*);
+void EnBox_Open(EnBox*, struct PlayState*);
+void EnBox_WaitOpen(EnBox*, struct PlayState*);
+void func_809C9700(EnBox*, struct PlayState*);
+void func_809CB054(EnBrob*, struct PlayState*);
+void func_809CB114(EnBrob*, struct PlayState*);
+void func_809CB218(EnBrob*, struct PlayState*);
+void func_809CB2B8(EnBrob*, struct PlayState*);
+void func_809CB354(EnBrob*, struct PlayState*);
+void func_809CB458(EnBrob*, struct PlayState*);
+void EnBubble_Pop(EnBubble*, struct PlayState*);
+void EnBubble_Regrow(EnBubble*, struct PlayState*);
+void EnBubble_Wait(EnBubble*, struct PlayState*);
+void EnButte_FlyAround(EnButte*, struct PlayState*);
+void EnButte_FollowLink(EnButte*, struct PlayState*);
+void EnButte_TransformIntoFairy(EnButte*, struct PlayState*);
+void EnButte_WaitToDie(EnButte*, struct PlayState*);
+void func_809CE884(EnBw*, struct PlayState*);
+void func_809CEA24(EnBw*, struct PlayState*);
+void func_809CF7AC(EnBw*, struct PlayState*);
+void func_809CF984(EnBw*, struct PlayState*);
+void func_809CFC4C(EnBw*, struct PlayState*);
+void func_809CFF98(EnBw*, struct PlayState*);
+void func_809D014C(EnBw*, struct PlayState*);
+void func_809D0268(EnBw*, struct PlayState*);
+void func_809D0424(EnBw*, struct PlayState*);
+void EnChanger_OpenChests(EnChanger*, struct PlayState*);
+void EnChanger_SetHeartPieceFlag(EnChanger*, struct PlayState*);
+void EnChanger_Wait(EnChanger*, struct PlayState*);
+void func_809DF6BC(EnCow*, struct PlayState*);
+void func_809DF730(EnCow*, struct PlayState*);
+void func_809DF778(EnCow*, struct PlayState*);
+void func_809DF7D8(EnCow*, struct PlayState*);
+void func_809DF870(EnCow*, struct PlayState*);
+void func_809DF8FC(EnCow*, struct PlayState*);
+void func_809DF96C(EnCow*, struct PlayState*);
+void func_809DFA84(EnCow*, struct PlayState*);
+void EnCrow_Damaged(EnCrow*, struct PlayState*);
+void EnCrow_Die(EnCrow*, struct PlayState*);
+void EnCrow_DiveAttack(EnCrow*, struct PlayState*);
+void EnCrow_FlyIdle(EnCrow*, struct PlayState*);
+void EnCrow_Respawn(EnCrow*, struct PlayState*);
+void EnCrow_TurnAway(EnCrow*, struct PlayState*);
+void EnCs_Talk(EnCs*, struct PlayState*);
+void EnCs_Wait(EnCs*, struct PlayState*);
+void EnCs_Walk(EnCs*, struct PlayState*);
+void EnDaiku_EscapeRotate(EnDaiku*, struct PlayState*);
+void EnDaiku_EscapeRun(EnDaiku*, struct PlayState*);
+void EnDaiku_InitEscape(EnDaiku*, struct PlayState*);
+void EnDaiku_Jailed(EnDaiku*, struct PlayState*);
+void EnDaiku_TentIdle(EnDaiku*, struct PlayState*);
+void EnDaiku_WaitFreedom(EnDaiku*, struct PlayState*);
+void EnDaikuKakariko_Run(EnDaikuKakariko*, struct PlayState*);
+void EnDaikuKakariko_StopRunning(EnDaikuKakariko*, struct PlayState*);
+void EnDaikuKakariko_Talk(EnDaikuKakariko*, struct PlayState*);
+void EnDaikuKakariko_Wait(EnDaikuKakariko*, struct PlayState*);
+void EnDekubaba_DeadStickDrop(EnDekubaba*, struct PlayState*);
+void EnDekubaba_DecideLunge(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Grow(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Hit(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Lunge(EnDekubaba*, struct PlayState*);
+void EnDekubaba_PrepareLunge(EnDekubaba*, struct PlayState*);
+void EnDekubaba_PrunedSomersault(EnDekubaba*, struct PlayState*);
+void EnDekubaba_PullBack(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Recover(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Retract(EnDekubaba*, struct PlayState*);
+void EnDekubaba_ShrinkDie(EnDekubaba*, struct PlayState*);
+void EnDekubaba_StunnedVertical(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Sway(EnDekubaba*, struct PlayState*);
+void EnDekubaba_Wait(EnDekubaba*, struct PlayState*);
+void EnDekunuts_BeDamaged(EnDekunuts*, struct PlayState*);
+void EnDekunuts_BeStunned(EnDekunuts*, struct PlayState*);
+void EnDekunuts_BeginRun(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Burrow(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Die(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Gasp(EnDekunuts*, struct PlayState*);
+void EnDekunuts_LookAround(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Run(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Stand(EnDekunuts*, struct PlayState*);
+void EnDekunuts_ThrowNut(EnDekunuts*, struct PlayState*);
+void EnDekunuts_Wait(EnDekunuts*, struct PlayState*);
+void EnDh_Attack(EnDh*, struct PlayState*);
+void EnDh_Burrow(EnDh*, struct PlayState*);
+void EnDh_Damage(EnDh*, struct PlayState*);
+void EnDh_Death(EnDh*, struct PlayState*);
+void EnDh_Retreat(EnDh*, struct PlayState*);
+void EnDh_Wait(EnDh*, struct PlayState*);
+void EnDh_Walk(EnDh*, struct PlayState*);
+void EnDha_Die(EnDha*, struct PlayState*);
+void EnDha_TakeDamage(EnDha*, struct PlayState*);
+void EnDha_Wait(EnDha*, struct PlayState*);
+void EnDivingGame_HandlePlayChoice(EnDivingGame*, struct PlayState*);
+void EnDivingGame_RupeeThrow(EnDivingGame*, struct PlayState*);
+void EnDivingGame_SetupRupeeThrow(EnDivingGame*, struct PlayState*);
+void EnDivingGame_SetupUnderwaterViewCs(EnDivingGame*, struct PlayState*);
+void EnDivingGame_Talk(EnDivingGame*, struct PlayState*);
+void func_809EDCB0(EnDivingGame*, struct PlayState*);
+void func_809EE048(EnDivingGame*, struct PlayState*);
+void func_809EE0FC(EnDivingGame*, struct PlayState*);
+void func_809EE194(EnDivingGame*, struct PlayState*);
+void func_809EE780(EnDivingGame*, struct PlayState*);
+void func_809EE800(EnDivingGame*, struct PlayState*);
+void func_809EE8F0(EnDivingGame*, struct PlayState*);
+void func_809EE96C(EnDivingGame*, struct PlayState*);
+void func_809EEA00(EnDivingGame*, struct PlayState*);
+void func_809EEA90(EnDivingGame*, struct PlayState*);
+void func_809EEAF8(EnDivingGame*, struct PlayState*);
+void EnDns_Burrow(EnDns*, struct PlayState*);
+void EnDns_Idle(EnDns*, struct PlayState*);
+void EnDns_PostBurrow(EnDns*, struct PlayState*);
+void EnDns_Sale(EnDns*, struct PlayState*);
+void EnDns_SetupBurrow(EnDns*, struct PlayState*);
+void EnDns_SetupIdle(EnDns*, struct PlayState*);
+void EnDns_SetupNoSaleBurrow(EnDns*, struct PlayState*);
+void EnDns_SetupSale(EnDns*, struct PlayState*);
+void EnDns_Talk(EnDns*, struct PlayState*);
+void EnDntDemo_Judge(EnDntDemo*, struct PlayState*);
+void EnDntDemo_Prize(EnDntDemo*, struct PlayState*);
+void EnDntDemo_Results(EnDntDemo*, struct PlayState*);
+void EnDntJiji_Burrow(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Cower(EnDntJiji*, struct PlayState*);
+void EnDntJiji_GivePrize(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Hide(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Return(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetFlower(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupBurrow(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupCower(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupGivePrize(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupHide(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupReturn(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupTalk(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupUnburrow(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupUp(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupWait(EnDntJiji*, struct PlayState*);
+void EnDntJiji_SetupWalk(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Talk(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Unburrow(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Up(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Wait(EnDntJiji*, struct PlayState*);
+void EnDntJiji_Walk(EnDntJiji*, struct PlayState*);
+void EnDntNomal_SetFlower(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageAttack(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageCelebrate(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageDance(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageHide(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageUnburrow(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageUp(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupStageWait(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupTargetGivePrize(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupTargetTalk(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupTargetUnburrow(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupTargetWait(EnDntNomal*, struct PlayState*);
+void EnDntNomal_SetupTargetWalk(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageAttack(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageAttackHide(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageCelebrate(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageDance(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageHide(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageReturn(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageSetupReturn(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageUnburrow(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageUp(EnDntNomal*, struct PlayState*);
+void EnDntNomal_StageWait(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetBurrow(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetFacePlayer(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetGivePrize(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetReturn(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetTalk(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetUnburrow(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetWait(EnDntNomal*, struct PlayState*);
+void EnDntNomal_TargetWalk(EnDntNomal*, struct PlayState*);
+void EnDntNomal_WaitForObject(EnDntNomal*, struct PlayState*);
+void func_809F73AC(EnDodojr*, struct PlayState*);
+void func_809F74C4(EnDodojr*, struct PlayState*);
+void func_809F758C(EnDodojr*, struct PlayState*);
+void func_809F768C(EnDodojr*, struct PlayState*);
+void func_809F773C(EnDodojr*, struct PlayState*);
+void func_809F77AC(EnDodojr*, struct PlayState*);
+void func_809F784C(EnDodojr*, struct PlayState*);
+void func_809F786C(EnDodojr*, struct PlayState*);
+void func_809F78EC(EnDodojr*, struct PlayState*);
+void func_809F799C(EnDodojr*, struct PlayState*);
+void func_809F7A00(EnDodojr*, struct PlayState*);
+void func_809F7AB8(EnDodojr*, struct PlayState*);
+void func_809F7B3C(EnDodojr*, struct PlayState*);
+void func_809F7BE4(EnDodojr*, struct PlayState*);
+void func_809F7C48(EnDodojr*, struct PlayState*);
+void EnDodongo_BreatheFire(EnDodongo*, struct PlayState*);
+void EnDodongo_Death(EnDodongo*, struct PlayState*);
+void EnDodongo_EndBreatheFire(EnDodongo*, struct PlayState*);
+void EnDodongo_Idle(EnDodongo*, struct PlayState*);
+void EnDodongo_Stunned(EnDodongo*, struct PlayState*);
+void EnDodongo_SwallowBomb(EnDodongo*, struct PlayState*);
+void EnDodongo_SweepTail(EnDodongo*, struct PlayState*);
+void EnDodongo_Walk(EnDodongo*, struct PlayState*);
+void EnDog_ChooseMovement(EnDog*, struct PlayState*);
+void EnDog_FaceLink(EnDog*, struct PlayState*);
+void EnDog_FollowPath(EnDog*, struct PlayState*);
+void EnDog_FollowPlayer(EnDog*, struct PlayState*);
+void EnDog_RunAway(EnDog*, struct PlayState*);
+void EnDog_Wait(EnDog*, struct PlayState*);
+void EnDoor_AjarClose(EnDoor*, struct PlayState*);
+void EnDoor_AjarOpen(EnDoor*, struct PlayState*);
+void EnDoor_AjarWait(EnDoor*, struct PlayState*);
+void EnDoor_Check(EnDoor*, struct PlayState*);
+void EnDoor_Idle(EnDoor*, struct PlayState*);
+void EnDoor_Open(EnDoor*, struct PlayState*);
+void EnDoor_SetupType(EnDoor*, struct PlayState*);
+void EnDoor_WaitForCheck(EnDoor*, struct PlayState*);
+void EnDs_BrewOddPotion1(EnDs*, struct PlayState*);
+void EnDs_BrewOddPotion2(EnDs*, struct PlayState*);
+void EnDs_BrewOddPotion3(EnDs*, struct PlayState*);
+void EnDs_DisplayOddPotionText(EnDs*, struct PlayState*);
+void EnDs_GiveBluePotion(EnDs*, struct PlayState*);
+void EnDs_GiveOddPotion(EnDs*, struct PlayState*);
+void EnDs_OfferBluePotion(EnDs*, struct PlayState*);
+void EnDs_OfferOddPotion(EnDs*, struct PlayState*);
+void EnDs_Talk(EnDs*, struct PlayState*);
+void EnDs_TalkAfterBrewOddPotion(EnDs*, struct PlayState*);
+void EnDs_TalkAfterGiveOddPotion(EnDs*, struct PlayState*);
+void EnDs_TalkNoEmptyBottle(EnDs*, struct PlayState*);
+void EnDs_Wait(EnDs*, struct PlayState*);
+void func_809FE3B4(EnDu*, struct PlayState*);
+void func_809FE3C0(EnDu*, struct PlayState*);
+void func_809FE4A4(EnDu*, struct PlayState*);
+void func_809FE638(EnDu*, struct PlayState*);
+void func_809FE6CC(EnDu*, struct PlayState*);
+void func_809FE740(EnDu*, struct PlayState*);
+void func_809FE798(EnDu*, struct PlayState*);
+void func_809FE890(EnDu*, struct PlayState*);
+void func_809FEB08(EnDu*, struct PlayState*);
+void func_809FEC14(EnDu*, struct PlayState*);
+void func_809FEC70(EnDu*, struct PlayState*);
+void func_809FECE4(EnDu*, struct PlayState*);
+void EnDyExtra_FallAndKill(EnDyExtra*, struct PlayState*);
+void EnDyExtra_WaitForTrigger(EnDyExtra*, struct PlayState*);
+void EnEiyer_Ambush(EnEiyer*, struct PlayState*);
+void EnEiyer_AppearFromGround(EnEiyer*, struct PlayState*);
+void EnEiyer_CircleUnderground(EnEiyer*, struct PlayState*);
+void EnEiyer_Dead(EnEiyer*, struct PlayState*);
+void EnEiyer_Die(EnEiyer*, struct PlayState*);
+void EnEiyer_DiveAttack(EnEiyer*, struct PlayState*);
+void EnEiyer_Glide(EnEiyer*, struct PlayState*);
+void EnEiyer_Hurt(EnEiyer*, struct PlayState*);
+void EnEiyer_Inactive(EnEiyer*, struct PlayState*);
+void EnEiyer_Land(EnEiyer*, struct PlayState*);
+void EnEiyer_StartAttack(EnEiyer*, struct PlayState*);
+void EnEiyer_Stunned(EnEiyer*, struct PlayState*);
+void EnEiyer_WanderUnderground(EnEiyer*, struct PlayState*);
+void func_80A0329C(EnElf*, struct PlayState*);
+void func_80A0353C(EnElf*, struct PlayState*);
+void func_80A03604(EnElf*, struct PlayState*);
+void func_80A03610(EnElf*, struct PlayState*);
+void func_80A03814(EnElf*, struct PlayState*);
+void func_80A03990(EnElf*, struct PlayState*);
+void func_80A03CF8(EnElf*, struct PlayState*);
+void EnEncount2_SpawnRocks(EnEncount2*, struct PlayState*);
+void EnEncount2_Wait(EnEncount2*, struct PlayState*);
+void EnExItem_BowlCounter(EnExItem*, struct PlayState*);
+void EnExItem_BowlPrize(EnExItem*, struct PlayState*);
+void EnExItem_ExitChest(EnExItem*, struct PlayState*);
+void EnExItem_FairyMagic(EnExItem*, struct PlayState*);
+void EnExItem_SetupBowlCounter(EnExItem*, struct PlayState*);
+void EnExItem_TargetPrizeApproach(EnExItem*, struct PlayState*);
+void EnExItem_TargetPrizeFinish(EnExItem*, struct PlayState*);
+void EnExItem_TargetPrizeGive(EnExItem*, struct PlayState*);
+void EnExItem_WaitForObject(EnExItem*, struct PlayState*);
+void EnExRuppy_DropIntoWater(EnExRuppy*, struct PlayState*);
+void EnExRuppy_EnterWater(EnExRuppy*, struct PlayState*);
+void EnExRuppy_GalleryTarget(EnExRuppy*, struct PlayState*);
+void EnExRuppy_Kill(EnExRuppy*, struct PlayState*);
+void EnExRuppy_Sink(EnExRuppy*, struct PlayState*);
+void EnExRuppy_WaitAsCollectible(EnExRuppy*, struct PlayState*);
+void EnExRuppy_WaitInGame(EnExRuppy*, struct PlayState*);
+void EnExRuppy_WaitToBlowUp(EnExRuppy*, struct PlayState*);
+void EnFd_JumpToGround(EnFd*, struct PlayState*);
+void EnFd_Land(EnFd*, struct PlayState*);
+void EnFd_Reappear(EnFd*, struct PlayState*);
+void EnFd_Run(EnFd*, struct PlayState*);
+void EnFd_SpinAndGrow(EnFd*, struct PlayState*);
+void EnFd_SpinAndSpawnFire(EnFd*, struct PlayState*);
+void EnFd_WaitForCore(EnFd*, struct PlayState*);
+void EnFdFire_DanceTowardsPlayer(EnFdFire*, struct PlayState*);
+void EnFdFire_Disappear(EnFdFire*, struct PlayState*);
+void EnFdFire_WaitToDie(EnFdFire*, struct PlayState*);
+void func_80A0E70C(EnFdFire*, struct PlayState*);
+void EnFireRock_Fall(EnFireRock*, struct PlayState*);
+void EnFireRock_SpawnMoreBrokenPieces(EnFireRock*, struct PlayState*);
+void FireRock_WaitOnFloor(EnFireRock*, struct PlayState*);
+void FireRock_WaitSpawnRocksFromCeiling(EnFireRock*, struct PlayState*);
+void EnFirefly_Die(EnFirefly*, struct PlayState*);
+void EnFirefly_DisturbDiveAttack(EnFirefly*, struct PlayState*);
+void EnFirefly_DiveAttack(EnFirefly*, struct PlayState*);
+void EnFirefly_Fall(EnFirefly*, struct PlayState*);
+void EnFirefly_FlyAway(EnFirefly*, struct PlayState*);
+void EnFirefly_FlyIdle(EnFirefly*, struct PlayState*);
+void EnFirefly_FrozenFall(EnFirefly*, struct PlayState*);
+void EnFirefly_Perch(EnFirefly*, struct PlayState*);
+void EnFirefly_Rebound(EnFirefly*, struct PlayState*);
+void EnFirefly_Stunned(EnFirefly*, struct PlayState*);
+void EnFish_Dropped_Fall(EnFish*, struct PlayState*);
+void EnFish_Dropped_FlopOnGround(EnFish*, struct PlayState*);
+void EnFish_Dropped_SwimAway(EnFish*, struct PlayState*);
+void EnFish_Respawning_ApproachPlayer(EnFish*, struct PlayState*);
+void EnFish_Respawning_FleePlayer(EnFish*, struct PlayState*);
+void EnFish_Respawning_FollowChild(EnFish*, struct PlayState*);
+void EnFish_Respawning_SlowDown(EnFish*, struct PlayState*);
+void EnFish_Unique_SwimIdle(EnFish*, struct PlayState*);
+void EnFr_Activate(EnFr*, struct PlayState*);
+void EnFr_ActivateCheckFrogSong(EnFr*, struct PlayState*);
+void EnFr_ChildSong(EnFr*, struct PlayState*);
+void EnFr_ChildSongFirstTime(EnFr*, struct PlayState*);
+void EnFr_ChooseJumpFromLogSpot(EnFr*, struct PlayState*);
+void EnFr_ContinueFrogSong(EnFr*, struct PlayState*);
+void EnFr_Deactivate(EnFr*, struct PlayState*);
+void EnFr_GiveReward(EnFr*, struct PlayState*);
+void EnFr_Idle(EnFr*, struct PlayState*);
+void EnFr_JumpingBackIntoWater(EnFr*, struct PlayState*);
+void EnFr_JumpingOutOfWater(EnFr*, struct PlayState*);
+void EnFr_JumpingUp(EnFr*, struct PlayState*);
+void EnFr_ListeningToOcarinaNotes(EnFr*, struct PlayState*);
+void EnFr_OrientOnLogSpot(EnFr*, struct PlayState*);
+void EnFr_PrintTextBox(EnFr*, struct PlayState*);
+void EnFr_SetIdle(EnFr*, struct PlayState*);
+void EnFr_SetReward(EnFr*, struct PlayState*);
+void EnFr_SetupFrogSong(EnFr*, struct PlayState*);
+void EnFr_SetupJumpingOutOfWater(EnFr*, struct PlayState*);
+void EnFr_TalkBeforeFrogSong(EnFr*, struct PlayState*);
+void EnFr_TalkBeforeReward(EnFr*, struct PlayState*);
+void func_80A1BE98(EnFr*, struct PlayState*);
+void EnFu_TeachSong(EnFu*, struct PlayState*);
+void EnFu_WaitAdult(EnFu*, struct PlayState*);
+void EnFu_WaitChild(EnFu*, struct PlayState*);
+void EnFu_WaitForPlayback(EnFu*, struct PlayState*);
+void func_80A1DB60(EnFu*, struct PlayState*);
+void func_80A1DBA0(EnFu*, struct PlayState*);
+void func_80A1DBD4(EnFu*, struct PlayState*);
+void EnFw_Bounce(EnFw*, struct PlayState*);
+void EnFw_JumpToParentInitPos(EnFw*, struct PlayState*);
+void EnFw_Run(EnFw*, struct PlayState*);
+void EnFw_TurnToParentInitPos(EnFw*, struct PlayState*);
+void EnFz_AimForFreeze(EnFz*, struct PlayState*);
+void EnFz_AimForMove(EnFz*, struct PlayState*);
+void EnFz_Appear(EnFz*, struct PlayState*);
+void EnFz_BlowSmoke(EnFz*, struct PlayState*);
+void EnFz_BlowSmokeStationary(EnFz*, struct PlayState*);
+void EnFz_Despawn(EnFz*, struct PlayState*);
+void EnFz_Disappear(EnFz*, struct PlayState*);
+void EnFz_Melt(EnFz*, struct PlayState*);
+void EnFz_MoveTowardsPlayer(EnFz*, struct PlayState*);
+void EnFz_Wait(EnFz*, struct PlayState*);
+void EnGSwitch_ArcheryPot(EnGSwitch*, struct PlayState*);
+void EnGSwitch_GalleryRupee(EnGSwitch*, struct PlayState*);
+void EnGSwitch_Kill(EnGSwitch*, struct PlayState*);
+void EnGSwitch_SilverRupeeCollected(EnGSwitch*, struct PlayState*);
+void EnGSwitch_SilverRupeeIdle(EnGSwitch*, struct PlayState*);
+void EnGSwitch_SilverRupeeTracker(EnGSwitch*, struct PlayState*);
+void EnGSwitch_WaitForObject(EnGSwitch*, struct PlayState*);
+void func_80A2F83C(EnGb*, struct PlayState*);
+void func_80A2F94C(EnGb*, struct PlayState*);
+void func_80A2F9C0(EnGb*, struct PlayState*);
+void func_80A2FA50(EnGb*, struct PlayState*);
+void func_80A2FB40(EnGb*, struct PlayState*);
+void func_80A2FBB0(EnGb*, struct PlayState*);
+void func_80A2FC0C(EnGb*, struct PlayState*);
+void func_80A2FC70(EnGb*, struct PlayState*);
+void EnGe1_BeginGame_Archery(EnGe1*, struct PlayState*);
+void EnGe1_BeginGiveItem_Archery(EnGe1*, struct PlayState*);
+void EnGe1_CheckForCard_GTGGuard(EnGe1*, struct PlayState*);
+void EnGe1_CheckGate_GateOp(EnGe1*, struct PlayState*);
+void EnGe1_GetReaction_GateGuard(EnGe1*, struct PlayState*);
+void EnGe1_GetReaction_ValleyFloor(EnGe1*, struct PlayState*);
+void EnGe1_KickPlayer(EnGe1*, struct PlayState*);
+void EnGe1_OpenGate_GateOp(EnGe1*, struct PlayState*);
+void EnGe1_Open_GTGGuard(EnGe1*, struct PlayState*);
+void EnGe1_RefuseEntryTooPoor_GTGGuard(EnGe1*, struct PlayState*);
+void EnGe1_SetNormalText(EnGe1*, struct PlayState*);
+void EnGe1_SetupOpen_GTGGuard(EnGe1*, struct PlayState*);
+void EnGe1_SetupWait_Archery(EnGe1*, struct PlayState*);
+void EnGe1_TalkAfterGame_Archery(EnGe1*, struct PlayState*);
+void EnGe1_TalkNoPrize_Archery(EnGe1*, struct PlayState*);
+void EnGe1_TalkOfferPlay_Archery(EnGe1*, struct PlayState*);
+void EnGe1_TalkTooPoor_Archery(EnGe1*, struct PlayState*);
+void EnGe1_TalkWinPrize_Archery(EnGe1*, struct PlayState*);
+void EnGe1_WaitDoNothing(EnGe1*, struct PlayState*);
+void EnGe1_WaitTillItemGiven_Archery(EnGe1*, struct PlayState*);
+void EnGe1_WaitTillOpened_GTGGuard(EnGe1*, struct PlayState*);
+void EnGe1_WaitUntilGateOpened_GateOp(EnGe1*, struct PlayState*);
+void EnGe1_Wait_Archery(EnGe1*, struct PlayState*);
+void EnGe1_WatchForAndSensePlayer(EnGe1*, struct PlayState*);
+void EnGe1_WatchForPlayerFrontOnly(EnGe1*, struct PlayState*);
+void EnGe2_ForceTalk(EnGe2*, struct PlayState*);
+void EnGe2_GiveCard(EnGe2*, struct PlayState*);
+void EnGe2_SetActionAfterTalk(EnGe2*, struct PlayState*);
+void EnGe2_WaitLookAtPlayer(EnGe2*, struct PlayState*);
+void EnGe2_WaitTillCardGiven(EnGe2*, struct PlayState*);
+void EnGe3_ForceTalk(EnGe3*, struct PlayState*);
+void EnGe3_GiveCard(EnGe3*, struct PlayState*);
+void EnGe3_Wait(EnGe3*, struct PlayState*);
+void EnGe3_WaitLookAtPlayer(EnGe3*, struct PlayState*);
+void EnGe3_WaitTillCardGiven(EnGe3*, struct PlayState*);
+void EnGeldB_Advance(EnGeldB*, struct PlayState*);
+void EnGeldB_Block(EnGeldB*, struct PlayState*);
+void EnGeldB_Circle(EnGeldB*, struct PlayState*);
+void EnGeldB_Damaged(EnGeldB*, struct PlayState*);
+void EnGeldB_Defeated(EnGeldB*, struct PlayState*);
+void EnGeldB_Flee(EnGeldB*, struct PlayState*);
+void EnGeldB_Jump(EnGeldB*, struct PlayState*);
+void EnGeldB_Pivot(EnGeldB*, struct PlayState*);
+void EnGeldB_Ready(EnGeldB*, struct PlayState*);
+void EnGeldB_RollBack(EnGeldB*, struct PlayState*);
+void EnGeldB_RollForward(EnGeldB*, struct PlayState*);
+void EnGeldB_Sidestep(EnGeldB*, struct PlayState*);
+void EnGeldB_Slash(EnGeldB*, struct PlayState*);
+void EnGeldB_SpinAttack(EnGeldB*, struct PlayState*);
+void EnGeldB_SpinDodge(EnGeldB*, struct PlayState*);
+void EnGeldB_Stunned(EnGeldB*, struct PlayState*);
+void EnGeldB_Wait(EnGeldB*, struct PlayState*);
+void EnGirlA_Noop(EnGirlA*, struct PlayState*);
+void EnGm_ProcessChoiceIndex(EnGm*, struct PlayState*);
+void func_80A3DB04(EnGm*, struct PlayState*);
+void func_80A3DBF4(EnGm*, struct PlayState*);
+void func_80A3DC44(EnGm*, struct PlayState*);
+void func_80A3DD7C(EnGm*, struct PlayState*);
+void func_80A3DF00(EnGm*, struct PlayState*);
+void func_80A3DF60(EnGm*, struct PlayState*);
+void EnGo_BiggoronActionFunc(EnGo*, struct PlayState*);
+void EnGo_CurledUp(EnGo*, struct PlayState*);
+void EnGo_Eyedrops(EnGo*, struct PlayState*);
+void EnGo_FireGenericActionFunc(EnGo*, struct PlayState*);
+void EnGo_GetItem(EnGo*, struct PlayState*);
+void EnGo_GoronLinkRolling(EnGo*, struct PlayState*);
+void EnGo_StopRolling(EnGo*, struct PlayState*);
+void EnGo_WakeUp(EnGo*, struct PlayState*);
+void func_80A3FEB4(EnGo*, struct PlayState*);
+void func_80A4008C(EnGo*, struct PlayState*);
+void func_80A40494(EnGo*, struct PlayState*);
+void func_80A405CC(EnGo*, struct PlayState*);
+void func_80A408D8(EnGo*, struct PlayState*);
+void func_80A40A54(EnGo*, struct PlayState*);
+void func_80A40B1C(EnGo*, struct PlayState*);
+void func_80A40C78(EnGo*, struct PlayState*);
+void func_80A40DCC(EnGo*, struct PlayState*);
+void EnGo2_BiggoronEyedrops(EnGo2*, struct PlayState*);
+void EnGo2_ContinueRolling(EnGo2*, struct PlayState*);
+void EnGo2_CurledUp(EnGo2*, struct PlayState*);
+void EnGo2_GoronDmtBombFlowerAnimation(EnGo2*, struct PlayState*);
+void EnGo2_GoronFireGenericAction(EnGo2*, struct PlayState*);
+void EnGo2_GoronLinkStopRolling(EnGo2*, struct PlayState*);
+void EnGo2_GoronRollingBigContinueRolling(EnGo2*, struct PlayState*);
+void EnGo2_GroundRolling(EnGo2*, struct PlayState*);
+void EnGo2_ReverseRolling(EnGo2*, struct PlayState*);
+void EnGo2_SetGetItem(EnGo2*, struct PlayState*);
+void EnGo2_SetupGetItem(EnGo2*, struct PlayState*);
+void EnGo2_SlowRolling(EnGo2*, struct PlayState*);
+void func_80A46B40(EnGo2*, struct PlayState*);
+void EnGoma_BossLimb(EnGoma*, struct PlayState*);
+void EnGoma_ChasePlayer(EnGoma*, struct PlayState*);
+void EnGoma_Dead(EnGoma*, struct PlayState*);
+void EnGoma_Debris(EnGoma*, struct PlayState*);
+void EnGoma_Die(EnGoma*, struct PlayState*);
+void EnGoma_Egg(EnGoma*, struct PlayState*);
+void EnGoma_EggFallToGround(EnGoma*, struct PlayState*);
+void EnGoma_Flee(EnGoma*, struct PlayState*);
+void EnGoma_Hatch(EnGoma*, struct PlayState*);
+void EnGoma_Hurt(EnGoma*, struct PlayState*);
+void EnGoma_Jump(EnGoma*, struct PlayState*);
+void EnGoma_Land(EnGoma*, struct PlayState*);
+void EnGoma_PrepareJump(EnGoma*, struct PlayState*);
+void EnGoma_Stand(EnGoma*, struct PlayState*);
+void EnGoma_Stunned(EnGoma*, struct PlayState*);
+void EnGoroiwa_MoveAndFallToGround(EnGoroiwa*, struct PlayState*);
+void EnGoroiwa_MoveDown(EnGoroiwa*, struct PlayState*);
+void EnGoroiwa_MoveUp(EnGoroiwa*, struct PlayState*);
+void EnGoroiwa_Roll(EnGoroiwa*, struct PlayState*);
+void EnGoroiwa_Wait(EnGoroiwa*, struct PlayState*);
+void func_80A4E910(EnGs*, struct PlayState*);
+void func_80A4EA08(EnGs*, struct PlayState*);
+void func_80A4EB3C(EnGs*, struct PlayState*);
+void func_80A4ED34(EnGs*, struct PlayState*);
+void func_80A4F13C(EnGs*, struct PlayState*);
+void func_80A4F700(EnGs*, struct PlayState*);
+void func_80A4F734(EnGs*, struct PlayState*);
+void func_80A50518(EnGuest*, struct PlayState*);
+void func_80A5057C(EnGuest*, struct PlayState*);
+void EnHeishi2_DoNothing1(EnHeishi2*, struct PlayState*);
+void EnHeishi_DoNothing2(EnHeishi2*, struct PlayState*);
+void func_80A531E4(EnHeishi2*, struct PlayState*);
+void func_80A53278(EnHeishi2*, struct PlayState*);
+void func_80A5344C(EnHeishi2*, struct PlayState*);
+void func_80A53538(EnHeishi2*, struct PlayState*);
+void func_80A535BC(EnHeishi2*, struct PlayState*);
+void func_80A53638(EnHeishi2*, struct PlayState*);
+void func_80A5372C(EnHeishi2*, struct PlayState*);
+void func_80A53850(EnHeishi2*, struct PlayState*);
+void func_80A53908(EnHeishi2*, struct PlayState*);
+void func_80A5399C(EnHeishi2*, struct PlayState*);
+void func_80A53AD4(EnHeishi2*, struct PlayState*);
+void func_80A53C0C(EnHeishi2*, struct PlayState*);
+void func_80A53C90(EnHeishi2*, struct PlayState*);
+void func_80A53D0C(EnHeishi2*, struct PlayState*);
+void func_80A53DF8(EnHeishi2*, struct PlayState*);
+void func_80A53F30(EnHeishi2*, struct PlayState*);
+void func_80A54038(EnHeishi2*, struct PlayState*);
+void func_80A540C0(EnHeishi2*, struct PlayState*);
+void func_80A541FC(EnHeishi2*, struct PlayState*);
+void func_80A5427C(EnHeishi2*, struct PlayState*);
+void func_80A54320(EnHeishi2*, struct PlayState*);
+void func_80A543A0(EnHeishi2*, struct PlayState*);
+void func_80A544AC(EnHeishi2*, struct PlayState*);
+void func_80A5455C(EnHeishi2*, struct PlayState*);
+void func_80A546DC(EnHeishi2*, struct PlayState*);
+void func_80A5475C(EnHeishi2*, struct PlayState*);
+void func_80A54954(EnHeishi2*, struct PlayState*);
+void func_80A549E8(EnHeishi2*, struct PlayState*);
+void EnHeishi3_CatchStart(EnHeishi3*, struct PlayState*);
+void EnHeishi3_ResetAnimationToIdle(EnHeishi3*, struct PlayState*);
+void EnHeishi3_SetupGuardType(EnHeishi3*, struct PlayState*);
+void EnHeishi3_StandSentinelInCastle(EnHeishi3*, struct PlayState*);
+void EnHeishi3_StandSentinelInGrounds(EnHeishi3*, struct PlayState*);
+void func_80A55BD4(EnHeishi3*, struct PlayState*);
+void func_80A55D00(EnHeishi3*, struct PlayState*);
+void EnHeishi4_MarketSneak(EnHeishi4*, struct PlayState*);
+void func_80A56328(EnHeishi4*, struct PlayState*);
+void func_80A563BC(EnHeishi4*, struct PlayState*);
+void func_80A56544(EnHeishi4*, struct PlayState*);
+void func_80A56614(EnHeishi4*, struct PlayState*);
+void func_80A5673C(EnHeishi4*, struct PlayState*);
+void func_80A56874(EnHeishi4*, struct PlayState*);
+void func_80A56900(EnHeishi4*, struct PlayState*);
+void func_80A56994(EnHeishi4*, struct PlayState*);
+void func_80A56A50(EnHeishi4*, struct PlayState*);
+void func_80A56ACC(EnHeishi4*, struct PlayState*);
+void func_80A56B40(EnHeishi4*, struct PlayState*);
+void EnHintnuts_BeginFreeze(EnHintnuts*, struct PlayState*);
+void EnHintnuts_BeginRun(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Burrow(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Freeze(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Leave(EnHintnuts*, struct PlayState*);
+void EnHintnuts_LookAround(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Run(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Stand(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Talk(EnHintnuts*, struct PlayState*);
+void EnHintnuts_ThrowNut(EnHintnuts*, struct PlayState*);
+void EnHintnuts_Wait(EnHintnuts*, struct PlayState*);
+void EnHoll_NextAction(EnHoll*, struct PlayState*);
+void EnHonotrap_EyeAttack(EnHonotrap*, struct PlayState*);
+void EnHonotrap_EyeClose(EnHonotrap*, struct PlayState*);
+void EnHonotrap_EyeIdle(EnHonotrap*, struct PlayState*);
+void EnHonotrap_EyeOpen(EnHonotrap*, struct PlayState*);
+void EnHonotrap_Flame(EnHonotrap*, struct PlayState*);
+void EnHonotrap_FlameChase(EnHonotrap*, struct PlayState*);
+void EnHonotrap_FlameDrop(EnHonotrap*, struct PlayState*);
+void EnHonotrap_FlameMove(EnHonotrap*, struct PlayState*);
+void EnHonotrap_FlameVanish(EnHonotrap*, struct PlayState*);
+void func_80A6F1A4(EnHs2*, struct PlayState*);
+void EnHy_DoNothing(EnHy*, struct PlayState*);
+void EnHy_InitImpl(EnHy*, struct PlayState*);
+void func_80A710F8(EnHy*, struct PlayState*);
+void func_80A711B4(EnHy*, struct PlayState*);
+void func_80A7127C(EnHy*, struct PlayState*);
+void func_80A712C0(EnHy*, struct PlayState*);
+void func_80A7134C(EnHy*, struct PlayState*);
+void func_80A714C4(EnHy*, struct PlayState*);
+void func_80A71530(EnHy*, struct PlayState*);
+void EnIceHono_CapturableFlame(EnIceHono*, struct PlayState*);
+void EnIceHono_DropFlame(EnIceHono*, struct PlayState*);
+void EnIceHono_SmallFlameMove(EnIceHono*, struct PlayState*);
+void EnIceHono_SpreadFlames(EnIceHono*, struct PlayState*);
+void func_80A747C0(EnIk*, struct PlayState*);
+void func_80A7492C(EnIk*, struct PlayState*);
+void func_80A74BA4(EnIk*, struct PlayState*);
+void func_80A74EBC(EnIk*, struct PlayState*);
+void func_80A7510C(EnIk*, struct PlayState*);
+void func_80A75260(EnIk*, struct PlayState*);
+void func_80A7545C(EnIk*, struct PlayState*);
+void func_80A75530(EnIk*, struct PlayState*);
+void func_80A7567C(EnIk*, struct PlayState*);
+void func_80A758B0(EnIk*, struct PlayState*);
+void func_80A75A38(EnIk*, struct PlayState*);
+void func_80A79FB0(EnIn*, struct PlayState*);
+void func_80A7A304(EnIn*, struct PlayState*);
+void func_80A7A4BC(EnIn*, struct PlayState*);
+void func_80A7A4C8(EnIn*, struct PlayState*);
+void func_80A7A568(EnIn*, struct PlayState*);
+void func_80A7A770(EnIn*, struct PlayState*);
+void func_80A7A848(EnIn*, struct PlayState*);
+void func_80A7A940(EnIn*, struct PlayState*);
+void func_80A7AA40(EnIn*, struct PlayState*);
+void func_80A7ABD4(EnIn*, struct PlayState*);
+void func_80A7AE84(EnIn*, struct PlayState*);
+void func_80A7AEF0(EnIn*, struct PlayState*);
+void func_80A7B018(EnIn*, struct PlayState*);
+void func_80A7B024(EnIn*, struct PlayState*);
+void func_80A7C3F4(EnInsect*, struct PlayState*);
+void func_80A7C5EC(EnInsect*, struct PlayState*);
+void func_80A7C86C(EnInsect*, struct PlayState*);
+void func_80A7CAD0(EnInsect*, struct PlayState*);
+void func_80A7CC3C(EnInsect*, struct PlayState*);
+void func_80A7CEC0(EnInsect*, struct PlayState*);
+void func_80A7D26C(EnInsect*, struct PlayState*);
+void func_80A7D460(EnInsect*, struct PlayState*);
+void EnIshi_Fly(EnIshi*, struct PlayState*);
+void EnIshi_LiftedUp(EnIshi*, struct PlayState*);
+void EnIshi_Wait(EnIshi*, struct PlayState*);
+void EnJj_BeginCutscene(EnJj*, struct PlayState*);
+void EnJj_OpenMouth(EnJj*, struct PlayState*);
+void EnJj_RemoveDust(EnJj*, struct PlayState*);
+void EnJj_WaitForFish(EnJj*, struct PlayState*);
+void EnJj_WaitToOpenMouth(EnJj*, struct PlayState*);
+void func_80A8F660(EnKakasi*, struct PlayState*);
+void func_80A8F75C(EnKakasi*, struct PlayState*);
+void func_80A8F8D0(EnKakasi*, struct PlayState*);
+void func_80A8F9C8(EnKakasi*, struct PlayState*);
+void func_80A8FAA4(EnKakasi*, struct PlayState*);
+void func_80A8FBB8(EnKakasi*, struct PlayState*);
+void func_80A90264(EnKakasi2*, struct PlayState*);
+void func_80A904D8(EnKakasi2*, struct PlayState*);
+void func_80A90578(EnKakasi2*, struct PlayState*);
+void func_80A9062C(EnKakasi2*, struct PlayState*);
+void func_80A906C4(EnKakasi2*, struct PlayState*);
+void func_80A911F0(EnKakasi3*, struct PlayState*);
+void func_80A91284(EnKakasi3*, struct PlayState*);
+void func_80A91348(EnKakasi3*, struct PlayState*);
+void func_80A915B8(EnKakasi3*, struct PlayState*);
+void func_80A91620(EnKakasi3*, struct PlayState*);
+void func_80A91760(EnKakasi3*, struct PlayState*);
+void func_80A917FC(EnKakasi3*, struct PlayState*);
+void func_80A9187C(EnKakasi3*, struct PlayState*);
+void func_80A918E4(EnKakasi3*, struct PlayState*);
+void func_80A91A90(EnKakasi3*, struct PlayState*);
+void EnKarebaba_Awaken(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Dead(EnKarebaba*, struct PlayState*);
+void EnKarebaba_DeadItemDrop(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Dying(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Grow(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Idle(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Regrow(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Retract(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Spin(EnKarebaba*, struct PlayState*);
+void EnKarebaba_Upright(EnKarebaba*, struct PlayState*);
+void func_80A99048(EnKo*, struct PlayState*);
+void func_80A99384(EnKo*, struct PlayState*);
+void func_80A99438(EnKo*, struct PlayState*);
+void func_80A99504(EnKo*, struct PlayState*);
+void func_80A99560(EnKo*, struct PlayState*);
+void func_80A995CC(EnKo*, struct PlayState*);
+void EnKusa_CutWaitRegrow(EnKusa*, struct PlayState*);
+void EnKusa_DoNothing(EnKusa*, struct PlayState*);
+void EnKusa_Fall(EnKusa*, struct PlayState*);
+void EnKusa_LiftedUp(EnKusa*, struct PlayState*);
+void EnKusa_Main(EnKusa*, struct PlayState*);
+void EnKusa_Regrow(EnKusa*, struct PlayState*);
+void EnKusa_UprootedWaitRegrow(EnKusa*, struct PlayState*);
+void EnKusa_WaitObject(EnKusa*, struct PlayState*);
+void EnKz_Mweep(EnKz*, struct PlayState*);
+void EnKz_PreMweepWait(EnKz*, struct PlayState*);
+void EnKz_SetupGetItem(EnKz*, struct PlayState*);
+void EnKz_SetupMweep(EnKz*, struct PlayState*);
+void EnKz_StartTimer(EnKz*, struct PlayState*);
+void EnKz_StopMweep(EnKz*, struct PlayState*);
+void EnKz_Wait(EnKz*, struct PlayState*);
+void EnMa1_DoNothing(EnMa1*, struct PlayState*);
+void func_80AA0D88(EnMa1*, struct PlayState*);
+void func_80AA0EA0(EnMa1*, struct PlayState*);
+void func_80AA0EFC(EnMa1*, struct PlayState*);
+void func_80AA0F44(EnMa1*, struct PlayState*);
+void func_80AA106C(EnMa1*, struct PlayState*);
+void func_80AA10EC(EnMa1*, struct PlayState*);
+void func_80AA1150(EnMa1*, struct PlayState*);
+void func_80AA2018(EnMa2*, struct PlayState*);
+void func_80AA204C(EnMa2*, struct PlayState*);
+void func_80AA20E4(EnMa2*, struct PlayState*);
+void func_80AA21C8(EnMa2*, struct PlayState*);
+void func_80AA3200(EnMa3*, struct PlayState*);
+void EnMb_ClubAttack(EnMb*, struct PlayState*);
+void EnMb_ClubDamaged(EnMb*, struct PlayState*);
+void EnMb_ClubDamagedWhileKneeling(EnMb*, struct PlayState*);
+void EnMb_ClubDead(EnMb*, struct PlayState*);
+void EnMb_ClubWaitAfterAttack(EnMb*, struct PlayState*);
+void EnMb_ClubWaitPlayerNear(EnMb*, struct PlayState*);
+void EnMb_SpearDamaged(EnMb*, struct PlayState*);
+void EnMb_SpearDead(EnMb*, struct PlayState*);
+void EnMb_SpearEndChargeQuick(EnMb*, struct PlayState*);
+void EnMb_SpearGuardLookAround(EnMb*, struct PlayState*);
+void EnMb_SpearGuardPrepareAndCharge(EnMb*, struct PlayState*);
+void EnMb_SpearGuardWalk(EnMb*, struct PlayState*);
+void EnMb_SpearPatrolEndCharge(EnMb*, struct PlayState*);
+void EnMb_SpearPatrolImmediateCharge(EnMb*, struct PlayState*);
+void EnMb_SpearPatrolPrepareAndCharge(EnMb*, struct PlayState*);
+void EnMb_SpearPatrolTurnTowardsWaypoint(EnMb*, struct PlayState*);
+void EnMb_SpearPatrolWalkTowardsWaypoint(EnMb*, struct PlayState*);
+void EnMb_Stunned(EnMb*, struct PlayState*);
+void func_80AAB874(EnMd*, struct PlayState*);
+void func_80AAB8F8(EnMd*, struct PlayState*);
+void func_80AAB948(EnMd*, struct PlayState*);
+void func_80AABC10(EnMd*, struct PlayState*);
+void func_80AABD0C(EnMd*, struct PlayState*);
+void EnMk_Wait(EnMk*, struct PlayState*);
+void func_80AACA40(EnMk*, struct PlayState*);
+void func_80AACA94(EnMk*, struct PlayState*);
+void func_80AACB14(EnMk*, struct PlayState*);
+void func_80AACB6C(EnMk*, struct PlayState*);
+void func_80AACBAC(EnMk*, struct PlayState*);
+void func_80AACC04(EnMk*, struct PlayState*);
+void func_80AACCA0(EnMk*, struct PlayState*);
+void func_80AACD48(EnMk*, struct PlayState*);
+void func_80AACE2C(EnMk*, struct PlayState*);
+void func_80AACEE8(EnMk*, struct PlayState*);
+void func_80AACFA0(EnMk*, struct PlayState*);
+void func_80AAD014(EnMk*, struct PlayState*);
+void func_80AAE224(EnMm*, struct PlayState*);
+void func_80AAE294(EnMm*, struct PlayState*);
+void func_80AAE50C(EnMm*, struct PlayState*);
+void func_80AAE598(EnMm*, struct PlayState*);
+void func_80AAF2BC(EnMm2*, struct PlayState*);
+void func_80AAF330(EnMm2*, struct PlayState*);
+void func_80AAF57C(EnMm2*, struct PlayState*);
+void func_80AAF668(EnMm2*, struct PlayState*);
+void EnMs_Sell(EnMs*, struct PlayState*);
+void EnMs_Talk(EnMs*, struct PlayState*);
+void EnMs_TalkAfterPurchase(EnMs*, struct PlayState*);
+void EnMs_Wait(EnMs*, struct PlayState*);
+void EnMu_Pose(EnMu*, struct PlayState*);
+void EnNiw_ResetAction(EnNiw*, struct PlayState*);
+void func_80AB6324(EnNiw*, struct PlayState*);
+void func_80AB63A8(EnNiw*, struct PlayState*);
+void func_80AB6450(EnNiw*, struct PlayState*);
+void func_80AB6570(EnNiw*, struct PlayState*);
+void func_80AB6A38(EnNiw*, struct PlayState*);
+void func_80AB6BF8(EnNiw*, struct PlayState*);
+void func_80AB6D08(EnNiw*, struct PlayState*);
+void func_80AB6EB4(EnNiw*, struct PlayState*);
+void func_80AB6F04(EnNiw*, struct PlayState*);
+void func_80AB70A0(EnNiw*, struct PlayState*);
+void func_80AB70F8(EnNiw*, struct PlayState*);
+void func_80AB714C(EnNiw*, struct PlayState*);
+void func_80AB7204(EnNiw*, struct PlayState*);
+void func_80AB7290(EnNiw*, struct PlayState*);
+void func_80AB7328(EnNiw*, struct PlayState*);
+void func_80AB7420(EnNiw*, struct PlayState*);
+void EnNiwGirl_Jump(EnNiwGirl*, struct PlayState*);
+void EnNiwGirl_Talk(EnNiwGirl*, struct PlayState*);
+void func_80AB9210(EnNiwGirl*, struct PlayState*);
+void func_80AB94D0(EnNiwGirl*, struct PlayState*);
+void func_80AB9F24(EnNiwLady*, struct PlayState*);
+void func_80ABA21C(EnNiwLady*, struct PlayState*);
+void func_80ABA244(EnNiwLady*, struct PlayState*);
+void func_80ABA654(EnNiwLady*, struct PlayState*);
+void func_80ABA778(EnNiwLady*, struct PlayState*);
+void func_80ABA878(EnNiwLady*, struct PlayState*);
+void func_80ABAA9C(EnNiwLady*, struct PlayState*);
+void func_80ABAB08(EnNiwLady*, struct PlayState*);
+void func_80ABAC00(EnNiwLady*, struct PlayState*);
+void func_80ABAC84(EnNiwLady*, struct PlayState*);
+void func_80ABAD38(EnNiwLady*, struct PlayState*);
+void func_80ABAD7C(EnNiwLady*, struct PlayState*);
+void func_80ABBB34(EnNutsball*, struct PlayState*);
+void func_80ABBBA8(EnNutsball*, struct PlayState*);
+void EnNy_Die(EnNy*, struct PlayState*);
+void EnNy_Move(EnNy*, struct PlayState*);
+void EnNy_SetupDie(EnNy*, struct PlayState*);
+void EnNy_TurnToStone(EnNy*, struct PlayState*);
+void func_80ABCE50(EnNy*, struct PlayState*);
+void func_80ABCE90(EnNy*, struct PlayState*);
+void func_80ABCEEC(EnNy*, struct PlayState*);
+void func_80ABD11C(EnNy*, struct PlayState*);
+void EnOE2_DoNothing(EnOE2*, struct PlayState*);
+void EnOkarinaEffect_ManageStorm(EnOkarinaEffect*, struct PlayState*);
+void EnOkarinaEffect_TriggerStorm(EnOkarinaEffect*, struct PlayState*);
+void EnOkuta_Appear(EnOkuta*, struct PlayState*);
+void EnOkuta_Die(EnOkuta*, struct PlayState*);
+void EnOkuta_Freeze(EnOkuta*, struct PlayState*);
+void EnOkuta_Hide(EnOkuta*, struct PlayState*);
+void EnOkuta_ProjectileFly(EnOkuta*, struct PlayState*);
+void EnOkuta_Shoot(EnOkuta*, struct PlayState*);
+void EnOkuta_WaitToAppear(EnOkuta*, struct PlayState*);
+void EnOkuta_WaitToDie(EnOkuta*, struct PlayState*);
+void EnOkuta_WaitToShoot(EnOkuta*, struct PlayState*);
+void EnOssan_InitActionFunc(EnOssan*, struct PlayState*);
+void EnOssan_MainActionFunc(EnOssan*, struct PlayState*);
+void EnOwl_ConfirmKokiriMessage(EnOwl*, struct PlayState*);
+void EnOwl_WaitDeathMountainShortcut(EnOwl*, struct PlayState*);
+void EnOwl_WaitDefault(EnOwl*, struct PlayState*);
+void EnOwl_WaitGerudo(EnOwl*, struct PlayState*);
+void EnOwl_WaitHyliaShortcut(EnOwl*, struct PlayState*);
+void EnOwl_WaitHyruleCastle(EnOwl*, struct PlayState*);
+void EnOwl_WaitKakariko(EnOwl*, struct PlayState*);
+void EnOwl_WaitLWPostSaria(EnOwl*, struct PlayState*);
+void EnOwl_WaitLWPreSaria(EnOwl*, struct PlayState*);
+void EnOwl_WaitLakeHylia(EnOwl*, struct PlayState*);
+void EnOwl_WaitOutsideKokiri(EnOwl*, struct PlayState*);
+void EnOwl_WaitZoraRiver(EnOwl*, struct PlayState*);
+void func_80ACA690(EnOwl*, struct PlayState*);
+void func_80ACA76C(EnOwl*, struct PlayState*);
+void func_80ACA7E0(EnOwl*, struct PlayState*);
+void func_80ACA998(EnOwl*, struct PlayState*);
+void func_80ACAA54(EnOwl*, struct PlayState*);
+void func_80ACAAC0(EnOwl*, struct PlayState*);
+void func_80ACAB88(EnOwl*, struct PlayState*);
+void func_80ACAC6C(EnOwl*, struct PlayState*);
+void func_80ACAD34(EnOwl*, struct PlayState*);
+void func_80ACADF0(EnOwl*, struct PlayState*);
+void func_80ACAEB8(EnOwl*, struct PlayState*);
+void func_80ACAF74(EnOwl*, struct PlayState*);
+void func_80ACB03C(EnOwl*, struct PlayState*);
+void func_80ACB148(EnOwl*, struct PlayState*);
+void func_80ACB22C(EnOwl*, struct PlayState*);
+void func_80ACB274(EnOwl*, struct PlayState*);
+void func_80ACB344(EnOwl*, struct PlayState*);
+void func_80ACB3E0(EnOwl*, struct PlayState*);
+void func_80ACB440(EnOwl*, struct PlayState*);
+void func_80ACB4FC(EnOwl*, struct PlayState*);
+void func_80ACB5C4(EnOwl*, struct PlayState*);
+void func_80ACB680(EnOwl*, struct PlayState*);
+void func_80ACBF50(EnOwl*, struct PlayState*);
+void func_80ACC00C(EnOwl*, struct PlayState*);
+void func_80ACC30C(EnOwl*, struct PlayState*);
+void EnPeehat_Adult_StateDie(EnPeehat*, struct PlayState*);
+void EnPeehat_Flying_StateFly(EnPeehat*, struct PlayState*);
+void EnPeehat_Flying_StateGrounded(EnPeehat*, struct PlayState*);
+void EnPeehat_Flying_StateLanding(EnPeehat*, struct PlayState*);
+void EnPeehat_Flying_StateRise(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateGround(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateHover(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateLanding(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateReturnHome(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateRise(EnPeehat*, struct PlayState*);
+void EnPeehat_Ground_StateSeekPlayer(EnPeehat*, struct PlayState*);
+void EnPeehat_Larva_StateSeekPlayer(EnPeehat*, struct PlayState*);
+void EnPeehat_StateAttackRecoil(EnPeehat*, struct PlayState*);
+void EnPeehat_StateBoomerangStunned(EnPeehat*, struct PlayState*);
+void EnPeehat_StateExplode(EnPeehat*, struct PlayState*);
+void EnPoDesert_Disappear(EnPoDesert*, struct PlayState*);
+void EnPoDesert_MoveToNextPoint(EnPoDesert*, struct PlayState*);
+void EnPoDesert_WaitForPlayer(EnPoDesert*, struct PlayState*);
+void EnPoField_Appear(EnPoField*, struct PlayState*);
+void EnPoField_CirclePlayer(EnPoField*, struct PlayState*);
+void EnPoField_Damage(EnPoField*, struct PlayState*);
+void EnPoField_Death(EnPoField*, struct PlayState*);
+void EnPoField_Disappear(EnPoField*, struct PlayState*);
+void EnPoField_Flee(EnPoField*, struct PlayState*);
+void EnPoField_SoulDisappear(EnPoField*, struct PlayState*);
+void EnPoField_SoulIdle(EnPoField*, struct PlayState*);
+void EnPoField_SoulInteract(EnPoField*, struct PlayState*);
+void EnPoField_WaitForSpawn(EnPoField*, struct PlayState*);
+void func_80AD587C(EnPoField*, struct PlayState*);
+void func_80AD58D4(EnPoField*, struct PlayState*);
+void EnPoRelay_DisappearAndReward(EnPoRelay*, struct PlayState*);
+void EnPoRelay_EndRace(EnPoRelay*, struct PlayState*);
+void EnPoRelay_Idle(EnPoRelay*, struct PlayState*);
+void EnPoRelay_Race(EnPoRelay*, struct PlayState*);
+void EnPoRelay_Talk(EnPoRelay*, struct PlayState*);
+void EnPoRelay_Talk2(EnPoRelay*, struct PlayState*);
+void func_80ADA4A8(EnPoSisters*, struct PlayState*);
+void func_80ADA530(EnPoSisters*, struct PlayState*);
+void func_80ADA6A0(EnPoSisters*, struct PlayState*);
+void func_80ADA7F0(EnPoSisters*, struct PlayState*);
+void func_80ADA8C0(EnPoSisters*, struct PlayState*);
+void func_80ADA9E8(EnPoSisters*, struct PlayState*);
+void func_80ADAAA4(EnPoSisters*, struct PlayState*);
+void func_80ADAC70(EnPoSisters*, struct PlayState*);
+void func_80ADAD54(EnPoSisters*, struct PlayState*);
+void func_80ADAE6C(EnPoSisters*, struct PlayState*);
+void func_80ADAFC0(EnPoSisters*, struct PlayState*);
+void func_80ADB17C(EnPoSisters*, struct PlayState*);
+void func_80ADB2B8(EnPoSisters*, struct PlayState*);
+void func_80ADB338(EnPoSisters*, struct PlayState*);
+void func_80ADB4B0(EnPoSisters*, struct PlayState*);
+void func_80ADB51C(EnPoSisters*, struct PlayState*);
+void func_80ADB770(EnPoSisters*, struct PlayState*);
+void func_80ADB9F0(EnPoSisters*, struct PlayState*);
+void func_80ADBB6C(EnPoSisters*, struct PlayState*);
+void func_80ADBBF4(EnPoSisters*, struct PlayState*);
+void func_80ADBC88(EnPoSisters*, struct PlayState*);
+void func_80ADBD38(EnPoSisters*, struct PlayState*);
+void func_80ADBD8C(EnPoSisters*, struct PlayState*);
+void func_80ADBEE8(EnPoSisters*, struct PlayState*);
+void func_80ADBF58(EnPoSisters*, struct PlayState*);
+void EnPoh_Appear(EnPoh*, struct PlayState*);
+void EnPoh_Attack(EnPoh*, struct PlayState*);
+void EnPoh_ComposerAppear(EnPoh*, struct PlayState*);
+void EnPoh_Death(EnPoh*, struct PlayState*);
+void EnPoh_Disappear(EnPoh*, struct PlayState*);
+void EnPoh_Idle(EnPoh*, struct PlayState*);
+void EnPoh_TalkComposer(EnPoh*, struct PlayState*);
+void EnPoh_TalkRegular(EnPoh*, struct PlayState*);
+void func_80ADEAC4(EnPoh*, struct PlayState*);
+void func_80ADEC9C(EnPoh*, struct PlayState*);
+void func_80ADEECC(EnPoh*, struct PlayState*);
+void func_80ADEF38(EnPoh*, struct PlayState*);
+void func_80ADF15C(EnPoh*, struct PlayState*);
+void func_80ADF574(EnPoh*, struct PlayState*);
+void func_80ADF5E0(EnPoh*, struct PlayState*);
+void func_80ADF894(EnPoh*, struct PlayState*);
+void func_80ADFE28(EnPoh*, struct PlayState*);
+void func_80ADFE80(EnPoh*, struct PlayState*);
+void func_80AE009C(EnPoh*, struct PlayState*);
+void func_80AE2744(EnRd*, struct PlayState*);
+void func_80AE2A10(EnRd*, struct PlayState*);
+void func_80AE2C1C(EnRd*, struct PlayState*);
+void func_80AE2FD0(EnRd*, struct PlayState*);
+void func_80AE3260(EnRd*, struct PlayState*);
+void func_80AE3454(EnRd*, struct PlayState*);
+void func_80AE3834(EnRd*, struct PlayState*);
+void func_80AE3978(EnRd*, struct PlayState*);
+void func_80AE3A54(EnRd*, struct PlayState*);
+void func_80AE3B18(EnRd*, struct PlayState*);
+void func_80AE3C98(EnRd*, struct PlayState*);
+void func_80AE3ECC(EnRd*, struct PlayState*);
+void EnRr_Approach(EnRr*, struct PlayState*);
+void EnRr_Damage(EnRr*, struct PlayState*);
+void EnRr_Death(EnRr*, struct PlayState*);
+void EnRr_GrabPlayer(EnRr*, struct PlayState*);
+void EnRr_Reach(EnRr*, struct PlayState*);
+void EnRr_Retreat(EnRr*, struct PlayState*);
+void EnRr_Stunned(EnRr*, struct PlayState*);
+void func_80AF6448(EnSa*, struct PlayState*);
+void func_80AF67D0(EnSa*, struct PlayState*);
+void func_80AF683C(EnSa*, struct PlayState*);
+void func_80AF68E4(EnSa*, struct PlayState*);
+void func_80AF6B20(EnSa*, struct PlayState*);
+void EnSb_Bounce(EnSb*, struct PlayState*);
+void EnSb_Cooldown(EnSb*, struct PlayState*);
+void EnSb_Lunge(EnSb*, struct PlayState*);
+void EnSb_Open(EnSb*, struct PlayState*);
+void EnSb_TurnAround(EnSb*, struct PlayState*);
+void EnSb_WaitClosed(EnSb*, struct PlayState*);
+void EnSb_WaitOpen(EnSb*, struct PlayState*);
+void EnSceneChange_DoNothing(EnSceneChange*, struct PlayState*);
+void EnShopnuts_Burrow(EnShopnuts*, struct PlayState*);
+void EnShopnuts_LookAround(EnShopnuts*, struct PlayState*);
+void EnShopnuts_SpawnSalesman(EnShopnuts*, struct PlayState*);
+void EnShopnuts_Stand(EnShopnuts*, struct PlayState*);
+void EnShopnuts_ThrowNut(EnShopnuts*, struct PlayState*);
+void EnShopnuts_Wait(EnShopnuts*, struct PlayState*);
+void func_80AFB768(EnSi*, struct PlayState*);
+void func_80AFB89C(EnSi*, struct PlayState*);
+void func_80AFB950(EnSi*, struct PlayState*);
+void func_80AFC218(EnSiofuki*, struct PlayState*);
+void func_80AFC34C(EnSiofuki*, struct PlayState*);
+void func_80AFC3C8(EnSiofuki*, struct PlayState*);
+void func_80AFC478(EnSiofuki*, struct PlayState*);
+void func_80AFC544(EnSiofuki*, struct PlayState*);
+void EnSkb_Advance(EnSkb*, struct PlayState*);
+void EnSkb_SetupAttack(EnSkb*, struct PlayState*);
+void func_80AFCE5C(EnSkb*, struct PlayState*);
+void func_80AFCFF0(EnSkb*, struct PlayState*);
+void func_80AFD508(EnSkb*, struct PlayState*);
+void func_80AFD59C(EnSkb*, struct PlayState*);
+void func_80AFD6CC(EnSkb*, struct PlayState*);
+void func_80AFD880(EnSkb*, struct PlayState*);
+void EnSkj_CleanupOcarinaGame(EnSkj*, struct PlayState*);
+void EnSkj_FailedMiniGame(EnSkj*, struct PlayState*);
+void EnSkj_FinishOcarinaGameRound(EnSkj*, struct PlayState*);
+void EnSkj_GiveOcarinaGameReward(EnSkj*, struct PlayState*);
+void EnSkj_SetupWaitForOcarina(EnSkj*, struct PlayState*);
+void EnSkj_StartOcarinaMinigame(EnSkj*, struct PlayState*);
+void EnSkj_WaitForNextRound(EnSkj*, struct PlayState*);
+void EnSkj_WaitForOcarina(EnSkj*, struct PlayState*);
+void EnSkj_WaitForOfferResponse(EnSkj*, struct PlayState*);
+void EnSkj_WaitForPlayback(EnSkj*, struct PlayState*);
+void EnSkj_WaitToGiveReward(EnSkj*, struct PlayState*);
+void EnSkj_WonOcarinaMiniGame(EnSkj*, struct PlayState*);
+void EnSsh_Drop(EnSsh*, struct PlayState*);
+void EnSsh_Idle(EnSsh*, struct PlayState*);
+void EnSsh_Land(EnSsh*, struct PlayState*);
+void EnSsh_Return(EnSsh*, struct PlayState*);
+void EnSsh_Start(EnSsh*, struct PlayState*);
+void EnSsh_Talk(EnSsh*, struct PlayState*);
+void EnSsh_Wait(EnSsh*, struct PlayState*);
+void EnSt_BounceAround(EnSt*, struct PlayState*);
+void EnSt_Die(EnSt*, struct PlayState*);
+void EnSt_FinishBouncing(EnSt*, struct PlayState*);
+void EnSt_LandOnGround(EnSt*, struct PlayState*);
+void EnSt_MoveToGround(EnSt*, struct PlayState*);
+void EnSt_ReturnToCeiling(EnSt*, struct PlayState*);
+void EnSt_StartOnCeilingOrGround(EnSt*, struct PlayState*);
+void EnSt_WaitOnCeiling(EnSt*, struct PlayState*);
+void EnSt_WaitOnGround(EnSt*, struct PlayState*);
+void EnSth_ChildRewardObtainedWait(EnSth*, struct PlayState*);
+void EnSth_GiveReward(EnSth*, struct PlayState*);
+void EnSth_ParentRewardObtainedWait(EnSth*, struct PlayState*);
+void EnSth_RewardObtainedTalk(EnSth*, struct PlayState*);
+void EnSth_RewardUnobtainedTalk(EnSth*, struct PlayState*);
+void EnSth_RewardUnobtainedWait(EnSth*, struct PlayState*);
+void EnSth_SetupAfterObjectLoaded(EnSth*, struct PlayState*);
+void EnSth_WaitForObjectLoaded(EnSth*, struct PlayState*);
+void EnStream_SuckPlayer(EnStream*, struct PlayState*);
+void EnStream_WaitForPlayer(EnStream*, struct PlayState*);
+void func_80B0D364(EnSw*, struct PlayState*);
+void func_80B0D3AC(EnSw*, struct PlayState*);
+void func_80B0D590(EnSw*, struct PlayState*);
+void func_80B0D878(EnSw*, struct PlayState*);
+void func_80B0DB00(EnSw*, struct PlayState*);
+void func_80B0DC7C(EnSw*, struct PlayState*);
+void func_80B0E5E0(EnSw*, struct PlayState*);
+void func_80B0E728(EnSw*, struct PlayState*);
+void func_80B0E90C(EnSw*, struct PlayState*);
+void func_80B0E9BC(EnSw*, struct PlayState*);
+void EnSyatekiItm_CheckTargets(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiItm_CleanupGame(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiItm_EndGame(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiItm_Idle(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiItm_SpawnTargets(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiItm_StartRound(EnSyatekiItm*, struct PlayState*);
+void EnSyatekiMan_EndGame(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_FinishPrize(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_GivePrize(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_Idle(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_RestartGame(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_SetupIdle(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_Start(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_StartGame(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_StopTalk(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_Talk(EnSyatekiMan*, struct PlayState*);
+void EnSyatekiMan_WaitForGame(EnSyatekiMan*, struct PlayState*);
+void func_80B11DEC(EnSyatekiNiw*, struct PlayState*);
+void func_80B11E78(EnSyatekiNiw*, struct PlayState*);
+void func_80B123A8(EnSyatekiNiw*, struct PlayState*);
+void func_80B12460(EnSyatekiNiw*, struct PlayState*);
+void func_80B128D8(EnSyatekiNiw*, struct PlayState*);
+void func_80B129EC(EnSyatekiNiw*, struct PlayState*);
+void EnTa_RunCuccoGame(EnTa*, struct PlayState*);
+void EnTa_TalkGeneralInLonLonHouse(EnTa*, struct PlayState*);
+void func_80B15100(EnTa*, struct PlayState*);
+void func_80B15260(EnTa*, struct PlayState*);
+void func_80B153D4(EnTa*, struct PlayState*);
+void func_80B15424(EnTa*, struct PlayState*);
+void func_80B161C0(EnTa*, struct PlayState*);
+void func_80B162E8(EnTa*, struct PlayState*);
+void func_80B1642C(EnTa*, struct PlayState*);
+void func_80B176E0(EnTakaraMan*, struct PlayState*);
+void func_80B1778C(EnTakaraMan*, struct PlayState*);
+void func_80B17934(EnTakaraMan*, struct PlayState*);
+void func_80B17A6C(EnTakaraMan*, struct PlayState*);
+void func_80B17AC4(EnTakaraMan*, struct PlayState*);
+void func_80B17B14(EnTakaraMan*, struct PlayState*);
+void EnTest_Fall(EnTest*, struct PlayState*);
+void EnTest_Idle(EnTest*, struct PlayState*);
+void EnTest_IdleFromBlock(EnTest*, struct PlayState*);
+void EnTest_JumpBack(EnTest*, struct PlayState*);
+void EnTest_JumpUp(EnTest*, struct PlayState*);
+void EnTest_Jumpslash(EnTest*, struct PlayState*);
+void EnTest_Land(EnTest*, struct PlayState*);
+void EnTest_Recoil(EnTest*, struct PlayState*);
+void EnTest_Rise(EnTest*, struct PlayState*);
+void EnTest_SlashDown(EnTest*, struct PlayState*);
+void EnTest_SlashDownEnd(EnTest*, struct PlayState*);
+void EnTest_SlashUp(EnTest*, struct PlayState*);
+void EnTest_StopAndBlock(EnTest*, struct PlayState*);
+void EnTest_Stunned(EnTest*, struct PlayState*);
+void EnTest_WaitAbove(EnTest*, struct PlayState*);
+void EnTest_WaitGround(EnTest*, struct PlayState*);
+void EnTest_WalkAndBlock(EnTest*, struct PlayState*);
+void func_80860C24(EnTest*, struct PlayState*);
+void func_80860F84(EnTest*, struct PlayState*);
+void func_808621D4(EnTest*, struct PlayState*);
+void func_80862418(EnTest*, struct PlayState*);
+void func_808628C8(EnTest*, struct PlayState*);
+void func_80862E6C(EnTest*, struct PlayState*);
+void func_80863044(EnTest*, struct PlayState*);
+void func_8086318C(EnTest*, struct PlayState*);
+void func_808633E8(EnTest*, struct PlayState*);
+void EnTg_SpinIfNotTalking(EnTg*, struct PlayState*);
+void EnTite_Attack(EnTite*, struct PlayState*);
+void EnTite_DeathCry(EnTite*, struct PlayState*);
+void EnTite_FallApart(EnTite*, struct PlayState*);
+void EnTite_FlipOnBack(EnTite*, struct PlayState*);
+void EnTite_FlipUpright(EnTite*, struct PlayState*);
+void EnTite_Idle(EnTite*, struct PlayState*);
+void EnTite_MoveTowardPlayer(EnTite*, struct PlayState*);
+void EnTite_Recoil(EnTite*, struct PlayState*);
+void EnTite_Stunned(EnTite*, struct PlayState*);
+void EnTite_TurnTowardPlayer(EnTite*, struct PlayState*);
+void func_80B20914(EnToryo*, struct PlayState*);
+void EnTp_Die(EnTp*, struct PlayState*);
+void EnTp_Fragment_Fade(EnTp*, struct PlayState*);
+void EnTp_Head_ApproachPlayer(EnTp*, struct PlayState*);
+void EnTp_Head_BurrowReturnHome(EnTp*, struct PlayState*);
+void EnTp_Head_TakeOff(EnTp*, struct PlayState*);
+void EnTp_Head_Wait(EnTp*, struct PlayState*);
+void EnTp_Tail_FollowHead(EnTp*, struct PlayState*);
+void EnTr_ChooseAction1(EnTr*, struct PlayState*);
+void EnTr_ChooseAction2(EnTr*, struct PlayState*);
+void EnTr_CrySpellcast(EnTr*, struct PlayState*);
+void EnTr_DoNothing(EnTr*, struct PlayState*);
+void EnTr_FlyKidnapCutscene(EnTr*, struct PlayState*);
+void EnTr_Reappear(EnTr*, struct PlayState*);
+void EnTr_ShrinkVanish(EnTr*, struct PlayState*);
+void EnTr_TakeOff(EnTr*, struct PlayState*);
+void EnTr_TurnLookOverShoulder(EnTr*, struct PlayState*);
+void EnTr_WaitToReappear(EnTr*, struct PlayState*);
+void EnTuboTrap_Fly(EnTuboTrap*, struct PlayState*);
+void EnTuboTrap_Levitate(EnTuboTrap*, struct PlayState*);
+void EnTuboTrap_WaitForProximity(EnTuboTrap*, struct PlayState*);
+void EnVali_Attacked(EnVali*, struct PlayState*);
+void EnVali_Burnt(EnVali*, struct PlayState*);
+void EnVali_DivideAndDie(EnVali*, struct PlayState*);
+void EnVali_DropAppear(EnVali*, struct PlayState*);
+void EnVali_FloatIdle(EnVali*, struct PlayState*);
+void EnVali_Frozen(EnVali*, struct PlayState*);
+void EnVali_Lurk(EnVali*, struct PlayState*);
+void EnVali_MoveArmsDown(EnVali*, struct PlayState*);
+void EnVali_Retaliate(EnVali*, struct PlayState*);
+void EnVali_ReturnToLurk(EnVali*, struct PlayState*);
+void EnVali_Stunned(EnVali*, struct PlayState*);
+void EnViewer_InitImpl(EnViewer*, struct PlayState*);
+void EnViewer_UpdateImpl(EnViewer*, struct PlayState*);
+void EnVm_Attack(EnVm*, struct PlayState*);
+void EnVm_Die(EnVm*, struct PlayState*);
+void EnVm_Stun(EnVm*, struct PlayState*);
+void EnVm_Wait(EnVm*, struct PlayState*);
+void EnWallTubo_DetectChu(EnWallTubo*, struct PlayState*);
+void EnWallTubo_FindGirl(EnWallTubo*, struct PlayState*);
+void EnWallTubo_SetWallFall(EnWallTubo*, struct PlayState*);
+void EnWallmas_Cooldown(EnWallmas*, struct PlayState*);
+void EnWallmas_Die(EnWallmas*, struct PlayState*);
+void EnWallmas_Drop(EnWallmas*, struct PlayState*);
+void EnWallmas_JumpToCeiling(EnWallmas*, struct PlayState*);
+void EnWallmas_Land(EnWallmas*, struct PlayState*);
+void EnWallmas_ReturnToCeiling(EnWallmas*, struct PlayState*);
+void EnWallmas_Stand(EnWallmas*, struct PlayState*);
+void EnWallmas_Stun(EnWallmas*, struct PlayState*);
+void EnWallmas_TakeDamage(EnWallmas*, struct PlayState*);
+void EnWallmas_TakePlayer(EnWallmas*, struct PlayState*);
+void EnWallmas_WaitForProximity(EnWallmas*, struct PlayState*);
+void EnWallmas_WaitForSwitchFlag(EnWallmas*, struct PlayState*);
+void EnWallmas_WaitToDrop(EnWallmas*, struct PlayState*);
+void EnWallmas_Walk(EnWallmas*, struct PlayState*);
+void EnWeatherTag_DisabledCloudyDeathMountain(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledCloudyHyruleMarket(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledCloudyLonLonRanch(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledCloudyRainThunderKakariko(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledCloudySnow(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledRainLakeHylia(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_DisabledRainThunder(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledCloudyDeathMountain(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledCloudyHyruleMarket(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledCloudyLonLonRanch(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledCloudyRainThunderKakariko(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledCloudySnow(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledRainLakeHylia(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_EnabledRainThunder(EnWeatherTag*, struct PlayState*);
+void EnWeatherTag_SetSandstormIntensity(EnWeatherTag*, struct PlayState*);
+void func_80B32804(EnWeiyer*, struct PlayState*);
+void func_80B328E8(EnWeiyer*, struct PlayState*);
+void func_80B32C2C(EnWeiyer*, struct PlayState*);
+void func_80B32D30(EnWeiyer*, struct PlayState*);
+void func_80B32E34(EnWeiyer*, struct PlayState*);
+void func_80B33018(EnWeiyer*, struct PlayState*);
+void func_80B331CC(EnWeiyer*, struct PlayState*);
+void func_80B332B4(EnWeiyer*, struct PlayState*);
+void func_80B33338(EnWeiyer*, struct PlayState*);
+void func_80B333B8(EnWeiyer*, struct PlayState*);
+void func_80B3349C(EnWeiyer*, struct PlayState*);
+void EnWf_BackflipAway(EnWf*, struct PlayState*);
+void EnWf_Blocking(EnWf*, struct PlayState*);
+void EnWf_Damaged(EnWf*, struct PlayState*);
+void EnWf_Die(EnWf*, struct PlayState*);
+void EnWf_RecoilFromBlockedSlash(EnWf*, struct PlayState*);
+void EnWf_RunAroundPlayer(EnWf*, struct PlayState*);
+void EnWf_RunAtPlayer(EnWf*, struct PlayState*);
+void EnWf_SearchForPlayer(EnWf*, struct PlayState*);
+void EnWf_Sidestep(EnWf*, struct PlayState*);
+void EnWf_Slash(EnWf*, struct PlayState*);
+void EnWf_SomersaultAndAttack(EnWf*, struct PlayState*);
+void EnWf_Stunned(EnWf*, struct PlayState*);
+void EnWf_Wait(EnWf*, struct PlayState*);
+void EnWf_WaitToAppear(EnWf*, struct PlayState*);
+void func_80B42F74(EnYabusameMark*, struct PlayState*);
+void EnZf_ApproachPlayer(EnZf*, struct PlayState*);
+void EnZf_CircleAroundPlayer(EnZf*, struct PlayState*);
+void EnZf_Damaged(EnZf*, struct PlayState*);
+void EnZf_Die(EnZf*, struct PlayState*);
+void EnZf_DrawSword(EnZf*, struct PlayState*);
+void EnZf_DropIn(EnZf*, struct PlayState*);
+void EnZf_HopAndTaunt(EnZf*, struct PlayState*);
+void EnZf_HopAway(EnZf*, struct PlayState*);
+void EnZf_JumpBack(EnZf*, struct PlayState*);
+void EnZf_JumpForward(EnZf*, struct PlayState*);
+void EnZf_JumpUp(EnZf*, struct PlayState*);
+void EnZf_RecoilFromBlockedSlash(EnZf*, struct PlayState*);
+void EnZf_SheatheSword(EnZf*, struct PlayState*);
+void EnZf_Slash(EnZf*, struct PlayState*);
+void EnZf_Stunned(EnZf*, struct PlayState*);
+void func_80B4543C(EnZf*, struct PlayState*);
+void func_80B46098(EnZf*, struct PlayState*);
+void func_80B463E4(EnZf*, struct PlayState*);
+void EnZl4_Cutscene(EnZl4*, struct PlayState*);
+void EnZl4_Idle(EnZl4*, struct PlayState*);
+void EnZl4_TheEnd(EnZl4*, struct PlayState*);
+void EnZo_Dive(EnZo*, struct PlayState*);
+void EnZo_Standing(EnZo*, struct PlayState*);
+void EnZo_Submerged(EnZo*, struct PlayState*);
+void EnZo_Surface(EnZo*, struct PlayState*);
+void EnZo_TreadWater(EnZo*, struct PlayState*);
+void EnfHG_Approach(EnfHG*, struct PlayState*);
+void EnfHG_Attack(EnfHG*, struct PlayState*);
+void EnfHG_Damage(EnfHG*, struct PlayState*);
+void EnfHG_Done(EnfHG*, struct PlayState*);
+void EnfHG_Intro(EnfHG*, struct PlayState*);
+void EnfHG_Retreat(EnfHG*, struct PlayState*);
+void ItemEtcetera_MoveFireArrowDown(ItemEtcetera*, struct PlayState*);
+void func_80B857D0(ItemEtcetera*, struct PlayState*);
+void ItemInbox_Wait(ItemInbox*, struct PlayState*);
+void ItemOcarina_DoNothing(ItemOcarina*, struct PlayState*);
+void ItemOcarina_Fly(ItemOcarina*, struct PlayState*);
+void ItemOcarina_GetThrown(ItemOcarina*, struct PlayState*);
+void ItemOcarina_StartSoTCutscene(ItemOcarina*, struct PlayState*);
+void ItemOcarina_WaitInWater(ItemOcarina*, struct PlayState*);
+void func_80B864EC(ItemOcarina*, struct PlayState*);
+void func_80B865E0(ItemOcarina*, struct PlayState*);
+void func_80B86AC8(ItemShield*, struct PlayState*);
+void func_80B86BC8(ItemShield*, struct PlayState*);
+void func_80B86CA8(ItemShield*, struct PlayState*);
+void func_80B86F68(ItemShield*, struct PlayState*);
+void ObjBean_Fly(ObjBean*, struct PlayState*);
+void ObjBean_GrowWaterPhase1(ObjBean*, struct PlayState*);
+void ObjBean_GrowWaterPhase2(ObjBean*, struct PlayState*);
+void ObjBean_GrowWaterPhase3(ObjBean*, struct PlayState*);
+void ObjBean_GrowWaterPhase4(ObjBean*, struct PlayState*);
+void ObjBean_GrowWaterPhase5(ObjBean*, struct PlayState*);
+void ObjBean_WaitForBean(ObjBean*, struct PlayState*);
+void ObjBean_WaitForPlayer(ObjBean*, struct PlayState*);
+void ObjBean_WaitForStepOff(ObjBean*, struct PlayState*);
+void ObjBean_WaitForWater(ObjBean*, struct PlayState*);
+void func_80B8FE3C(ObjBean*, struct PlayState*);
+void func_80B8FEAC(ObjBean*, struct PlayState*);
+void func_80B8FF8C(ObjBean*, struct PlayState*);
+void func_80B90050(ObjBean*, struct PlayState*);
+void func_80B90918(ObjBean*, struct PlayState*);
+void func_80B909B0(ObjBean*, struct PlayState*);
+void func_80B90A34(ObjBean*, struct PlayState*);
+void ObjComb_Wait(ObjComb*, struct PlayState*);
+void func_80B92C80(ObjElevator*, struct PlayState*);
+void func_80B92D44(ObjElevator*, struct PlayState*);
+void func_80B93DF4(ObjHsblock*, struct PlayState*);
+void func_80B93E5C(ObjHsblock*, struct PlayState*);
+void ObjIcePoly_Idle(ObjIcePoly*, struct PlayState*);
+void ObjIcePoly_Melt(ObjIcePoly*, struct PlayState*);
+void ObjKibako_Held(ObjKibako*, struct PlayState*);
+void ObjKibako_Idle(ObjKibako*, struct PlayState*);
+void ObjKibako_Thrown(ObjKibako*, struct PlayState*);
+void ObjKibako2_Idle(ObjKibako2*, struct PlayState*);
+void ObjKibako2_Kill(ObjKibako2*, struct PlayState*);
+void func_80B96560(ObjLift*, struct PlayState*);
+void func_80B96678(ObjLift*, struct PlayState*);
+void func_80B96840(ObjLift*, struct PlayState*);
+void ObjLightswitch_Disappear(ObjLightswitch*, struct PlayState*);
+void ObjLightswitch_DisappearDelay(ObjLightswitch*, struct PlayState*);
+void ObjLightswitch_Off(ObjLightswitch*, struct PlayState*);
+void ObjLightswitch_On(ObjLightswitch*, struct PlayState*);
+void ObjLightswitch_TurnOff(ObjLightswitch*, struct PlayState*);
+void ObjLightswitch_TurnOn(ObjLightswitch*, struct PlayState*);
+void ObjMakekinsuta_DoNothing(ObjMakekinsuta*, struct PlayState*);
+void func_80B98320(ObjMakekinsuta*, struct PlayState*);
+void ObjMure_ActiveState(ObjMure*, struct PlayState*);
+void ObjMure_CulledState(ObjMure*, struct PlayState*);
+void ObjMure_InitialAction(ObjMure*, struct PlayState*);
+void ObjMure2_Wait(ObjMure2*, struct PlayState*);
+void func_80B9A668(ObjMure2*, struct PlayState*);
+void func_80B9A6F8(ObjMure2*, struct PlayState*);
+void func_80B9AF34(ObjMure3*, struct PlayState*);
+void func_80B9AF64(ObjMure3*, struct PlayState*);
+void func_80B9AFFC(ObjMure3*, struct PlayState*);
+void ObjOshihiki_Fall(ObjOshihiki*, struct PlayState*);
+void ObjOshihiki_OnActor(ObjOshihiki*, struct PlayState*);
+void ObjOshihiki_OnScene(ObjOshihiki*, struct PlayState*);
+void ObjOshihiki_Push(ObjOshihiki*, struct PlayState*);
+void func_80B9D054(ObjRoomtimer*, struct PlayState*);
+void func_80B9D0B0(ObjRoomtimer*, struct PlayState*);
+void ObjTimeblock_AltBehaviorVisible(ObjTimeblock*, struct PlayState*);
+void ObjTimeblock_AltBehaviourNotVisible(ObjTimeblock*, struct PlayState*);
+void ObjTimeblock_DoNothing(ObjTimeblock*, struct PlayState*);
+void ObjTimeblock_Normal(ObjTimeblock*, struct PlayState*);
+void ObjTsubo_Idle(ObjTsubo*, struct PlayState*);
+void ObjTsubo_LiftedUp(ObjTsubo*, struct PlayState*);
+void ObjTsubo_Thrown(ObjTsubo*, struct PlayState*);
+void ObjTsubo_WaitForObject(ObjTsubo*, struct PlayState*);
+void ObjWarp2block_DoNothing(ObjWarp2block*, struct PlayState*);
+void func_80BA24F8(ObjWarp2block*, struct PlayState*);
+void func_80BA2610(ObjWarp2block*, struct PlayState*);
+void OceffSpot_End(OceffSpot*, struct PlayState*);
+void OceffSpot_GrowCylinder(OceffSpot*, struct PlayState*);
+void OceffSpot_Wait(OceffSpot*, struct PlayState*);
+void OceffStorm_DefaultAction(OceffStorm*, struct PlayState*);
+void OceffStorm_UnkAction(OceffStorm*, struct PlayState*);
+void ShotSun_SpawnFairy(ShotSun*, struct PlayState*);
+void ShotSun_TriggerFairy(ShotSun*, struct PlayState*);
+void ShotSun_UpdateHyliaSun(ShotSun*, struct PlayState*);
+void func_80BADF0C(ShotSun*, struct PlayState*);
+
+}  // extern "C" for forward declarations
 
 // Include actor headers for offsetof() compile-time resolution
+#include "overlays/actors/ovl_Arms_Hook/z_arms_hook.h"
+#include "overlays/actors/ovl_Arrow_Fire/z_arrow_fire.h"
+#include "overlays/actors/ovl_Arrow_Ice/z_arrow_ice.h"
+#include "overlays/actors/ovl_Arrow_Light/z_arrow_light.h"
+#include "overlays/actors/ovl_Bg_Bdan_Objects/z_bg_bdan_objects.h"
+#include "overlays/actors/ovl_Bg_Bdan_Switch/z_bg_bdan_switch.h"
+#include "overlays/actors/ovl_Bg_Bom_Guard/z_bg_bom_guard.h"
+#include "overlays/actors/ovl_Bg_Bombwall/z_bg_bombwall.h"
+#include "overlays/actors/ovl_Bg_Bowl_Wall/z_bg_bowl_wall.h"
+#include "overlays/actors/ovl_Bg_Breakwall/z_bg_breakwall.h"
+#include "overlays/actors/ovl_Bg_Ddan_Jd/z_bg_ddan_jd.h"
+#include "overlays/actors/ovl_Bg_Ddan_Kd/z_bg_ddan_kd.h"
+#include "overlays/actors/ovl_Bg_Dodoago/z_bg_dodoago.h"
 #include "overlays/actors/ovl_Bg_Dy_Yoseizo/z_bg_dy_yoseizo.h"
+#include "overlays/actors/ovl_Bg_Ganon_Otyuka/z_bg_ganon_otyuka.h"
+#include "overlays/actors/ovl_Bg_Gate_Shutter/z_bg_gate_shutter.h"
+#include "overlays/actors/ovl_Bg_Gjyo_Bridge/z_bg_gjyo_bridge.h"
+#include "overlays/actors/ovl_Bg_Gnd_Firemeiro/z_bg_gnd_firemeiro.h"
+#include "overlays/actors/ovl_Bg_Gnd_Iceblock/z_bg_gnd_iceblock.h"
+#include "overlays/actors/ovl_Bg_Gnd_Soulmeiro/z_bg_gnd_soulmeiro.h"
+#include "overlays/actors/ovl_Bg_Haka/z_bg_haka.h"
+#include "overlays/actors/ovl_Bg_Haka_Gate/z_bg_haka_gate.h"
+#include "overlays/actors/ovl_Bg_Haka_Huta/z_bg_haka_huta.h"
+#include "overlays/actors/ovl_Bg_Haka_Megane/z_bg_haka_megane.h"
+#include "overlays/actors/ovl_Bg_Haka_MeganeBG/z_bg_haka_meganebg.h"
+#include "overlays/actors/ovl_Bg_Haka_Sgami/z_bg_haka_sgami.h"
+#include "overlays/actors/ovl_Bg_Haka_Ship/z_bg_haka_ship.h"
+#include "overlays/actors/ovl_Bg_Haka_Trap/z_bg_haka_trap.h"
+#include "overlays/actors/ovl_Bg_Haka_Tubo/z_bg_haka_tubo.h"
+#include "overlays/actors/ovl_Bg_Haka_Water/z_bg_haka_water.h"
+#include "overlays/actors/ovl_Bg_Haka_Zou/z_bg_haka_zou.h"
+#include "overlays/actors/ovl_Bg_Heavy_Block/z_bg_heavy_block.h"
+#include "overlays/actors/ovl_Bg_Hidan_Curtain/z_bg_hidan_curtain.h"
+#include "overlays/actors/ovl_Bg_Hidan_Dalm/z_bg_hidan_dalm.h"
+#include "overlays/actors/ovl_Bg_Hidan_Firewall/z_bg_hidan_firewall.h"
+#include "overlays/actors/ovl_Bg_Hidan_Fslift/z_bg_hidan_fslift.h"
+#include "overlays/actors/ovl_Bg_Hidan_Fwbig/z_bg_hidan_fwbig.h"
+#include "overlays/actors/ovl_Bg_Hidan_Hrock/z_bg_hidan_hrock.h"
+#include "overlays/actors/ovl_Bg_Hidan_Kousi/z_bg_hidan_kousi.h"
+#include "overlays/actors/ovl_Bg_Hidan_Rock/z_bg_hidan_rock.h"
+#include "overlays/actors/ovl_Bg_Hidan_Sima/z_bg_hidan_sima.h"
+#include "overlays/actors/ovl_Bg_Hidan_Syoku/z_bg_hidan_syoku.h"
+#include "overlays/actors/ovl_Bg_Ice_Objects/z_bg_ice_objects.h"
+#include "overlays/actors/ovl_Bg_Ice_Shelter/z_bg_ice_shelter.h"
+#include "overlays/actors/ovl_Bg_Ice_Shutter/z_bg_ice_shutter.h"
+#include "overlays/actors/ovl_Bg_Ice_Turara/z_bg_ice_turara.h"
+#include "overlays/actors/ovl_Bg_Ingate/z_bg_ingate.h"
+#include "overlays/actors/ovl_Bg_Jya_1flift/z_bg_jya_1flift.h"
+#include "overlays/actors/ovl_Bg_Jya_Amishutter/z_bg_jya_amishutter.h"
+#include "overlays/actors/ovl_Bg_Jya_Bombchuiwa/z_bg_jya_bombchuiwa.h"
+#include "overlays/actors/ovl_Bg_Jya_Cobra/z_bg_jya_cobra.h"
+#include "overlays/actors/ovl_Bg_Jya_Haheniron/z_bg_jya_haheniron.h"
+#include "overlays/actors/ovl_Bg_Jya_Ironobj/z_bg_jya_ironobj.h"
+#include "overlays/actors/ovl_Bg_Jya_Kanaami/z_bg_jya_kanaami.h"
+#include "overlays/actors/ovl_Bg_Jya_Lift/z_bg_jya_lift.h"
+#include "overlays/actors/ovl_Bg_Jya_Megami/z_bg_jya_megami.h"
+#include "overlays/actors/ovl_Bg_Jya_Zurerukabe/z_bg_jya_zurerukabe.h"
+#include "overlays/actors/ovl_Bg_Mizu_Bwall/z_bg_mizu_bwall.h"
+#include "overlays/actors/ovl_Bg_Mizu_Shutter/z_bg_mizu_shutter.h"
+#include "overlays/actors/ovl_Bg_Mizu_Uzu/z_bg_mizu_uzu.h"
+#include "overlays/actors/ovl_Bg_Mizu_Water/z_bg_mizu_water.h"
+#include "overlays/actors/ovl_Bg_Mjin/z_bg_mjin.h"
+#include "overlays/actors/ovl_Bg_Mori_Bigst/z_bg_mori_bigst.h"
+#include "overlays/actors/ovl_Bg_Mori_Elevator/z_bg_mori_elevator.h"
+#include "overlays/actors/ovl_Bg_Mori_Hashigo/z_bg_mori_hashigo.h"
+#include "overlays/actors/ovl_Bg_Mori_Hashira4/z_bg_mori_hashira4.h"
+#include "overlays/actors/ovl_Bg_Mori_Hineri/z_bg_mori_hineri.h"
+#include "overlays/actors/ovl_Bg_Mori_Idomizu/z_bg_mori_idomizu.h"
+#include "overlays/actors/ovl_Bg_Mori_Kaitenkabe/z_bg_mori_kaitenkabe.h"
+#include "overlays/actors/ovl_Bg_Mori_Rakkatenjo/z_bg_mori_rakkatenjo.h"
+#include "overlays/actors/ovl_Bg_Po_Event/z_bg_po_event.h"
+#include "overlays/actors/ovl_Bg_Pushbox/z_bg_pushbox.h"
+#include "overlays/actors/ovl_Bg_Relay_Objects/z_bg_relay_objects.h"
+#include "overlays/actors/ovl_Bg_Spot00_Hanebasi/z_bg_spot00_hanebasi.h"
+#include "overlays/actors/ovl_Bg_Spot01_Fusya/z_bg_spot01_fusya.h"
+#include "overlays/actors/ovl_Bg_Spot01_Idomizu/z_bg_spot01_idomizu.h"
+#include "overlays/actors/ovl_Bg_Spot01_Idosoko/z_bg_spot01_idosoko.h"
+#include "overlays/actors/ovl_Bg_Spot01_Objects2/z_bg_spot01_objects2.h"
+#include "overlays/actors/ovl_Bg_Spot02_Objects/z_bg_spot02_objects.h"
+#include "overlays/actors/ovl_Bg_Spot03_Taki/z_bg_spot03_taki.h"
+#include "overlays/actors/ovl_Bg_Spot05_Soko/z_bg_spot05_soko.h"
+#include "overlays/actors/ovl_Bg_Spot06_Objects/z_bg_spot06_objects.h"
+#include "overlays/actors/ovl_Bg_Spot07_Taki/z_bg_spot07_taki.h"
+#include "overlays/actors/ovl_Bg_Spot08_Iceblock/z_bg_spot08_iceblock.h"
+#include "overlays/actors/ovl_Bg_Spot11_Oasis/z_bg_spot11_oasis.h"
+#include "overlays/actors/ovl_Bg_Spot12_Gate/z_bg_spot12_gate.h"
+#include "overlays/actors/ovl_Bg_Spot12_Saku/z_bg_spot12_saku.h"
+#include "overlays/actors/ovl_Bg_Spot15_Rrbox/z_bg_spot15_rrbox.h"
+#include "overlays/actors/ovl_Bg_Spot15_Saku/z_bg_spot15_saku.h"
+#include "overlays/actors/ovl_Bg_Spot16_Bombstone/z_bg_spot16_bombstone.h"
+#include "overlays/actors/ovl_Bg_Spot18_Basket/z_bg_spot18_basket.h"
+#include "overlays/actors/ovl_Bg_Spot18_Obj/z_bg_spot18_obj.h"
+#include "overlays/actors/ovl_Bg_Spot18_Shutter/z_bg_spot18_shutter.h"
+#include "overlays/actors/ovl_Bg_Toki_Hikari/z_bg_toki_hikari.h"
+#include "overlays/actors/ovl_Bg_Ydan_Hasi/z_bg_ydan_hasi.h"
+#include "overlays/actors/ovl_Bg_Ydan_Maruta/z_bg_ydan_maruta.h"
+#include "overlays/actors/ovl_Bg_Ydan_Sp/z_bg_ydan_sp.h"
 #include "overlays/actors/ovl_Boss_Fd2/z_boss_fd2.h"
 #include "overlays/actors/ovl_Boss_Ganon/z_boss_ganon.h"
 #include "overlays/actors/ovl_Boss_Ganon2/z_boss_ganon2.h"
 #include "overlays/actors/ovl_Boss_Ganondrof/z_boss_ganondrof.h"
 #include "overlays/actors/ovl_Boss_Goma/z_boss_goma.h"
+#include "overlays/actors/ovl_Boss_Mo/z_boss_mo.h"
 #include "overlays/actors/ovl_Boss_Tw/z_boss_tw.h"
 #include "overlays/actors/ovl_Boss_Va/z_boss_va.h"
+#include "overlays/actors/ovl_Demo_6K/z_demo_6k.h"
+#include "overlays/actors/ovl_Demo_Shd/z_demo_shd.h"
+#include "overlays/actors/ovl_Door_Ana/z_door_ana.h"
+#include "overlays/actors/ovl_Door_Gerudo/z_door_gerudo.h"
 #include "overlays/actors/ovl_Door_Killer/z_door_killer.h"
+#include "overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
 #include "overlays/actors/ovl_Door_Warp1/z_door_warp1.h"
+#include "overlays/actors/ovl_Efc_Erupc/z_efc_erupc.h"
+#include "overlays/actors/ovl_Eff_Dust/z_eff_dust.h"
+#include "overlays/actors/ovl_Elf_Msg/z_elf_msg.h"
+#include "overlays/actors/ovl_Elf_Msg2/z_elf_msg2.h"
 #include "overlays/actors/ovl_En_Am/z_en_am.h"
 #include "overlays/actors/ovl_En_Ani/z_en_ani.h"
 #include "overlays/actors/ovl_En_Anubice/z_en_anubice.h"
+#include "overlays/actors/ovl_En_Anubice_Fire/z_en_anubice_fire.h"
+#include "overlays/actors/ovl_En_Anubice_Tag/z_en_anubice_tag.h"
 #include "overlays/actors/ovl_En_Arrow/z_en_arrow.h"
 #include "overlays/actors/ovl_En_Attack_Niw/z_en_attack_niw.h"
+#include "overlays/actors/ovl_En_Ba/z_en_ba.h"
 #include "overlays/actors/ovl_En_Bb/z_en_bb.h"
+#include "overlays/actors/ovl_En_Bdfire/z_en_bdfire.h"
 #include "overlays/actors/ovl_En_Bigokuta/z_en_bigokuta.h"
 #include "overlays/actors/ovl_En_Bili/z_en_bili.h"
 #include "overlays/actors/ovl_En_Bird/z_en_bird.h"
+#include "overlays/actors/ovl_En_Blkobj/z_en_blkobj.h"
+#include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 #include "overlays/actors/ovl_En_Bom_Bowl_Man/z_en_bom_bowl_man.h"
+#include "overlays/actors/ovl_En_Bom_Bowl_Pit/z_en_bom_bowl_pit.h"
+#include "overlays/actors/ovl_En_Bom_Chu/z_en_bom_chu.h"
+#include "overlays/actors/ovl_En_Bombf/z_en_bombf.h"
+#include "overlays/actors/ovl_En_Boom/z_en_boom.h"
 #include "overlays/actors/ovl_En_Box/z_en_box.h"
 #include "overlays/actors/ovl_En_Brob/z_en_brob.h"
+#include "overlays/actors/ovl_En_Bubble/z_en_bubble.h"
 #include "overlays/actors/ovl_En_Butte/z_en_butte.h"
 #include "overlays/actors/ovl_En_Bw/z_en_bw.h"
+#include "overlays/actors/ovl_En_Changer/z_en_changer.h"
 #include "overlays/actors/ovl_En_Cow/z_en_cow.h"
 #include "overlays/actors/ovl_En_Crow/z_en_crow.h"
 #include "overlays/actors/ovl_En_Cs/z_en_cs.h"
@@ -1452,6 +2471,7 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Dha/z_en_dha.h"
 #include "overlays/actors/ovl_En_Diving_Game/z_en_diving_game.h"
 #include "overlays/actors/ovl_En_Dns/z_en_dns.h"
+#include "overlays/actors/ovl_En_Dnt_Demo/z_en_dnt_demo.h"
 #include "overlays/actors/ovl_En_Dnt_Jiji/z_en_dnt_jiji.h"
 #include "overlays/actors/ovl_En_Dnt_Nomal/z_en_dnt_nomal.h"
 #include "overlays/actors/ovl_En_Dodojr/z_en_dodojr.h"
@@ -1460,14 +2480,22 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Door/z_en_door.h"
 #include "overlays/actors/ovl_En_Ds/z_en_ds.h"
 #include "overlays/actors/ovl_En_Du/z_en_du.h"
+#include "overlays/actors/ovl_En_Dy_Extra/z_en_dy_extra.h"
 #include "overlays/actors/ovl_En_Eiyer/z_en_eiyer.h"
 #include "overlays/actors/ovl_En_Elf/z_en_elf.h"
+#include "overlays/actors/ovl_En_Encount2/z_en_encount2.h"
+#include "overlays/actors/ovl_En_Ex_Item/z_en_ex_item.h"
+#include "overlays/actors/ovl_En_Ex_Ruppy/z_en_ex_ruppy.h"
 #include "overlays/actors/ovl_En_Fd/z_en_fd.h"
+#include "overlays/actors/ovl_En_Fd_Fire/z_en_fd_fire.h"
+#include "overlays/actors/ovl_En_Fire_Rock/z_en_fire_rock.h"
 #include "overlays/actors/ovl_En_Firefly/z_en_firefly.h"
 #include "overlays/actors/ovl_En_Fish/z_en_fish.h"
 #include "overlays/actors/ovl_En_Fr/z_en_fr.h"
 #include "overlays/actors/ovl_En_Fu/z_en_fu.h"
 #include "overlays/actors/ovl_En_Fw/z_en_fw.h"
+#include "overlays/actors/ovl_En_Fz/z_en_fz.h"
+#include "overlays/actors/ovl_En_G_Switch/z_en_g_switch.h"
 #include "overlays/actors/ovl_En_Gb/z_en_gb.h"
 #include "overlays/actors/ovl_En_Ge1/z_en_ge1.h"
 #include "overlays/actors/ovl_En_Ge2/z_en_ge2.h"
@@ -1478,22 +2506,29 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Go/z_en_go.h"
 #include "overlays/actors/ovl_En_Go2/z_en_go2.h"
 #include "overlays/actors/ovl_En_Goma/z_en_goma.h"
+#include "overlays/actors/ovl_En_Goroiwa/z_en_goroiwa.h"
+#include "overlays/actors/ovl_En_Gs/z_en_gs.h"
 #include "overlays/actors/ovl_En_Guest/z_en_guest.h"
 #include "overlays/actors/ovl_En_Heishi2/z_en_heishi2.h"
 #include "overlays/actors/ovl_En_Heishi3/z_en_heishi3.h"
 #include "overlays/actors/ovl_En_Heishi4/z_en_heishi4.h"
 #include "overlays/actors/ovl_En_Hintnuts/z_en_hintnuts.h"
+#include "overlays/actors/ovl_En_Holl/z_en_holl.h"
+#include "overlays/actors/ovl_En_Honotrap/z_en_honotrap.h"
 #include "overlays/actors/ovl_En_Hs2/z_en_hs2.h"
 #include "overlays/actors/ovl_En_Hy/z_en_hy.h"
+#include "overlays/actors/ovl_En_Ice_Hono/z_en_ice_hono.h"
 #include "overlays/actors/ovl_En_Ik/z_en_ik.h"
 #include "overlays/actors/ovl_En_In/z_en_in.h"
 #include "overlays/actors/ovl_En_Insect/z_en_insect.h"
+#include "overlays/actors/ovl_En_Ishi/z_en_ishi.h"
 #include "overlays/actors/ovl_En_Jj/z_en_jj.h"
 #include "overlays/actors/ovl_En_Kakasi/z_en_kakasi.h"
 #include "overlays/actors/ovl_En_Kakasi2/z_en_kakasi2.h"
 #include "overlays/actors/ovl_En_Kakasi3/z_en_kakasi3.h"
 #include "overlays/actors/ovl_En_Karebaba/z_en_karebaba.h"
 #include "overlays/actors/ovl_En_Ko/z_en_ko.h"
+#include "overlays/actors/ovl_En_Kusa/z_en_kusa.h"
 #include "overlays/actors/ovl_En_Kz/z_en_kz.h"
 #include "overlays/actors/ovl_En_Ma1/z_en_ma1.h"
 #include "overlays/actors/ovl_En_Ma2/z_en_ma2.h"
@@ -1508,6 +2543,10 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Niw/z_en_niw.h"
 #include "overlays/actors/ovl_En_Niw_Girl/z_en_niw_girl.h"
 #include "overlays/actors/ovl_En_Niw_Lady/z_en_niw_lady.h"
+#include "overlays/actors/ovl_En_Nutsball/z_en_nutsball.h"
+#include "overlays/actors/ovl_En_Ny/z_en_ny.h"
+#include "overlays/actors/ovl_En_OE2/z_en_oe2.h"
+#include "overlays/actors/ovl_En_Okarina_Effect/z_en_okarina_effect.h"
 #include "overlays/actors/ovl_En_Okuta/z_en_okuta.h"
 #include "overlays/actors/ovl_En_Ossan/z_en_ossan.h"
 #include "overlays/actors/ovl_En_Owl/z_en_owl.h"
@@ -1518,15 +2557,21 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Po_Sisters/z_en_po_sisters.h"
 #include "overlays/actors/ovl_En_Poh/z_en_poh.h"
 #include "overlays/actors/ovl_En_Rd/z_en_rd.h"
+#include "overlays/actors/ovl_En_Rr/z_en_rr.h"
 #include "overlays/actors/ovl_En_Sa/z_en_sa.h"
 #include "overlays/actors/ovl_En_Sb/z_en_sb.h"
+#include "overlays/actors/ovl_En_Scene_Change/z_en_scene_change.h"
 #include "overlays/actors/ovl_En_Shopnuts/z_en_shopnuts.h"
+#include "overlays/actors/ovl_En_Si/z_en_si.h"
+#include "overlays/actors/ovl_En_Siofuki/z_en_siofuki.h"
 #include "overlays/actors/ovl_En_Skb/z_en_skb.h"
 #include "overlays/actors/ovl_En_Skj/z_en_skj.h"
 #include "overlays/actors/ovl_En_Ssh/z_en_ssh.h"
 #include "overlays/actors/ovl_En_St/z_en_st.h"
 #include "overlays/actors/ovl_En_Sth/z_en_sth.h"
+#include "overlays/actors/ovl_En_Stream/z_en_stream.h"
 #include "overlays/actors/ovl_En_Sw/z_en_sw.h"
+#include "overlays/actors/ovl_En_Syateki_Itm/z_en_syateki_itm.h"
 #include "overlays/actors/ovl_En_Syateki_Man/z_en_syateki_man.h"
 #include "overlays/actors/ovl_En_Syateki_Niw/z_en_syateki_niw.h"
 #include "overlays/actors/ovl_En_Ta/z_en_ta.h"
@@ -1535,17 +2580,165 @@ void EnZo_TreadWater(EnZo*, PlayState*);
 #include "overlays/actors/ovl_En_Tg/z_en_tg.h"
 #include "overlays/actors/ovl_En_Tite/z_en_tite.h"
 #include "overlays/actors/ovl_En_Toryo/z_en_toryo.h"
+#include "overlays/actors/ovl_En_Tp/z_en_tp.h"
 #include "overlays/actors/ovl_En_Tr/z_en_tr.h"
+#include "overlays/actors/ovl_En_Tubo_Trap/z_en_tubo_trap.h"
 #include "overlays/actors/ovl_En_Vali/z_en_vali.h"
+#include "overlays/actors/ovl_En_Viewer/z_en_viewer.h"
 #include "overlays/actors/ovl_En_Vm/z_en_vm.h"
+#include "overlays/actors/ovl_En_Wall_Tubo/z_en_wall_tubo.h"
 #include "overlays/actors/ovl_En_Wallmas/z_en_wallmas.h"
+#include "overlays/actors/ovl_En_Weather_Tag/z_en_weather_tag.h"
 #include "overlays/actors/ovl_En_Weiyer/z_en_weiyer.h"
 #include "overlays/actors/ovl_En_Wf/z_en_wf.h"
+#include "overlays/actors/ovl_En_Yabusame_Mark/z_en_yabusame_mark.h"
 #include "overlays/actors/ovl_En_Zf/z_en_zf.h"
 #include "overlays/actors/ovl_En_Zl4/z_en_zl4.h"
 #include "overlays/actors/ovl_En_Zo/z_en_zo.h"
+#include "overlays/actors/ovl_En_fHG/z_en_fhg.h"
+#include "overlays/actors/ovl_Item_Etcetera/z_item_etcetera.h"
+#include "overlays/actors/ovl_Item_Inbox/z_item_inbox.h"
+#include "overlays/actors/ovl_Item_Ocarina/z_item_ocarina.h"
+#include "overlays/actors/ovl_Item_Shield/z_item_shield.h"
+#include "overlays/actors/ovl_Obj_Bean/z_obj_bean.h"
+#include "overlays/actors/ovl_Obj_Comb/z_obj_comb.h"
+#include "overlays/actors/ovl_Obj_Elevator/z_obj_elevator.h"
+#include "overlays/actors/ovl_Obj_Hsblock/z_obj_hsblock.h"
+#include "overlays/actors/ovl_Obj_Ice_Poly/z_obj_ice_poly.h"
+#include "overlays/actors/ovl_Obj_Kibako/z_obj_kibako.h"
+#include "overlays/actors/ovl_Obj_Kibako2/z_obj_kibako2.h"
+#include "overlays/actors/ovl_Obj_Lift/z_obj_lift.h"
+#include "overlays/actors/ovl_Obj_Lightswitch/z_obj_lightswitch.h"
+#include "overlays/actors/ovl_Obj_Makekinsuta/z_obj_makekinsuta.h"
+#include "overlays/actors/ovl_Obj_Mure/z_obj_mure.h"
+#include "overlays/actors/ovl_Obj_Mure2/z_obj_mure2.h"
+#include "overlays/actors/ovl_Obj_Mure3/z_obj_mure3.h"
+#include "overlays/actors/ovl_Obj_Oshihiki/z_obj_oshihiki.h"
+#include "overlays/actors/ovl_Obj_Roomtimer/z_obj_roomtimer.h"
+#include "overlays/actors/ovl_Obj_Timeblock/z_obj_timeblock.h"
+#include "overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.h"
+#include "overlays/actors/ovl_Obj_Warp2block/z_obj_warp2block.h"
+#include "overlays/actors/ovl_Oceff_Spot/z_oceff_spot.h"
+#include "overlays/actors/ovl_Oceff_Storm/z_oceff_storm.h"
+#include "overlays/actors/ovl_Shot_Sun/z_shot_sun.h"
+
+extern "C" {
 
 // Action function tables
+static void* ArmsHook_ActionFuncs[] = {
+    (void*)ArmsHook_Shoot,
+    (void*)ArmsHook_Wait,
+    NULL  // Terminator
+};
+
+static void* ArrowFire_ActionFuncs[] = {
+    (void*)ArrowFire_Charge,
+    (void*)ArrowFire_Fly,
+    (void*)ArrowFire_Hit,
+    NULL  // Terminator
+};
+
+static void* ArrowIce_ActionFuncs[] = {
+    (void*)ArrowIce_Charge,
+    (void*)ArrowIce_Fly,
+    (void*)ArrowIce_Hit,
+    NULL  // Terminator
+};
+
+static void* ArrowLight_ActionFuncs[] = {
+    (void*)ArrowLight_Charge,
+    (void*)ArrowLight_Fly,
+    (void*)ArrowLight_Hit,
+    NULL  // Terminator
+};
+
+static void* BgBdanObjects_ActionFuncs[] = {
+    (void*)BgBdanObjects_DoNothing,
+    (void*)func_8086C054,
+    (void*)func_8086C1A0,
+    (void*)func_8086C29C,
+    (void*)func_8086C3D8,
+    (void*)func_8086C55C,
+    (void*)func_8086C5BC,
+    (void*)func_8086C618,
+    (void*)func_8086C6EC,
+    (void*)func_8086C76C,
+    (void*)func_8086C7D0,
+    (void*)func_8086C874,
+    (void*)func_8086C9A8,
+    (void*)func_8086C9F0,
+    (void*)func_8086CABC,
+    (void*)func_8086CB10,
+    (void*)func_8086CB8C,
+    NULL  // Terminator
+};
+
+static void* BgBdanSwitch_ActionFuncs[] = {
+    (void*)func_8086D5E0,
+    (void*)func_8086D694,
+    (void*)func_8086D754,
+    (void*)func_8086D80C,
+    (void*)func_8086D888,
+    (void*)func_8086D8CC,
+    (void*)func_8086D95C,
+    (void*)func_8086DA1C,
+    (void*)func_8086DAC4,
+    (void*)func_8086DB40,
+    (void*)func_8086DB68,
+    (void*)func_8086DC48,
+    (void*)func_8086DCE8,
+    (void*)func_8086DDC0,
+    NULL  // Terminator
+};
+
+static void* BgBomGuard_ActionFuncs[] = {
+    (void*)func_8086E638,
+    NULL  // Terminator
+};
+
+static void* BgBombwall_ActionFuncs[] = {
+    (void*)func_8086ED70,
+    (void*)func_8086EE40,
+    NULL  // Terminator
+};
+
+static void* BgBowlWall_ActionFuncs[] = {
+    (void*)BgBowlWall_FallDoEffects,
+    (void*)BgBowlWall_FinishFall,
+    (void*)BgBowlWall_Reset,
+    (void*)BgBowlWall_SpawnBullseyes,
+    (void*)BgBowlWall_WaitForHit,
+    NULL  // Terminator
+};
+
+static void* BgBreakwall_ActionFuncs[] = {
+    (void*)BgBreakwall_LavaCoverMove,
+    (void*)BgBreakwall_Wait,
+    (void*)BgBreakwall_WaitForObject,
+    NULL  // Terminator
+};
+
+static void* BgDdanJd_ActionFuncs[] = {
+    (void*)BgDdanJd_Idle,
+    (void*)BgDdanJd_Move,
+    NULL  // Terminator
+};
+
+static void* BgDdanKd_ActionFuncs[] = {
+    (void*)BgDdanKd_CheckForExplosions,
+    (void*)BgDdanKd_DoNothing,
+    (void*)BgDdanKd_LowerStairs,
+    NULL  // Terminator
+};
+
+static void* BgDodoago_ActionFuncs[] = {
+    (void*)BgDodoago_DoNothing,
+    (void*)BgDodoago_LightOneEye,
+    (void*)BgDodoago_OpenJaw,
+    (void*)BgDodoago_WaitExplosives,
+    NULL  // Terminator
+};
+
 static void* BgDyYoseizo_ActionFuncs[] = {
     (void*)BgDyYoseizo_CheckMagicAcquired,
     (void*)BgDyYoseizo_ChooseType,
@@ -1563,6 +2756,672 @@ static void* BgDyYoseizo_ActionFuncs[] = {
     (void*)BgDyYoseizo_SpinGrow_NoReward,
     (void*)BgDyYoseizo_SpinShrink,
     (void*)BgDyYoseizo_Vanish,
+    NULL  // Terminator
+};
+
+static void* BgGanonOtyuka_ActionFuncs[] = {
+    (void*)BgGanonOtyuka_Fall,
+    (void*)BgGanonOtyuka_WaitToFall,
+    NULL  // Terminator
+};
+
+static void* BgGateShutter_ActionFuncs[] = {
+    (void*)func_8087828C,
+    (void*)func_80878300,
+    (void*)func_808783AC,
+    (void*)func_808783D4,
+    NULL  // Terminator
+};
+
+static void* BgGjyoBridge_ActionFuncs[] = {
+    (void*)BgGjyoBridge_SpawnBridge,
+    (void*)BgGjyoBridge_TriggerCutscene,
+    (void*)func_808787A4,
+    NULL  // Terminator
+};
+
+static void* BgGndFiremeiro_ActionFuncs[] = {
+    (void*)BgGndFiremeiro_Rise,
+    (void*)BgGndFiremeiro_Shake,
+    (void*)BgGndFiremeiro_Sink,
+    NULL  // Terminator
+};
+
+static void* BgGndIceblock_ActionFuncs[] = {
+    (void*)BgGndIceblock_Fall,
+    (void*)BgGndIceblock_Hole,
+    (void*)BgGndIceblock_Idle,
+    (void*)BgGndIceblock_Reset,
+    (void*)BgGndIceblock_Slide,
+    NULL  // Terminator
+};
+
+static void* BgGndSoulmeiro_ActionFuncs[] = {
+    (void*)func_8087AF38,
+    (void*)func_8087B284,
+    (void*)func_8087B350,
+    NULL  // Terminator
+};
+
+static void* BgHaka_ActionFuncs[] = {
+    (void*)func_8087B7E8,
+    (void*)func_8087B938,
+    (void*)func_8087BAAC,
+    (void*)func_8087BAE4,
+    NULL  // Terminator
+};
+
+static void* BgHakaGate_ActionFuncs[] = {
+    (void*)BgHakaGate_DoNothing,
+    (void*)BgHakaGate_FalseSkull,
+    (void*)BgHakaGate_FloorClosed,
+    (void*)BgHakaGate_FloorOpen,
+    (void*)BgHakaGate_GateOpen,
+    (void*)BgHakaGate_GateWait,
+    (void*)BgHakaGate_SkullOfTruth,
+    (void*)BgHakaGate_StatueIdle,
+    (void*)BgHakaGate_StatueInactive,
+    (void*)BgHakaGate_StatueTurn,
+    NULL  // Terminator
+};
+
+static void* BgHakaHuta_ActionFuncs[] = {
+    (void*)BgHakaHuta_DoNothing,
+    (void*)BgHakaHuta_Open,
+    (void*)BgHakaHuta_SlideOpen,
+    (void*)BgHakaHuta_SpawnEnemies,
+    (void*)func_8087D720,
+    NULL  // Terminator
+};
+
+static void* BgHakaMegane_ActionFuncs[] = {
+    (void*)BgHakaMegane_DoNothing,
+    (void*)func_8087DB24,
+    (void*)func_8087DBF0,
+    NULL  // Terminator
+};
+
+static void* BgHakaMeganeBG_ActionFuncs[] = {
+    (void*)func_8087DFF8,
+    (void*)func_8087E040,
+    (void*)func_8087E10C,
+    (void*)func_8087E1E0,
+    (void*)func_8087E258,
+    (void*)func_8087E288,
+    (void*)func_8087E2D8,
+    (void*)func_8087E34C,
+    NULL  // Terminator
+};
+
+static void* BgHakaSgami_ActionFuncs[] = {
+    (void*)BgHakaSgami_SetupSpin,
+    (void*)BgHakaSgami_Spin,
+    NULL  // Terminator
+};
+
+static void* BgHakaShip_ActionFuncs[] = {
+    (void*)BgHakaShip_ChildUpdatePosition,
+    (void*)BgHakaShip_CrashFall,
+    (void*)BgHakaShip_CrashShake,
+    (void*)BgHakaShip_CutsceneStationary,
+    (void*)BgHakaShip_Move,
+    (void*)BgHakaShip_SetupCrash,
+    (void*)BgHakaShip_WaitForSong,
+    NULL  // Terminator
+};
+
+static void* BgHakaTrap_ActionFuncs[] = {
+    (void*)func_808801B8,
+    (void*)func_808802D8,
+    (void*)func_80880484,
+    (void*)func_808805C0,
+    (void*)func_808806BC,
+    (void*)func_808808F4,
+    (void*)func_808809B0,
+    (void*)func_80880AE8,
+    (void*)func_80880C0C,
+    NULL  // Terminator
+};
+
+static void* BgHakaTubo_ActionFuncs[] = {
+    (void*)BgHakaTubo_DropCollectible,
+    (void*)BgHakaTubo_Idle,
+    NULL  // Terminator
+};
+
+static void* BgHakaWater_ActionFuncs[] = {
+    (void*)BgHakaWater_ChangeWaterLevel,
+    (void*)BgHakaWater_Wait,
+    NULL  // Terminator
+};
+
+static void* BgHakaZou_ActionFuncs[] = {
+    (void*)BgHakaZou_DoNothing,
+    (void*)BgHakaZou_Wait,
+    (void*)func_80882BDC,
+    (void*)func_80883000,
+    (void*)func_80883104,
+    (void*)func_80883144,
+    (void*)func_80883254,
+    (void*)func_80883328,
+    (void*)func_808834D8,
+    NULL  // Terminator
+};
+
+static void* BgHeavyBlock_ActionFuncs[] = {
+    (void*)BgHeavyBlock_DoNothing,
+    (void*)BgHeavyBlock_Fly,
+    (void*)BgHeavyBlock_Land,
+    (void*)BgHeavyBlock_LiftedUp,
+    (void*)BgHeavyBlock_MovePiece,
+    (void*)BgHeavyBlock_Wait,
+    NULL  // Terminator
+};
+
+static void* BgHidanCurtain_ActionFuncs[] = {
+    (void*)BgHidanCurtain_TurnOff,
+    (void*)BgHidanCurtain_TurnOn,
+    (void*)BgHidanCurtain_WaitForClear,
+    (void*)BgHidanCurtain_WaitForCutscene,
+    (void*)BgHidanCurtain_WaitForSwitchOff,
+    (void*)BgHidanCurtain_WaitForSwitchOn,
+    (void*)BgHidanCurtain_WaitForTimer,
+    NULL  // Terminator
+};
+
+static void* BgHidanDalm_ActionFuncs[] = {
+    (void*)BgHidanDalm_Shrink,
+    (void*)BgHidanDalm_Wait,
+    NULL  // Terminator
+};
+
+static void* BgHidanFirewall_ActionFuncs[] = {
+    (void*)BgHidanFirewall_Countdown,
+    (void*)BgHidanFirewall_Erupt,
+    (void*)BgHidanFirewall_Wait,
+    NULL  // Terminator
+};
+
+static void* BgHidanFslift_ActionFuncs[] = {
+    (void*)func_80886FCC,
+    (void*)func_8088706C,
+    (void*)func_808870D8,
+    NULL  // Terminator
+};
+
+static void* BgHidanFwbig_ActionFuncs[] = {
+    (void*)BgHidanFwbig_Lower,
+    (void*)BgHidanFwbig_Move,
+    (void*)BgHidanFwbig_Rise,
+    (void*)BgHidanFwbig_WaitForCs,
+    (void*)BgHidanFwbig_WaitForPlayer,
+    (void*)BgHidanFwbig_WaitForSwitch,
+    (void*)BgHidanFwbig_WaitForTimer,
+    NULL  // Terminator
+};
+
+static void* BgHidanHrock_ActionFuncs[] = {
+    (void*)func_808894A4,
+    (void*)func_808894B0,
+    (void*)func_8088960C,
+    (void*)func_808896B8,
+    NULL  // Terminator
+};
+
+static void* BgHidanKousi_ActionFuncs[] = {
+    (void*)func_80889B5C,
+    (void*)func_80889BC0,
+    (void*)func_80889C18,
+    (void*)func_80889C90,
+    (void*)func_80889D28,
+    NULL  // Terminator
+};
+
+static void* BgHidanRock_ActionFuncs[] = {
+    (void*)func_8088B268,
+    (void*)func_8088B5F4,
+    (void*)func_8088B634,
+    (void*)func_8088B69C,
+    (void*)func_8088B79C,
+    (void*)func_8088B90C,
+    (void*)func_8088B954,
+    (void*)func_8088B990,
+    NULL  // Terminator
+};
+
+static void* BgHidanSima_ActionFuncs[] = {
+    (void*)func_8088E518,
+    (void*)func_8088E5D0,
+    (void*)func_8088E6D0,
+    (void*)func_8088E760,
+    (void*)func_8088E7A8,
+    NULL  // Terminator
+};
+
+static void* BgHidanSyoku_ActionFuncs[] = {
+    (void*)func_8088F4B8,
+    (void*)func_8088F514,
+    (void*)func_8088F5A0,
+    (void*)func_8088F62C,
+    NULL  // Terminator
+};
+
+static void* BgIceObjects_ActionFuncs[] = {
+    (void*)BgIceObjects_Idle,
+    (void*)BgIceObjects_Reset,
+    (void*)BgIceObjects_Slide,
+    (void*)BgIceObjects_Stuck,
+    NULL  // Terminator
+};
+
+static void* BgIceShelter_ActionFuncs[] = {
+    (void*)func_8089107C,
+    (void*)func_808911D4,
+    NULL  // Terminator
+};
+
+static void* BgIceShutter_ActionFuncs[] = {
+    (void*)func_80891CF4,
+    (void*)func_80891D6C,
+    (void*)func_80891DD4,
+    NULL  // Terminator
+};
+
+static void* BgIceTurara_ActionFuncs[] = {
+    (void*)BgIceTurara_Fall,
+    (void*)BgIceTurara_Regrow,
+    (void*)BgIceTurara_Shiver,
+    (void*)BgIceTurara_Stalagmite,
+    (void*)BgIceTurara_Wait,
+    NULL  // Terminator
+};
+
+static void* BgInGate_ActionFuncs[] = {
+    (void*)BgInGate_DoNothing,
+    (void*)func_80892890,
+    NULL  // Terminator
+};
+
+static void* BgJya1flift_ActionFuncs[] = {
+    (void*)BgJya1flift_DelayMove,
+    (void*)BgJya1flift_DoNothing,
+    (void*)BgJya1flift_Move,
+    (void*)BgJya1flift_WaitForSwitch,
+    NULL  // Terminator
+};
+
+static void* BgJyaAmishutter_ActionFuncs[] = {
+    (void*)BgJyaAmishutter_WaitForPlayer,
+    (void*)func_80893438,
+    (void*)func_808934C0,
+    (void*)func_8089350C,
+    NULL  // Terminator
+};
+
+static void* BgJyaBombchuiwa_ActionFuncs[] = {
+    (void*)BgJyaBombchuiwa_WaitForExplosion,
+    (void*)func_808949B8,
+    NULL  // Terminator
+};
+
+static void* BgJyaCobra_ActionFuncs[] = {
+    (void*)func_80896950,
+    (void*)func_80896ABC,
+    NULL  // Terminator
+};
+
+static void* BgJyaHaheniron_ActionFuncs[] = {
+    (void*)BgJyaHaheniron_ChairCrumble,
+    (void*)BgJyaHaheniron_PillarCrumble,
+    (void*)BgJyaHaheniron_RubbleCollide,
+    NULL  // Terminator
+};
+
+static void* BgJyaIronobj_ActionFuncs[] = {
+    (void*)func_808992E8,
+    NULL  // Terminator
+};
+
+static void* BgJyaKanaami_ActionFuncs[] = {
+    (void*)func_80899894,
+    (void*)func_80899950,
+    NULL  // Terminator
+};
+
+static void* BgJyaLift_ActionFuncs[] = {
+    (void*)BgJyaLift_DelayMove,
+    (void*)BgJyaLift_Move,
+    NULL  // Terminator
+};
+
+static void* BgJyaMegami_ActionFuncs[] = {
+    (void*)BgJyaMegami_DetectLight,
+    (void*)BgJyaMegami_Explode,
+    NULL  // Terminator
+};
+
+static void* BgJyaZurerukabe_ActionFuncs[] = {
+    (void*)func_8089B7C4,
+    (void*)func_8089B870,
+    NULL  // Terminator
+};
+
+static void* BgMizuBwall_ActionFuncs[] = {
+    (void*)BgMizuBwall_Break,
+    (void*)BgMizuBwall_DoNothing,
+    (void*)BgMizuBwall_Idle,
+    NULL  // Terminator
+};
+
+static void* BgMizuShutter_ActionFuncs[] = {
+    (void*)BgMizuShutter_Move,
+    (void*)BgMizuShutter_WaitForCutscene,
+    (void*)BgMizuShutter_WaitForSwitch,
+    (void*)BgMizuShutter_WaitForTimer,
+    NULL  // Terminator
+};
+
+static void* BgMizuUzu_ActionFuncs[] = {
+    (void*)func_8089F788,
+    NULL  // Terminator
+};
+
+static void* BgMizuWater_ActionFuncs[] = {
+    (void*)BgMizuWater_ChangeWaterLevel,
+    (void*)BgMizuWater_WaitForAction,
+    NULL  // Terminator
+};
+
+static void* BgMjin_ActionFuncs[] = {
+    (void*)BgMjin_DoNothing,
+    (void*)func_808A0850,
+    NULL  // Terminator
+};
+
+static void* BgMoriBigst_ActionFuncs[] = {
+    (void*)BgMoriBigst_Fall,
+    (void*)BgMoriBigst_Landing,
+    (void*)BgMoriBigst_StalfosFight,
+    (void*)BgMoriBigst_StalfosPairFight,
+    (void*)BgMoriBigst_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgMoriElevator_ActionFuncs[] = {
+    (void*)BgMoriElevator_MoveAboveGround,
+    (void*)BgMoriElevator_MoveIntoGround,
+    (void*)BgMoriElevator_SetPosition,
+    (void*)BgMoriElevator_WaitAfterInit,
+    (void*)func_808A2008,
+    NULL  // Terminator
+};
+
+static void* BgMoriHashigo_ActionFuncs[] = {
+    (void*)BgMoriHashigo_Clasp,
+    (void*)BgMoriHashigo_LadderFall,
+    (void*)BgMoriHashigo_LadderWait,
+    (void*)BgMoriHashigo_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgMoriHashira4_ActionFuncs[] = {
+    (void*)BgMoriHashira4_GateOpen,
+    (void*)BgMoriHashira4_GateWait,
+    (void*)BgMoriHashira4_PillarsRotate,
+    (void*)BgMoriHashira4_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgMoriHineri_ActionFuncs[] = {
+    (void*)BgMoriHineri_DoNothing,
+    (void*)BgMoriHineri_SpawnBossKeyChest,
+    (void*)func_808A39FC,
+    (void*)func_808A3C8C,
+    (void*)func_808A3D58,
+    (void*)func_808A3E54,
+    NULL  // Terminator
+};
+
+static void* BgMoriIdomizu_ActionFuncs[] = {
+    (void*)BgMoriIdomizu_Main,
+    (void*)BgMoriIdomizu_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgMoriKaitenkabe_ActionFuncs[] = {
+    (void*)BgMoriKaitenkabe_Rotate,
+    (void*)BgMoriKaitenkabe_Wait,
+    (void*)BgMoriKaitenkabe_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgMoriRakkatenjo_ActionFuncs[] = {
+    (void*)BgMoriRakkatenjo_Fall,
+    (void*)BgMoriRakkatenjo_Rest,
+    (void*)BgMoriRakkatenjo_Rise,
+    (void*)BgMoriRakkatenjo_Wait,
+    (void*)BgMoriRakkatenjo_WaitForMoriTex,
+    NULL  // Terminator
+};
+
+static void* BgPoEvent_ActionFuncs[] = {
+    (void*)BgPoEvent_AmyPuzzle,
+    (void*)BgPoEvent_AmyWait,
+    (void*)BgPoEvent_BlockFall,
+    (void*)BgPoEvent_BlockIdle,
+    (void*)BgPoEvent_BlockPush,
+    (void*)BgPoEvent_BlockReset,
+    (void*)BgPoEvent_BlockShake,
+    (void*)BgPoEvent_BlockSolved,
+    (void*)BgPoEvent_BlockWait,
+    (void*)BgPoEvent_PaintingAppear,
+    (void*)BgPoEvent_PaintingBurn,
+    (void*)BgPoEvent_PaintingEmpty,
+    (void*)BgPoEvent_PaintingPresent,
+    (void*)BgPoEvent_PaintingVanish,
+    NULL  // Terminator
+};
+
+static void* BgPushbox_ActionFuncs[] = {
+    (void*)BgPushbox_UpdateImpl,
+    NULL  // Terminator
+};
+
+static void* BgRelayObjects_ActionFuncs[] = {
+    (void*)BgRelayObjects_DoNothing,
+    (void*)func_808A90F4,
+    (void*)func_808A91AC,
+    (void*)func_808A9234,
+    (void*)func_808A932C,
+    (void*)func_808A939C,
+    NULL  // Terminator
+};
+
+static void* BgSpot00Hanebasi_ActionFuncs[] = {
+    (void*)BgSpot00Hanebasi_DoNothing,
+    (void*)BgSpot00Hanebasi_DrawbridgeRiseAndFall,
+    (void*)BgSpot00Hanebasi_DrawbridgeWait,
+    (void*)BgSpot00Hanebasi_SetTorchLightInfo,
+    NULL  // Terminator
+};
+
+static void* BgSpot01Fusya_ActionFuncs[] = {
+    (void*)func_808AAA50,
+    NULL  // Terminator
+};
+
+static void* BgSpot01Idomizu_ActionFuncs[] = {
+    (void*)BgSpot01Idomizu_UpdateWaterLevel,
+    NULL  // Terminator
+};
+
+static void* BgSpot01Idosoko_ActionFuncs[] = {
+    (void*)func_808ABF54,
+    NULL  // Terminator
+};
+
+static void* BgSpot01Objects2_ActionFuncs[] = {
+    (void*)func_808AC2BC,
+    (void*)func_808AC474,
+    NULL  // Terminator
+};
+
+static void* BgSpot02Objects_ActionFuncs[] = {
+    (void*)func_808AC8FC,
+    (void*)func_808AC908,
+    (void*)func_808ACA08,
+    (void*)func_808ACAFC,
+    (void*)func_808ACB58,
+    (void*)func_808ACC34,
+    (void*)func_808AD3D4,
+    NULL  // Terminator
+};
+
+static void* BgSpot03Taki_ActionFuncs[] = {
+    (void*)BgSpot03Taki_HandleWaterfallState,
+    NULL  // Terminator
+};
+
+static void* BgSpot05Soko_ActionFuncs[] = {
+    (void*)func_808AE5A8,
+    (void*)func_808AE5B4,
+    (void*)func_808AE630,
+    NULL  // Terminator
+};
+
+static void* BgSpot06Objects_ActionFuncs[] = {
+    (void*)BgSpot06Objects_DoNothing,
+    (void*)BgSpot06Objects_GateOpen,
+    (void*)BgSpot06Objects_GateWaitForSwitch,
+    (void*)BgSpot06Objects_GateWaitToOpen,
+    (void*)BgSpot06Objects_LockFloat,
+    (void*)BgSpot06Objects_LockPullOutward,
+    (void*)BgSpot06Objects_LockSwimToSurface,
+    (void*)BgSpot06Objects_LockWait,
+    (void*)BgSpot06Objects_WaterPlaneCutsceneLower,
+    (void*)BgSpot06Objects_WaterPlaneCutsceneRise,
+    (void*)BgSpot06Objects_WaterPlaneCutsceneWait,
+    NULL  // Terminator
+};
+
+static void* BgSpot07Taki_ActionFuncs[] = {
+    (void*)BgSpot07Taki_DoNothing,
+    NULL  // Terminator
+};
+
+static void* BgSpot08Iceblock_ActionFuncs[] = {
+    (void*)BgSpot08Iceblock_FloatNonrotating,
+    (void*)BgSpot08Iceblock_FloatOrbitingTwins,
+    (void*)BgSpot08Iceblock_FloatRotating,
+    NULL  // Terminator
+};
+
+static void* BgSpot11Oasis_ActionFuncs[] = {
+    (void*)func_808B2980,
+    (void*)func_808B29F0,
+    (void*)func_808B2AB8,
+    NULL  // Terminator
+};
+
+static void* BgSpot12Gate_ActionFuncs[] = {
+    (void*)func_808B30D8,
+    (void*)func_808B314C,
+    (void*)func_808B318C,
+    (void*)func_808B3298,
+    NULL  // Terminator
+};
+
+static void* BgSpot12Saku_ActionFuncs[] = {
+    (void*)func_808B357C,
+    (void*)func_808B3604,
+    (void*)func_808B37AC,
+    NULL  // Terminator
+};
+
+static void* BgSpot15Rrbox_ActionFuncs[] = {
+    (void*)func_808B40AC,
+    (void*)func_808B4194,
+    (void*)func_808B43D0,
+    (void*)func_808B44CC,
+    NULL  // Terminator
+};
+
+static void* BgSpot15Saku_ActionFuncs[] = {
+    (void*)func_808B4930,
+    (void*)func_808B4978,
+    (void*)func_808B4A04,
+    NULL  // Terminator
+};
+
+static void* BgSpot16Bombstone_ActionFuncs[] = {
+    (void*)func_808B5950,
+    (void*)func_808B5A94,
+    (void*)func_808B5B04,
+    (void*)func_808B5B6C,
+    NULL  // Terminator
+};
+
+static void* BgSpot18Basket_ActionFuncs[] = {
+    (void*)func_808B7AFC,
+    (void*)func_808B7B6C,
+    (void*)func_808B7BCC,
+    (void*)func_808B7D50,
+    (void*)func_808B7FC0,
+    (void*)func_808B81A0,
+    NULL  // Terminator
+};
+
+static void* BgSpot18Obj_ActionFuncs[] = {
+    (void*)func_808B8DD0,
+    (void*)func_808B8E7C,
+    (void*)func_808B8F08,
+    (void*)func_808B9040,
+    NULL  // Terminator
+};
+
+static void* BgSpot18Shutter_ActionFuncs[] = {
+    (void*)func_808B95AC,
+    (void*)func_808B95B8,
+    (void*)func_808B9618,
+    (void*)func_808B9698,
+    (void*)func_808B971C,
+    NULL  // Terminator
+};
+
+static void* BgTokiHikari_ActionFuncs[] = {
+    (void*)BgTokiHikari_DoNothing,
+    (void*)func_808BA204,
+    (void*)func_808BA22C,
+    (void*)func_808BA274,
+    NULL  // Terminator
+};
+
+static void* BgYdanHasi_ActionFuncs[] = {
+    (void*)BgYdanHasi_DecWaterTimer,
+    (void*)BgYdanHasi_InitWater,
+    (void*)BgYdanHasi_MoveWater,
+    (void*)BgYdanHasi_SetupThreeBlocks,
+    (void*)BgYdanHasi_UpdateFloatingBlock,
+    (void*)BgYdanHasi_UpdateThreeBlocks,
+    NULL  // Terminator
+};
+
+static void* BgYdanMaruta_ActionFuncs[] = {
+    (void*)BgYdanMaruta_DoNothing,
+    (void*)func_808BEFF4,
+    (void*)func_808BF078,
+    (void*)func_808BF108,
+    (void*)func_808BF1EC,
+    NULL  // Terminator
+};
+
+static void* BgYdanSp_ActionFuncs[] = {
+    (void*)BgYdanSp_BurnFloorWeb,
+    (void*)BgYdanSp_BurnWallWeb,
+    (void*)BgYdanSp_FloorWebBreaking,
+    (void*)BgYdanSp_FloorWebBroken,
+    (void*)BgYdanSp_FloorWebIdle,
+    (void*)BgYdanSp_WallWebIdle,
     NULL  // Terminator
 };
 
@@ -1645,6 +3504,11 @@ static void* BossGoma_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* BossMo_ActionFuncs[] = {
+    (void*)BossMo_Tentacle,
+    NULL  // Terminator
+};
+
 static void* BossTw_ActionFuncs[] = {
     (void*)BossTw_BlastFire,
     (void*)BossTw_BlastIce,
@@ -1701,6 +3565,33 @@ static void* BossVa_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* Demo6K_ActionFuncs[] = {
+    (void*)func_80966DB0,
+    (void*)func_80966E98,
+    (void*)func_809670AC,
+    (void*)func_80967DBC,
+    NULL  // Terminator
+};
+
+static void* DemoShd_ActionFuncs[] = {
+    (void*)func_80991298,
+    NULL  // Terminator
+};
+
+static void* DoorAna_ActionFuncs[] = {
+    (void*)DoorAna_GrabPlayer,
+    (void*)DoorAna_WaitClosed,
+    (void*)DoorAna_WaitOpen,
+    NULL  // Terminator
+};
+
+static void* DoorGerudo_ActionFuncs[] = {
+    (void*)func_8099485C,
+    (void*)func_8099496C,
+    (void*)func_809949C8,
+    NULL  // Terminator
+};
+
 static void* DoorKiller_ActionFuncs[] = {
     (void*)DoorKiller_Die,
     (void*)DoorKiller_FallAsRubble,
@@ -1710,6 +3601,24 @@ static void* DoorKiller_ActionFuncs[] = {
     (void*)DoorKiller_Wait,
     (void*)DoorKiller_WaitBeforeWobble,
     (void*)DoorKiller_Wobble,
+    NULL  // Terminator
+};
+
+static void* DoorShutter_ActionFuncs[] = {
+    (void*)DoorShutter_SetupType,
+    (void*)func_80996A54,
+    (void*)func_80996B00,
+    (void*)func_80996B0C,
+    (void*)func_80996EE8,
+    (void*)func_80996F98,
+    (void*)func_80997004,
+    (void*)func_80997150,
+    (void*)func_809973E8,
+    (void*)func_80997528,
+    (void*)func_80997568,
+    (void*)func_809975C0,
+    (void*)func_809976B8,
+    (void*)func_80997744,
     NULL  // Terminator
 };
 
@@ -1736,6 +3645,31 @@ static void* DoorWarp1_ActionFuncs[] = {
     (void*)func_8099A3A4,
     (void*)func_8099A508,
     (void*)func_8099B020,
+    NULL  // Terminator
+};
+
+static void* EfcErupc_ActionFuncs[] = {
+    (void*)EfcErupc_UpdateAction,
+    NULL  // Terminator
+};
+
+static void* EffDust_ActionFuncs[] = {
+    (void*)EffDust_UpdateFunc_8099DB28,
+    (void*)EffDust_UpdateFunc_8099DD74,
+    (void*)EffDust_UpdateFunc_8099DFC0,
+    NULL  // Terminator
+};
+
+static void* ElfMsg_ActionFuncs[] = {
+    (void*)ElfMsg_CallNaviCuboid,
+    (void*)ElfMsg_CallNaviCylinder,
+    NULL  // Terminator
+};
+
+static void* ElfMsg2_ActionFuncs[] = {
+    (void*)ElfMsg2_WaitForTextClose,
+    (void*)ElfMsg2_WaitForTextRead,
+    (void*)ElfMsg2_WaitUntilActivated,
     NULL  // Terminator
 };
 
@@ -1775,6 +3709,19 @@ static void* EnAnubice_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnAnubiceFire_ActionFuncs[] = {
+    (void*)func_809B26EC,
+    (void*)func_809B27D8,
+    (void*)func_809B2B48,
+    NULL  // Terminator
+};
+
+static void* EnAnubiceTag_ActionFuncs[] = {
+    (void*)EnAnubiceTag_ManageAnubis,
+    (void*)EnAnubiceTag_SpawnAnubis,
+    NULL  // Terminator
+};
+
 static void* EnArrow_ActionFuncs[] = {
     (void*)EnArrow_Fly,
     (void*)EnArrow_Shoot,
@@ -1790,6 +3737,15 @@ static void* EnAttackNiw_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnBa_ActionFuncs[] = {
+    (void*)EnBa_Die,
+    (void*)EnBa_FallAsBlob,
+    (void*)EnBa_Idle,
+    (void*)EnBa_RecoilFromDamage,
+    (void*)EnBa_SwingAtPlayer,
+    NULL  // Terminator
+};
+
 static void* EnBb_ActionFuncs[] = {
     (void*)EnBb_Blue,
     (void*)EnBb_Damage,
@@ -1800,6 +3756,12 @@ static void* EnBb_ActionFuncs[] = {
     (void*)EnBb_Red,
     (void*)EnBb_Stunned,
     (void*)EnBb_White,
+    NULL  // Terminator
+};
+
+static void* EnBdfire_ActionFuncs[] = {
+    (void*)func_809BC2A4,
+    (void*)func_809BC598,
     NULL  // Terminator
 };
 
@@ -1841,6 +3803,21 @@ static void* EnBird_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnBlkobj_ActionFuncs[] = {
+    (void*)EnBlkobj_DarkLinkFight,
+    (void*)EnBlkobj_DoNothing,
+    (void*)EnBlkobj_SpawnDarkLink,
+    (void*)EnBlkobj_Wait,
+    NULL  // Terminator
+};
+
+static void* EnBom_ActionFuncs[] = {
+    (void*)EnBom_Explode,
+    (void*)EnBom_Move,
+    (void*)EnBom_WaitForRelease,
+    NULL  // Terminator
+};
+
 static void* EnBomBowlMan_ActionFuncs[] = {
     (void*)EnBomBowMan_BlinkAwake,
     (void*)EnBomBowMan_CheckBeatenDC,
@@ -1857,6 +3834,38 @@ static void* EnBomBowlMan_ActionFuncs[] = {
     (void*)EnBomBowlMan_BeginPlayGame,
     (void*)EnBomBowlMan_HandlePlayChoice,
     (void*)func_809C41FC,
+    NULL  // Terminator
+};
+
+static void* EnBomBowlPit_ActionFuncs[] = {
+    (void*)EnBomBowlPit_CameraDollyIn,
+    (void*)EnBomBowlPit_DetectHit,
+    (void*)EnBomBowlPit_GivePrize,
+    (void*)EnBomBowlPit_Reset,
+    (void*)EnBomBowlPit_SetupDetectHit,
+    (void*)EnBomBowlPit_SetupGivePrize,
+    (void*)EnBomBowlPit_SpawnPrize,
+    (void*)EnBomBowlPit_WaitTillPrizeGiven,
+    NULL  // Terminator
+};
+
+static void* EnBomChu_ActionFuncs[] = {
+    (void*)EnBomChu_Move,
+    (void*)EnBomChu_WaitForKill,
+    (void*)EnBomChu_WaitForRelease,
+    NULL  // Terminator
+};
+
+static void* EnBombf_ActionFuncs[] = {
+    (void*)EnBombf_Explode,
+    (void*)EnBombf_GrowBomb,
+    (void*)EnBombf_Move,
+    (void*)EnBombf_WaitForRelease,
+    NULL  // Terminator
+};
+
+static void* EnBoom_ActionFuncs[] = {
+    (void*)EnBoom_Fly,
     NULL  // Terminator
 };
 
@@ -1883,6 +3892,13 @@ static void* EnBrob_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnBubble_ActionFuncs[] = {
+    (void*)EnBubble_Pop,
+    (void*)EnBubble_Regrow,
+    (void*)EnBubble_Wait,
+    NULL  // Terminator
+};
+
 static void* EnButte_ActionFuncs[] = {
     (void*)EnButte_FlyAround,
     (void*)EnButte_FollowLink,
@@ -1901,6 +3917,13 @@ static void* EnBw_ActionFuncs[] = {
     (void*)func_809D014C,
     (void*)func_809D0268,
     (void*)func_809D0424,
+    NULL  // Terminator
+};
+
+static void* EnChanger_ActionFuncs[] = {
+    (void*)EnChanger_OpenChests,
+    (void*)EnChanger_SetHeartPieceFlag,
+    (void*)EnChanger_Wait,
     NULL  // Terminator
 };
 
@@ -2032,6 +4055,13 @@ static void* EnDns_ActionFuncs[] = {
     (void*)EnDns_SetupNoSaleBurrow,
     (void*)EnDns_SetupSale,
     (void*)EnDns_Talk,
+    NULL  // Terminator
+};
+
+static void* EnDntDemo_ActionFuncs[] = {
+    (void*)EnDntDemo_Judge,
+    (void*)EnDntDemo_Prize,
+    (void*)EnDntDemo_Results,
     NULL  // Terminator
 };
 
@@ -2182,6 +4212,12 @@ static void* EnDu_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnDyExtra_ActionFuncs[] = {
+    (void*)EnDyExtra_FallAndKill,
+    (void*)EnDyExtra_WaitForTrigger,
+    NULL  // Terminator
+};
+
 static void* EnEiyer_ActionFuncs[] = {
     (void*)EnEiyer_Ambush,
     (void*)EnEiyer_AppearFromGround,
@@ -2210,6 +4246,37 @@ static void* EnElf_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnEncount2_ActionFuncs[] = {
+    (void*)EnEncount2_SpawnRocks,
+    (void*)EnEncount2_Wait,
+    NULL  // Terminator
+};
+
+static void* EnExItem_ActionFuncs[] = {
+    (void*)EnExItem_BowlCounter,
+    (void*)EnExItem_BowlPrize,
+    (void*)EnExItem_ExitChest,
+    (void*)EnExItem_FairyMagic,
+    (void*)EnExItem_SetupBowlCounter,
+    (void*)EnExItem_TargetPrizeApproach,
+    (void*)EnExItem_TargetPrizeFinish,
+    (void*)EnExItem_TargetPrizeGive,
+    (void*)EnExItem_WaitForObject,
+    NULL  // Terminator
+};
+
+static void* EnExRuppy_ActionFuncs[] = {
+    (void*)EnExRuppy_DropIntoWater,
+    (void*)EnExRuppy_EnterWater,
+    (void*)EnExRuppy_GalleryTarget,
+    (void*)EnExRuppy_Kill,
+    (void*)EnExRuppy_Sink,
+    (void*)EnExRuppy_WaitAsCollectible,
+    (void*)EnExRuppy_WaitInGame,
+    (void*)EnExRuppy_WaitToBlowUp,
+    NULL  // Terminator
+};
+
 static void* EnFd_ActionFuncs[] = {
     (void*)EnFd_JumpToGround,
     (void*)EnFd_Land,
@@ -2218,6 +4285,22 @@ static void* EnFd_ActionFuncs[] = {
     (void*)EnFd_SpinAndGrow,
     (void*)EnFd_SpinAndSpawnFire,
     (void*)EnFd_WaitForCore,
+    NULL  // Terminator
+};
+
+static void* EnFdFire_ActionFuncs[] = {
+    (void*)EnFdFire_DanceTowardsPlayer,
+    (void*)EnFdFire_Disappear,
+    (void*)EnFdFire_WaitToDie,
+    (void*)func_80A0E70C,
+    NULL  // Terminator
+};
+
+static void* EnFireRock_ActionFuncs[] = {
+    (void*)EnFireRock_Fall,
+    (void*)EnFireRock_SpawnMoreBrokenPieces,
+    (void*)FireRock_WaitOnFloor,
+    (void*)FireRock_WaitSpawnRocksFromCeiling,
     NULL  // Terminator
 };
 
@@ -2289,6 +4372,31 @@ static void* EnFw_ActionFuncs[] = {
     (void*)EnFw_JumpToParentInitPos,
     (void*)EnFw_Run,
     (void*)EnFw_TurnToParentInitPos,
+    NULL  // Terminator
+};
+
+static void* EnFz_ActionFuncs[] = {
+    (void*)EnFz_AimForFreeze,
+    (void*)EnFz_AimForMove,
+    (void*)EnFz_Appear,
+    (void*)EnFz_BlowSmoke,
+    (void*)EnFz_BlowSmokeStationary,
+    (void*)EnFz_Despawn,
+    (void*)EnFz_Disappear,
+    (void*)EnFz_Melt,
+    (void*)EnFz_MoveTowardsPlayer,
+    (void*)EnFz_Wait,
+    NULL  // Terminator
+};
+
+static void* EnGSwitch_ActionFuncs[] = {
+    (void*)EnGSwitch_ArcheryPot,
+    (void*)EnGSwitch_GalleryRupee,
+    (void*)EnGSwitch_Kill,
+    (void*)EnGSwitch_SilverRupeeCollected,
+    (void*)EnGSwitch_SilverRupeeIdle,
+    (void*)EnGSwitch_SilverRupeeTracker,
+    (void*)EnGSwitch_WaitForObject,
     NULL  // Terminator
 };
 
@@ -2445,6 +4553,26 @@ static void* EnGoma_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnGoroiwa_ActionFuncs[] = {
+    (void*)EnGoroiwa_MoveAndFallToGround,
+    (void*)EnGoroiwa_MoveDown,
+    (void*)EnGoroiwa_MoveUp,
+    (void*)EnGoroiwa_Roll,
+    (void*)EnGoroiwa_Wait,
+    NULL  // Terminator
+};
+
+static void* EnGs_ActionFuncs[] = {
+    (void*)func_80A4E910,
+    (void*)func_80A4EA08,
+    (void*)func_80A4EB3C,
+    (void*)func_80A4ED34,
+    (void*)func_80A4F13C,
+    (void*)func_80A4F700,
+    (void*)func_80A4F734,
+    NULL  // Terminator
+};
+
 static void* EnGuest_ActionFuncs[] = {
     (void*)func_80A50518,
     (void*)func_80A5057C,
@@ -2527,6 +4655,24 @@ static void* EnHintnuts_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnHoll_ActionFuncs[] = {
+    (void*)EnHoll_NextAction,
+    NULL  // Terminator
+};
+
+static void* EnHonotrap_ActionFuncs[] = {
+    (void*)EnHonotrap_EyeAttack,
+    (void*)EnHonotrap_EyeClose,
+    (void*)EnHonotrap_EyeIdle,
+    (void*)EnHonotrap_EyeOpen,
+    (void*)EnHonotrap_Flame,
+    (void*)EnHonotrap_FlameChase,
+    (void*)EnHonotrap_FlameDrop,
+    (void*)EnHonotrap_FlameMove,
+    (void*)EnHonotrap_FlameVanish,
+    NULL  // Terminator
+};
+
 static void* EnHs2_ActionFuncs[] = {
     (void*)func_80A6F1A4,
     NULL  // Terminator
@@ -2542,6 +4688,14 @@ static void* EnHy_ActionFuncs[] = {
     (void*)func_80A7134C,
     (void*)func_80A714C4,
     (void*)func_80A71530,
+    NULL  // Terminator
+};
+
+static void* EnIceHono_ActionFuncs[] = {
+    (void*)EnIceHono_CapturableFlame,
+    (void*)EnIceHono_DropFlame,
+    (void*)EnIceHono_SmallFlameMove,
+    (void*)EnIceHono_SpreadFlames,
     NULL  // Terminator
 };
 
@@ -2587,6 +4741,13 @@ static void* EnInsect_ActionFuncs[] = {
     (void*)func_80A7CEC0,
     (void*)func_80A7D26C,
     (void*)func_80A7D460,
+    NULL  // Terminator
+};
+
+static void* EnIshi_ActionFuncs[] = {
+    (void*)EnIshi_Fly,
+    (void*)EnIshi_LiftedUp,
+    (void*)EnIshi_Wait,
     NULL  // Terminator
 };
 
@@ -2653,6 +4814,18 @@ static void* EnKo_ActionFuncs[] = {
     (void*)func_80A99504,
     (void*)func_80A99560,
     (void*)func_80A995CC,
+    NULL  // Terminator
+};
+
+static void* EnKusa_ActionFuncs[] = {
+    (void*)EnKusa_CutWaitRegrow,
+    (void*)EnKusa_DoNothing,
+    (void*)EnKusa_Fall,
+    (void*)EnKusa_LiftedUp,
+    (void*)EnKusa_Main,
+    (void*)EnKusa_Regrow,
+    (void*)EnKusa_UprootedWaitRegrow,
+    (void*)EnKusa_WaitObject,
     NULL  // Terminator
 };
 
@@ -2811,6 +4984,35 @@ static void* EnNiwLady_ActionFuncs[] = {
     (void*)func_80ABAC84,
     (void*)func_80ABAD38,
     (void*)func_80ABAD7C,
+    NULL  // Terminator
+};
+
+static void* EnNutsball_ActionFuncs[] = {
+    (void*)func_80ABBB34,
+    (void*)func_80ABBBA8,
+    NULL  // Terminator
+};
+
+static void* EnNy_ActionFuncs[] = {
+    (void*)EnNy_Die,
+    (void*)EnNy_Move,
+    (void*)EnNy_SetupDie,
+    (void*)EnNy_TurnToStone,
+    (void*)func_80ABCE50,
+    (void*)func_80ABCE90,
+    (void*)func_80ABCEEC,
+    (void*)func_80ABD11C,
+    NULL  // Terminator
+};
+
+static void* EnOE2_ActionFuncs[] = {
+    (void*)EnOE2_DoNothing,
+    NULL  // Terminator
+};
+
+static void* EnOkarinaEffect_ActionFuncs[] = {
+    (void*)EnOkarinaEffect_ManageStorm,
+    (void*)EnOkarinaEffect_TriggerStorm,
     NULL  // Terminator
 };
 
@@ -2994,6 +5196,17 @@ static void* EnRd_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnRr_ActionFuncs[] = {
+    (void*)EnRr_Approach,
+    (void*)EnRr_Damage,
+    (void*)EnRr_Death,
+    (void*)EnRr_GrabPlayer,
+    (void*)EnRr_Reach,
+    (void*)EnRr_Retreat,
+    (void*)EnRr_Stunned,
+    NULL  // Terminator
+};
+
 static void* EnSa_ActionFuncs[] = {
     (void*)func_80AF6448,
     (void*)func_80AF67D0,
@@ -3014,6 +5227,11 @@ static void* EnSb_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnSceneChange_ActionFuncs[] = {
+    (void*)EnSceneChange_DoNothing,
+    NULL  // Terminator
+};
+
 static void* EnShopnuts_ActionFuncs[] = {
     (void*)EnShopnuts_Burrow,
     (void*)EnShopnuts_LookAround,
@@ -3021,6 +5239,22 @@ static void* EnShopnuts_ActionFuncs[] = {
     (void*)EnShopnuts_Stand,
     (void*)EnShopnuts_ThrowNut,
     (void*)EnShopnuts_Wait,
+    NULL  // Terminator
+};
+
+static void* EnSi_ActionFuncs[] = {
+    (void*)func_80AFB768,
+    (void*)func_80AFB89C,
+    (void*)func_80AFB950,
+    NULL  // Terminator
+};
+
+static void* EnSiofuki_ActionFuncs[] = {
+    (void*)func_80AFC218,
+    (void*)func_80AFC34C,
+    (void*)func_80AFC3C8,
+    (void*)func_80AFC478,
+    (void*)func_80AFC544,
     NULL  // Terminator
 };
 
@@ -3088,6 +5322,12 @@ static void* EnSth_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnStream_ActionFuncs[] = {
+    (void*)EnStream_SuckPlayer,
+    (void*)EnStream_WaitForPlayer,
+    NULL  // Terminator
+};
+
 static void* EnSw_ActionFuncs[] = {
     (void*)func_80B0D364,
     (void*)func_80B0D3AC,
@@ -3099,6 +5339,16 @@ static void* EnSw_ActionFuncs[] = {
     (void*)func_80B0E728,
     (void*)func_80B0E90C,
     (void*)func_80B0E9BC,
+    NULL  // Terminator
+};
+
+static void* EnSyatekiItm_ActionFuncs[] = {
+    (void*)EnSyatekiItm_CheckTargets,
+    (void*)EnSyatekiItm_CleanupGame,
+    (void*)EnSyatekiItm_EndGame,
+    (void*)EnSyatekiItm_Idle,
+    (void*)EnSyatekiItm_SpawnTargets,
+    (void*)EnSyatekiItm_StartRound,
     NULL  // Terminator
 };
 
@@ -3204,6 +5454,17 @@ static void* EnToryo_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnTp_ActionFuncs[] = {
+    (void*)EnTp_Die,
+    (void*)EnTp_Fragment_Fade,
+    (void*)EnTp_Head_ApproachPlayer,
+    (void*)EnTp_Head_BurrowReturnHome,
+    (void*)EnTp_Head_TakeOff,
+    (void*)EnTp_Head_Wait,
+    (void*)EnTp_Tail_FollowHead,
+    NULL  // Terminator
+};
+
 static void* EnTr_ActionFuncs[] = {
     (void*)EnTr_ChooseAction1,
     (void*)EnTr_ChooseAction2,
@@ -3215,6 +5476,13 @@ static void* EnTr_ActionFuncs[] = {
     (void*)EnTr_TakeOff,
     (void*)EnTr_TurnLookOverShoulder,
     (void*)EnTr_WaitToReappear,
+    NULL  // Terminator
+};
+
+static void* EnTuboTrap_ActionFuncs[] = {
+    (void*)EnTuboTrap_Fly,
+    (void*)EnTuboTrap_Levitate,
+    (void*)EnTuboTrap_WaitForProximity,
     NULL  // Terminator
 };
 
@@ -3233,11 +5501,24 @@ static void* EnVali_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnViewer_ActionFuncs[] = {
+    (void*)EnViewer_InitImpl,
+    (void*)EnViewer_UpdateImpl,
+    NULL  // Terminator
+};
+
 static void* EnVm_ActionFuncs[] = {
     (void*)EnVm_Attack,
     (void*)EnVm_Die,
     (void*)EnVm_Stun,
     (void*)EnVm_Wait,
+    NULL  // Terminator
+};
+
+static void* EnWallTubo_ActionFuncs[] = {
+    (void*)EnWallTubo_DetectChu,
+    (void*)EnWallTubo_FindGirl,
+    (void*)EnWallTubo_SetWallFall,
     NULL  // Terminator
 };
 
@@ -3256,6 +5537,25 @@ static void* EnWallmas_ActionFuncs[] = {
     (void*)EnWallmas_WaitForSwitchFlag,
     (void*)EnWallmas_WaitToDrop,
     (void*)EnWallmas_Walk,
+    NULL  // Terminator
+};
+
+static void* EnWeatherTag_ActionFuncs[] = {
+    (void*)EnWeatherTag_DisabledCloudyDeathMountain,
+    (void*)EnWeatherTag_DisabledCloudyHyruleMarket,
+    (void*)EnWeatherTag_DisabledCloudyLonLonRanch,
+    (void*)EnWeatherTag_DisabledCloudyRainThunderKakariko,
+    (void*)EnWeatherTag_DisabledCloudySnow,
+    (void*)EnWeatherTag_DisabledRainLakeHylia,
+    (void*)EnWeatherTag_DisabledRainThunder,
+    (void*)EnWeatherTag_EnabledCloudyDeathMountain,
+    (void*)EnWeatherTag_EnabledCloudyHyruleMarket,
+    (void*)EnWeatherTag_EnabledCloudyLonLonRanch,
+    (void*)EnWeatherTag_EnabledCloudyRainThunderKakariko,
+    (void*)EnWeatherTag_EnabledCloudySnow,
+    (void*)EnWeatherTag_EnabledRainLakeHylia,
+    (void*)EnWeatherTag_EnabledRainThunder,
+    (void*)EnWeatherTag_SetSandstormIntensity,
     NULL  // Terminator
 };
 
@@ -3289,6 +5589,11 @@ static void* EnWf_ActionFuncs[] = {
     (void*)EnWf_Stunned,
     (void*)EnWf_Wait,
     (void*)EnWf_WaitToAppear,
+    NULL  // Terminator
+};
+
+static void* EnYabusameMark_ActionFuncs[] = {
+    (void*)func_80B42F74,
     NULL  // Terminator
 };
 
@@ -3330,6 +5635,207 @@ static void* EnZo_ActionFuncs[] = {
     NULL  // Terminator
 };
 
+static void* EnfHG_ActionFuncs[] = {
+    (void*)EnfHG_Approach,
+    (void*)EnfHG_Attack,
+    (void*)EnfHG_Damage,
+    (void*)EnfHG_Done,
+    (void*)EnfHG_Intro,
+    (void*)EnfHG_Retreat,
+    NULL  // Terminator
+};
+
+static void* ItemEtcetera_ActionFuncs[] = {
+    (void*)ItemEtcetera_MoveFireArrowDown,
+    (void*)func_80B857D0,
+    NULL  // Terminator
+};
+
+static void* ItemInbox_ActionFuncs[] = {
+    (void*)ItemInbox_Wait,
+    NULL  // Terminator
+};
+
+static void* ItemOcarina_ActionFuncs[] = {
+    (void*)ItemOcarina_DoNothing,
+    (void*)ItemOcarina_Fly,
+    (void*)ItemOcarina_GetThrown,
+    (void*)ItemOcarina_StartSoTCutscene,
+    (void*)ItemOcarina_WaitInWater,
+    (void*)func_80B864EC,
+    (void*)func_80B865E0,
+    NULL  // Terminator
+};
+
+static void* ItemShield_ActionFuncs[] = {
+    (void*)func_80B86AC8,
+    (void*)func_80B86BC8,
+    (void*)func_80B86CA8,
+    (void*)func_80B86F68,
+    NULL  // Terminator
+};
+
+static void* ObjBean_ActionFuncs[] = {
+    (void*)ObjBean_Fly,
+    (void*)ObjBean_GrowWaterPhase1,
+    (void*)ObjBean_GrowWaterPhase2,
+    (void*)ObjBean_GrowWaterPhase3,
+    (void*)ObjBean_GrowWaterPhase4,
+    (void*)ObjBean_GrowWaterPhase5,
+    (void*)ObjBean_WaitForBean,
+    (void*)ObjBean_WaitForPlayer,
+    (void*)ObjBean_WaitForStepOff,
+    (void*)ObjBean_WaitForWater,
+    (void*)func_80B8FE3C,
+    (void*)func_80B8FEAC,
+    (void*)func_80B8FF8C,
+    (void*)func_80B90050,
+    (void*)func_80B90918,
+    (void*)func_80B909B0,
+    (void*)func_80B90A34,
+    NULL  // Terminator
+};
+
+static void* ObjComb_ActionFuncs[] = {
+    (void*)ObjComb_Wait,
+    NULL  // Terminator
+};
+
+static void* ObjElevator_ActionFuncs[] = {
+    (void*)func_80B92C80,
+    (void*)func_80B92D44,
+    NULL  // Terminator
+};
+
+static void* ObjHsblock_ActionFuncs[] = {
+    (void*)func_80B93DF4,
+    (void*)func_80B93E5C,
+    NULL  // Terminator
+};
+
+static void* ObjIcePoly_ActionFuncs[] = {
+    (void*)ObjIcePoly_Idle,
+    (void*)ObjIcePoly_Melt,
+    NULL  // Terminator
+};
+
+static void* ObjKibako_ActionFuncs[] = {
+    (void*)ObjKibako_Held,
+    (void*)ObjKibako_Idle,
+    (void*)ObjKibako_Thrown,
+    NULL  // Terminator
+};
+
+static void* ObjKibako2_ActionFuncs[] = {
+    (void*)ObjKibako2_Idle,
+    (void*)ObjKibako2_Kill,
+    NULL  // Terminator
+};
+
+static void* ObjLift_ActionFuncs[] = {
+    (void*)func_80B96560,
+    (void*)func_80B96678,
+    (void*)func_80B96840,
+    NULL  // Terminator
+};
+
+static void* ObjLightswitch_ActionFuncs[] = {
+    (void*)ObjLightswitch_Disappear,
+    (void*)ObjLightswitch_DisappearDelay,
+    (void*)ObjLightswitch_Off,
+    (void*)ObjLightswitch_On,
+    (void*)ObjLightswitch_TurnOff,
+    (void*)ObjLightswitch_TurnOn,
+    NULL  // Terminator
+};
+
+static void* ObjMakekinsuta_ActionFuncs[] = {
+    (void*)ObjMakekinsuta_DoNothing,
+    (void*)func_80B98320,
+    NULL  // Terminator
+};
+
+static void* ObjMure_ActionFuncs[] = {
+    (void*)ObjMure_ActiveState,
+    (void*)ObjMure_CulledState,
+    (void*)ObjMure_InitialAction,
+    NULL  // Terminator
+};
+
+static void* ObjMure2_ActionFuncs[] = {
+    (void*)ObjMure2_Wait,
+    (void*)func_80B9A668,
+    (void*)func_80B9A6F8,
+    NULL  // Terminator
+};
+
+static void* ObjMure3_ActionFuncs[] = {
+    (void*)func_80B9AF34,
+    (void*)func_80B9AF64,
+    (void*)func_80B9AFFC,
+    NULL  // Terminator
+};
+
+static void* ObjOshihiki_ActionFuncs[] = {
+    (void*)ObjOshihiki_Fall,
+    (void*)ObjOshihiki_OnActor,
+    (void*)ObjOshihiki_OnScene,
+    (void*)ObjOshihiki_Push,
+    NULL  // Terminator
+};
+
+static void* ObjRoomtimer_ActionFuncs[] = {
+    (void*)func_80B9D054,
+    (void*)func_80B9D0B0,
+    NULL  // Terminator
+};
+
+static void* ObjTimeblock_ActionFuncs[] = {
+    (void*)ObjTimeblock_AltBehaviorVisible,
+    (void*)ObjTimeblock_AltBehaviourNotVisible,
+    (void*)ObjTimeblock_DoNothing,
+    (void*)ObjTimeblock_Normal,
+    NULL  // Terminator
+};
+
+static void* ObjTsubo_ActionFuncs[] = {
+    (void*)ObjTsubo_Idle,
+    (void*)ObjTsubo_LiftedUp,
+    (void*)ObjTsubo_Thrown,
+    (void*)ObjTsubo_WaitForObject,
+    NULL  // Terminator
+};
+
+static void* ObjWarp2block_ActionFuncs[] = {
+    (void*)ObjWarp2block_DoNothing,
+    (void*)func_80BA24F8,
+    (void*)func_80BA2610,
+    NULL  // Terminator
+};
+
+static void* OceffSpot_ActionFuncs[] = {
+    (void*)OceffSpot_End,
+    (void*)OceffSpot_GrowCylinder,
+    (void*)OceffSpot_Wait,
+    NULL  // Terminator
+};
+
+static void* OceffStorm_ActionFuncs[] = {
+    (void*)OceffStorm_DefaultAction,
+    (void*)OceffStorm_UnkAction,
+    NULL  // Terminator
+};
+
+static void* ShotSun_ActionFuncs[] = {
+    (void*)ShotSun_SpawnFairy,
+    (void*)ShotSun_TriggerFairy,
+    (void*)ShotSun_UpdateHyliaSun,
+    (void*)func_80BADF0C,
+    NULL  // Terminator
+};
+
+}  // extern "C"
+
 // Field types for serialization
 typedef enum {
     FIELD_TYPE_U8,
@@ -3352,6 +5858,62 @@ typedef struct {
 } FieldDescriptor;
 
 // Field descriptors for syncable state variables (offsets via offsetof())
+static FieldDescriptor ArrowFire_Fields[] = {
+    { "radius", offsetof(ArrowFire, radius), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(ArrowFire, timer), FIELD_TYPE_U16, 1 },
+    { "alpha", offsetof(ArrowFire, alpha), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgBdanObjects_Fields[] = {
+    { "switchFlag", offsetof(BgBdanObjects, switchFlag), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgBdanObjects, timer), FIELD_TYPE_S16, 1 },
+    { "cameraSetting", offsetof(BgBdanObjects, cameraSetting), FIELD_TYPE_S32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgBdanSwitch_Fields[] = {
+    { "unk_1C8", offsetof(BgBdanSwitch, unk_1C8), FIELD_TYPE_F32, 1 },
+    { "unk_1CC", offsetof(BgBdanSwitch, unk_1CC), FIELD_TYPE_S16, 1 },
+    { "unk_1CE", offsetof(BgBdanSwitch, unk_1CE), FIELD_TYPE_U8, 1 },
+    { "unk_1D0", offsetof(BgBdanSwitch, unk_1D0), FIELD_TYPE_F32, 1 },
+    { "unk_1D4", offsetof(BgBdanSwitch, unk_1D4), FIELD_TYPE_F32, 1 },
+    { "unk_1D8", offsetof(BgBdanSwitch, unk_1D8), FIELD_TYPE_S16, 1 },
+    { "unk_1DA", offsetof(BgBdanSwitch, unk_1DA), FIELD_TYPE_S16, 1 },
+    { "unk_1DC", offsetof(BgBdanSwitch, unk_1DC), FIELD_TYPE_U8, 1 },
+    { "unk_1DD", offsetof(BgBdanSwitch, unk_1DD), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgBomGuard_Fields[] = {
+    { "unk_168", offsetof(BgBomGuard, unk_168), FIELD_TYPE_U8, 1 },
+    { "unk_16C", offsetof(BgBomGuard, unk_16C), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgBombwall_Fields[] = {
+    { "unk_2A0", offsetof(BgBombwall, unk_2A0), FIELD_TYPE_S16, 1 },
+    { "unk_2A2", offsetof(BgBombwall, unk_2A2), FIELD_TYPE_U8, 1 },
+    { "unk_2A3", offsetof(BgBombwall, unk_2A3), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgBowlWall_Fields[] = {
+    { "initPos", offsetof(BgBowlWall, initPos), FIELD_TYPE_VEC3F, 1 },
+    { "bullseyeCenter", offsetof(BgBowlWall, bullseyeCenter), FIELD_TYPE_VEC3F, 1 },
+    { "isHit", offsetof(BgBowlWall, isHit), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(BgBowlWall, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgDdanJd_Fields[] = {
+    { "state", offsetof(BgDdanJd, state), FIELD_TYPE_U8, 1 },
+    { "ySpeed", offsetof(BgDdanJd, ySpeed), FIELD_TYPE_U8, 1 },
+    { "idleTimer", offsetof(BgDdanJd, idleTimer), FIELD_TYPE_S16, 1 },
+    { "targetY", offsetof(BgDdanJd, targetY), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor BgDyYoseizo_Fields[] = {
     { "lightBallSpawned", offsetof(BgDyYoseizo, lightBallSpawned), FIELD_TYPE_U8, 1 },
     { "giveDefenseHearts", offsetof(BgDyYoseizo, giveDefenseHearts), FIELD_TYPE_U8, 1 },
@@ -3386,6 +5948,509 @@ static FieldDescriptor BgDyYoseizo_Fields[] = {
     { "headRot", offsetof(BgDyYoseizo, headRot), FIELD_TYPE_VEC3S, 1 },
     { "torsoRot", offsetof(BgDyYoseizo, torsoRot), FIELD_TYPE_VEC3S, 1 },
     { "unk_348", offsetof(BgDyYoseizo, unk_348), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgGanonOtyuka_Fields[] = {
+    { "dropTimer", offsetof(BgGanonOtyuka, dropTimer), FIELD_TYPE_S16, 1 },
+    { "isFalling", offsetof(BgGanonOtyuka, isFalling), FIELD_TYPE_U8, 1 },
+    { "unwalledSides", offsetof(BgGanonOtyuka, unwalledSides), FIELD_TYPE_U8, 1 },
+    { "visibleSides", offsetof(BgGanonOtyuka, visibleSides), FIELD_TYPE_U8, 1 },
+    { "flashTimer", offsetof(BgGanonOtyuka, flashTimer), FIELD_TYPE_U8, 1 },
+    { "flashState", offsetof(BgGanonOtyuka, flashState), FIELD_TYPE_U8, 1 },
+    { "flashYScale", offsetof(BgGanonOtyuka, flashYScale), FIELD_TYPE_F32, 1 },
+    { "flashPrimColorR", offsetof(BgGanonOtyuka, flashPrimColorR), FIELD_TYPE_F32, 1 },
+    { "flashPrimColorG", offsetof(BgGanonOtyuka, flashPrimColorG), FIELD_TYPE_F32, 1 },
+    { "flashPrimColorB", offsetof(BgGanonOtyuka, flashPrimColorB), FIELD_TYPE_F32, 1 },
+    { "flashEnvColorR", offsetof(BgGanonOtyuka, flashEnvColorR), FIELD_TYPE_F32, 1 },
+    { "flashEnvColorG", offsetof(BgGanonOtyuka, flashEnvColorG), FIELD_TYPE_F32, 1 },
+    { "flashEnvColorB", offsetof(BgGanonOtyuka, flashEnvColorB), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgGateShutter_Fields[] = {
+    { "openingState", offsetof(BgGateShutter, openingState), FIELD_TYPE_S16, 1 },
+    { "somePos", offsetof(BgGateShutter, somePos), FIELD_TYPE_VEC3F, 1 },
+    { "unk_178", offsetof(BgGateShutter, unk_178), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgGndIceblock_Fields[] = {
+    { "targetPos", offsetof(BgGndIceblock, targetPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaGate_Fields[] = {
+    { "switchFlag", offsetof(BgHakaGate, switchFlag), FIELD_TYPE_U8, 1 },
+    { "actionVar1", offsetof(BgHakaGate, actionVar1), FIELD_TYPE_S16, 1 },
+    { "actionVar2", offsetof(BgHakaGate, actionVar2), FIELD_TYPE_S16, 1 },
+    { "actionVar3", offsetof(BgHakaGate, actionVar3), FIELD_TYPE_S16, 1 },
+    { "actionVar4", offsetof(BgHakaGate, actionVar4), FIELD_TYPE_S16, 1 },
+    { "actionVar5", offsetof(BgHakaGate, actionVar5), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaHuta_Fields[] = {
+    { "counter", offsetof(BgHakaHuta, counter), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgHakaHuta, unk_16A), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaMegane_Fields[] = {
+    { "unk_168", offsetof(BgHakaMegane, unk_168), FIELD_TYPE_U8, 1 },
+    { "objBankIndex", offsetof(BgHakaMegane, objBankIndex), FIELD_TYPE_S8, 1 },
+    { "unk_16A", offsetof(BgHakaMegane, unk_16A), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaMeganeBG_Fields[] = {
+    { "unk_168", offsetof(BgHakaMeganeBG, unk_168), FIELD_TYPE_U8, 1 },
+    { "unk_16A", offsetof(BgHakaMeganeBG, unk_16A), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaSgami_Fields[] = {
+    { "requiredObjBankIndex", offsetof(BgHakaSgami, requiredObjBankIndex), FIELD_TYPE_S8, 1 },
+    { "unk_151", offsetof(BgHakaSgami, unk_151), FIELD_TYPE_S8, 1 },
+    { "timer", offsetof(BgHakaSgami, timer), FIELD_TYPE_S16, 1 },
+    { "blureEffectIndex", offsetof(BgHakaSgami, blureEffectIndex), FIELD_TYPE_S32, 2 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaShip_Fields[] = {
+    { "counter", offsetof(BgHakaShip, counter), FIELD_TYPE_U8, 1 },
+    { "switchFlag", offsetof(BgHakaShip, switchFlag), FIELD_TYPE_U8, 1 },
+    { "yOffset", offsetof(BgHakaShip, yOffset), FIELD_TYPE_S16, 1 },
+    { "bellSoundPos", offsetof(BgHakaShip, bellSoundPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaTrap_Fields[] = {
+    { "timer", offsetof(BgHakaTrap, timer), FIELD_TYPE_U8, 1 },
+    { "unk_169", offsetof(BgHakaTrap, unk_169), FIELD_TYPE_U8, 1 },
+    { "unk_16A", offsetof(BgHakaTrap, unk_16A), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgHakaTrap, unk_16C), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaTubo_Fields[] = {
+    { "dropTimer", offsetof(BgHakaTubo, dropTimer), FIELD_TYPE_S16, 1 },
+    { "fireScroll", offsetof(BgHakaTubo, fireScroll), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaWater_Fields[] = {
+    { "isLowered", offsetof(BgHakaWater, isLowered), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHakaZou_Fields[] = {
+    { "requiredObjBankIndex", offsetof(BgHakaZou, requiredObjBankIndex), FIELD_TYPE_S8, 1 },
+    { "switchFlag", offsetof(BgHakaZou, switchFlag), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgHakaZou, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanCurtain_Fields[] = {
+    { "type", offsetof(BgHidanCurtain, type), FIELD_TYPE_U8, 1 },
+    { "treasureFlag", offsetof(BgHidanCurtain, treasureFlag), FIELD_TYPE_U8, 1 },
+    { "size", offsetof(BgHidanCurtain, size), FIELD_TYPE_U8, 1 },
+    { "alpha", offsetof(BgHidanCurtain, alpha), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgHidanCurtain, timer), FIELD_TYPE_S16, 1 },
+    { "texScroll", offsetof(BgHidanCurtain, texScroll), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanDalm_Fields[] = {
+    { "switchFlag", offsetof(BgHidanDalm, switchFlag), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanFirewall_Fields[] = {
+    { "unk_150", offsetof(BgHidanFirewall, unk_150), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanFslift_Fields[] = {
+    { "timer", offsetof(BgHidanFslift, timer), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgHidanFslift, unk_16A), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanFwbig_Fields[] = {
+    { "direction", offsetof(BgHidanFwbig, direction), FIELD_TYPE_S8, 1 },
+    { "moveState", offsetof(BgHidanFwbig, moveState), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgHidanFwbig, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanHrock_Fields[] = {
+    { "unk_168", offsetof(BgHidanHrock, unk_168), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgHidanHrock, unk_16A), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanKousi_Fields[] = {
+    { "unk_168", offsetof(BgHidanKousi, unk_168), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanRock_Fields[] = {
+    { "type", offsetof(BgHidanRock, type), FIELD_TYPE_U8, 1 },
+    { "unk_169", offsetof(BgHidanRock, unk_169), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgHidanRock, timer), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgHidanRock, unk_16C), FIELD_TYPE_F32, 1 },
+    { "unk_170", offsetof(BgHidanRock, unk_170), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanSima_Fields[] = {
+    { "timer", offsetof(BgHidanSima, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgHidanSyoku_Fields[] = {
+    { "unk_168", offsetof(BgHidanSyoku, unk_168), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(BgHidanSyoku, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgIceObjects_Fields[] = {
+    { "targetPos", offsetof(BgIceObjects, targetPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgIceShelter_Fields[] = {
+    { "alpha", offsetof(BgIceShelter, alpha), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgIceTurara_Fields[] = {
+    { "shiverTimer", offsetof(BgIceTurara, shiverTimer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJya1flift_Fields[] = {
+    { "moveDelay", offsetof(BgJya1flift, moveDelay), FIELD_TYPE_S16, 1 },
+    { "isMovingDown", offsetof(BgJya1flift, isMovingDown), FIELD_TYPE_U8, 1 },
+    { "hasInitialized", offsetof(BgJya1flift, hasInitialized), FIELD_TYPE_U8, 1 },
+    { "isLinkRiding", offsetof(BgJya1flift, isLinkRiding), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaBombchuiwa_Fields[] = {
+    { "lightRayIntensity", offsetof(BgJyaBombchuiwa, lightRayIntensity), FIELD_TYPE_F32, 1 },
+    { "timer", offsetof(BgJyaBombchuiwa, timer), FIELD_TYPE_S16, 1 },
+    { "drawFlags", offsetof(BgJyaBombchuiwa, drawFlags), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaCobra_Fields[] = {
+    { "unk_168", offsetof(BgJyaCobra, unk_168), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgJyaCobra, unk_16A), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgJyaCobra, unk_16C), FIELD_TYPE_S16, 1 },
+    { "unk_16E", offsetof(BgJyaCobra, unk_16E), FIELD_TYPE_S16, 1 },
+    { "unk_170", offsetof(BgJyaCobra, unk_170), FIELD_TYPE_S16, 1 },
+    { "unk_172", offsetof(BgJyaCobra, unk_172), FIELD_TYPE_U8, 1 },
+    { "unk_174", offsetof(BgJyaCobra, unk_174), FIELD_TYPE_VEC3F, 1 },
+    { "unk_180", offsetof(BgJyaCobra, unk_180), FIELD_TYPE_VEC3F, 1 },
+    { "unk_18C", offsetof(BgJyaCobra, unk_18C), FIELD_TYPE_F32, 1 },
+    { "unk_190", offsetof(BgJyaCobra, unk_190), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaHaheniron_Fields[] = {
+    { "timer", offsetof(BgJyaHaheniron, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaKanaami_Fields[] = {
+    { "unk_168", offsetof(BgJyaKanaami, unk_168), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgJyaKanaami, unk_16A), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaLift_Fields[] = {
+    { "moveDelay", offsetof(BgJyaLift, moveDelay), FIELD_TYPE_S16, 1 },
+    { "isSpawned", offsetof(BgJyaLift, isSpawned), FIELD_TYPE_U8, 1 },
+    { "unk_16B", offsetof(BgJyaLift, unk_16B), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaMegami_Fields[] = {
+    { "lightTimer", offsetof(BgJyaMegami, lightTimer), FIELD_TYPE_S16, 1 },
+    { "explosionTimer", offsetof(BgJyaMegami, explosionTimer), FIELD_TYPE_S16, 1 },
+    { "crumbleIndex", offsetof(BgJyaMegami, crumbleIndex), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgJyaZurerukabe_Fields[] = {
+    { "unk_168", offsetof(BgJyaZurerukabe, unk_168), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgJyaZurerukabe, unk_16A), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgJyaZurerukabe, unk_16C), FIELD_TYPE_S16, 1 },
+    { "unk_16E", offsetof(BgJyaZurerukabe, unk_16E), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMizuBwall_Fields[] = {
+    { "yRot", offsetof(BgMizuBwall, yRot), FIELD_TYPE_F32, 1 },
+    { "scrollAlpha1", offsetof(BgMizuBwall, scrollAlpha1), FIELD_TYPE_S32, 1 },
+    { "scrollAlpha2", offsetof(BgMizuBwall, scrollAlpha2), FIELD_TYPE_S32, 1 },
+    { "scrollAlpha3", offsetof(BgMizuBwall, scrollAlpha3), FIELD_TYPE_S32, 1 },
+    { "scrollAlpha4", offsetof(BgMizuBwall, scrollAlpha4), FIELD_TYPE_S32, 1 },
+    { "breakTimer", offsetof(BgMizuBwall, breakTimer), FIELD_TYPE_S32, 1 },
+    { "unk_2B4", offsetof(BgMizuBwall, unk_2B4), FIELD_TYPE_S8, 4 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMizuShutter_Fields[] = {
+    { "timer", offsetof(BgMizuShutter, timer), FIELD_TYPE_S32, 1 },
+    { "timerMax", offsetof(BgMizuShutter, timerMax), FIELD_TYPE_S32, 1 },
+    { "maxSpeed", offsetof(BgMizuShutter, maxSpeed), FIELD_TYPE_F32, 1 },
+    { "closedPos", offsetof(BgMizuShutter, closedPos), FIELD_TYPE_VEC3F, 1 },
+    { "openPos", offsetof(BgMizuShutter, openPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMizuWater_Fields[] = {
+    { "type", offsetof(BgMizuWater, type), FIELD_TYPE_S32, 1 },
+    { "targetY", offsetof(BgMizuWater, targetY), FIELD_TYPE_F32, 1 },
+    { "baseY", offsetof(BgMizuWater, baseY), FIELD_TYPE_F32, 1 },
+    { "switchFlag", offsetof(BgMizuWater, switchFlag), FIELD_TYPE_S32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriBigst_Fields[] = {
+    { "waitTimer", offsetof(BgMoriBigst, waitTimer), FIELD_TYPE_S16, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriBigst, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriElevator_Fields[] = {
+    { "targetY", offsetof(BgMoriElevator, targetY), FIELD_TYPE_F32, 1 },
+    { "unk_16C", offsetof(BgMoriElevator, unk_16C), FIELD_TYPE_S32, 1 },
+    { "unk_170", offsetof(BgMoriElevator, unk_170), FIELD_TYPE_U8, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriElevator, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { "unk_172", offsetof(BgMoriElevator, unk_172), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriHashigo_Fields[] = {
+    { "hitTimer", offsetof(BgMoriHashigo, hitTimer), FIELD_TYPE_S16, 1 },
+    { "bounceCounter", offsetof(BgMoriHashigo, bounceCounter), FIELD_TYPE_S16, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriHashigo, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriHashira4_Fields[] = {
+    { "moriTexObjIndex", offsetof(BgMoriHashira4, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { "switchFlag", offsetof(BgMoriHashira4, switchFlag), FIELD_TYPE_S8, 1 },
+    { "gateTimer", offsetof(BgMoriHashira4, gateTimer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriHineri_Fields[] = {
+    { "moriHineriObjIdx", offsetof(BgMoriHineri, moriHineriObjIdx), FIELD_TYPE_S8, 1 },
+    { "moriTexObjIdx", offsetof(BgMoriHineri, moriTexObjIdx), FIELD_TYPE_S8, 1 },
+    { "boxObjIdx", offsetof(BgMoriHineri, boxObjIdx), FIELD_TYPE_S8, 1 },
+    { "switchFlag", offsetof(BgMoriHineri, switchFlag), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriIdomizu_Fields[] = {
+    { "targetWaterLevel", offsetof(BgMoriIdomizu, targetWaterLevel), FIELD_TYPE_F32, 1 },
+    { "prevSwitchFlagSet", offsetof(BgMoriIdomizu, prevSwitchFlagSet), FIELD_TYPE_S32, 1 },
+    { "isLoaded", offsetof(BgMoriIdomizu, isLoaded), FIELD_TYPE_S16, 1 },
+    { "drainTimer", offsetof(BgMoriIdomizu, drainTimer), FIELD_TYPE_S16, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriIdomizu, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriKaitenkabe_Fields[] = {
+    { "timer", offsetof(BgMoriKaitenkabe, timer), FIELD_TYPE_S32, 1 },
+    { "rotDirection", offsetof(BgMoriKaitenkabe, rotDirection), FIELD_TYPE_F32, 1 },
+    { "rotSpeed", offsetof(BgMoriKaitenkabe, rotSpeed), FIELD_TYPE_F32, 1 },
+    { "rotYdeg", offsetof(BgMoriKaitenkabe, rotYdeg), FIELD_TYPE_F32, 1 },
+    { "lockedPlayerPos", offsetof(BgMoriKaitenkabe, lockedPlayerPos), FIELD_TYPE_VEC3F, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriKaitenkabe, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgMoriRakkatenjo_Fields[] = {
+    { "timer", offsetof(BgMoriRakkatenjo, timer), FIELD_TYPE_S32, 1 },
+    { "bounceCount", offsetof(BgMoriRakkatenjo, bounceCount), FIELD_TYPE_S32, 1 },
+    { "fallCount", offsetof(BgMoriRakkatenjo, fallCount), FIELD_TYPE_S32, 1 },
+    { "moriTexObjIndex", offsetof(BgMoriRakkatenjo, moriTexObjIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgPoEvent_Fields[] = {
+    { "type", offsetof(BgPoEvent, type), FIELD_TYPE_U8, 1 },
+    { "index", offsetof(BgPoEvent, index), FIELD_TYPE_U8, 1 },
+    { "direction", offsetof(BgPoEvent, direction), FIELD_TYPE_S8, 1 },
+    { "timer", offsetof(BgPoEvent, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgRelayObjects_Fields[] = {
+    { "switchFlag", offsetof(BgRelayObjects, switchFlag), FIELD_TYPE_U8, 1 },
+    { "unk_169", offsetof(BgRelayObjects, unk_169), FIELD_TYPE_S8, 1 },
+    { "timer", offsetof(BgRelayObjects, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot00Hanebasi_Fields[] = {
+    { "destAngle", offsetof(BgSpot00Hanebasi, destAngle), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot01Fusya_Fields[] = {
+    { "unk_150", offsetof(BgSpot01Fusya, unk_150), FIELD_TYPE_U8, 1 },
+    { "unk_154", offsetof(BgSpot01Fusya, unk_154), FIELD_TYPE_F32, 1 },
+    { "unk_158", offsetof(BgSpot01Fusya, unk_158), FIELD_TYPE_F32, 1 },
+    { "unk_15C", offsetof(BgSpot01Fusya, unk_15C), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot01Idomizu_Fields[] = {
+    { "waterHeight", offsetof(BgSpot01Idomizu, waterHeight), FIELD_TYPE_F32, 1 },
+    { "unk_154", offsetof(BgSpot01Idomizu, unk_154), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot01Objects2_Fields[] = {
+    { "unk_168", offsetof(BgSpot01Objects2, unk_168), FIELD_TYPE_U8, 1 },
+    { "objectId", offsetof(BgSpot01Objects2, objectId), FIELD_TYPE_S32, 1 },
+    { "objBankIndex", offsetof(BgSpot01Objects2, objBankIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot02Objects_Fields[] = {
+    { "timer", offsetof(BgSpot02Objects, timer), FIELD_TYPE_S16, 1 },
+    { "unk_16A", offsetof(BgSpot02Objects, unk_16A), FIELD_TYPE_U8, 1 },
+    { "unk_16B", offsetof(BgSpot02Objects, unk_16B), FIELD_TYPE_U8, 1 },
+    { "unk_16C", offsetof(BgSpot02Objects, unk_16C), FIELD_TYPE_S8, 4 },
+    { "unk_170", offsetof(BgSpot02Objects, unk_170), FIELD_TYPE_U16, 1 },
+    { "unk_172", offsetof(BgSpot02Objects, unk_172), FIELD_TYPE_U16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot03Taki_Fields[] = {
+    { "timer", offsetof(BgSpot03Taki, timer), FIELD_TYPE_S16, 1 },
+    { "state", offsetof(BgSpot03Taki, state), FIELD_TYPE_U8, 1 },
+    { "switchFlag", offsetof(BgSpot03Taki, switchFlag), FIELD_TYPE_U16, 1 },
+    { "openingAlpha", offsetof(BgSpot03Taki, openingAlpha), FIELD_TYPE_F32, 1 },
+    { "bufferIndex", offsetof(BgSpot03Taki, bufferIndex), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot05Soko_Fields[] = {
+    { "switchFlag", offsetof(BgSpot05Soko, switchFlag), FIELD_TYPE_S32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot06Objects_Fields[] = {
+    { "switchFlag", offsetof(BgSpot06Objects, switchFlag), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(BgSpot06Objects, timer), FIELD_TYPE_S16, 1 },
+    { "lakeHyliaWaterLevel", offsetof(BgSpot06Objects, lakeHyliaWaterLevel), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot08Iceblock_Fields[] = {
+    { "surfaceNormal", offsetof(BgSpot08Iceblock, surfaceNormal), FIELD_TYPE_VEC3F, 1 },
+    { "normalDelta", offsetof(BgSpot08Iceblock, normalDelta), FIELD_TYPE_VEC3F, 1 },
+    { "rotationAxis", offsetof(BgSpot08Iceblock, rotationAxis), FIELD_TYPE_VEC3F, 1 },
+    { "bobPhaseSlow", offsetof(BgSpot08Iceblock, bobPhaseSlow), FIELD_TYPE_S16, 1 },
+    { "bobPhaseFast", offsetof(BgSpot08Iceblock, bobPhaseFast), FIELD_TYPE_S16, 1 },
+    { "bobIncrSlow", offsetof(BgSpot08Iceblock, bobIncrSlow), FIELD_TYPE_S16, 1 },
+    { "bobIncrFast", offsetof(BgSpot08Iceblock, bobIncrFast), FIELD_TYPE_S16, 1 },
+    { "sinkOffset", offsetof(BgSpot08Iceblock, sinkOffset), FIELD_TYPE_F32, 1 },
+    { "bobOffset", offsetof(BgSpot08Iceblock, bobOffset), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot11Oasis_Fields[] = {
+    { "unk_150", offsetof(BgSpot11Oasis, unk_150), FIELD_TYPE_U8, 1 },
+    { "unk_151", offsetof(BgSpot11Oasis, unk_151), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot12Gate_Fields[] = {
+    { "unk_168", offsetof(BgSpot12Gate, unk_168), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot12Saku_Fields[] = {
+    { "timer", offsetof(BgSpot12Saku, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot15Rrbox_Fields[] = {
+    { "unk_168", offsetof(BgSpot15Rrbox, unk_168), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgSpot15Rrbox, unk_16C), FIELD_TYPE_F32, 1 },
+    { "unk_170", offsetof(BgSpot15Rrbox, unk_170), FIELD_TYPE_F32, 1 },
+    { "unk_174", offsetof(BgSpot15Rrbox, unk_174), FIELD_TYPE_F32, 1 },
+    { "unk_178", offsetof(BgSpot15Rrbox, unk_178), FIELD_TYPE_F32, 1 },
+    { "unk_17C", offsetof(BgSpot15Rrbox, unk_17C), FIELD_TYPE_F32, 1 },
+    { "bgId", offsetof(BgSpot15Rrbox, bgId), FIELD_TYPE_S32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot15Saku_Fields[] = {
+    { "unk_168", offsetof(BgSpot15Saku, unk_168), FIELD_TYPE_U8, 1 },
+    { "unk_170", offsetof(BgSpot15Saku, unk_170), FIELD_TYPE_VEC3F, 1 },
+    { "timer", offsetof(BgSpot15Saku, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot16Bombstone_Fields[] = {
+    { "unk_154", offsetof(BgSpot16Bombstone, unk_154), FIELD_TYPE_S16, 1 },
+    { "switchFlag", offsetof(BgSpot16Bombstone, switchFlag), FIELD_TYPE_S16, 1 },
+    { "unk_158", offsetof(BgSpot16Bombstone, unk_158), FIELD_TYPE_S16, 1 },
+    { "sinRotation", offsetof(BgSpot16Bombstone, sinRotation), FIELD_TYPE_F32, 1 },
+    { "cosRotation", offsetof(BgSpot16Bombstone, cosRotation), FIELD_TYPE_F32, 1 },
+    { "unk_210", offsetof(BgSpot16Bombstone, unk_210), FIELD_TYPE_S16, 1 },
+    { "unk_212", offsetof(BgSpot16Bombstone, unk_212), FIELD_TYPE_S16, 1 },
+    { "bombiwaBankIndex", offsetof(BgSpot16Bombstone, bombiwaBankIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot18Basket_Fields[] = {
+    { "unk_208", offsetof(BgSpot18Basket, unk_208), FIELD_TYPE_F32, 1 },
+    { "unk_20C", offsetof(BgSpot18Basket, unk_20C), FIELD_TYPE_S16, 1 },
+    { "unk_20E", offsetof(BgSpot18Basket, unk_20E), FIELD_TYPE_S16, 1 },
+    { "unk_210", offsetof(BgSpot18Basket, unk_210), FIELD_TYPE_S16, 1 },
+    { "unk_212", offsetof(BgSpot18Basket, unk_212), FIELD_TYPE_S16, 1 },
+    { "unk_214", offsetof(BgSpot18Basket, unk_214), FIELD_TYPE_S16, 1 },
+    { "unk_216", offsetof(BgSpot18Basket, unk_216), FIELD_TYPE_S16, 1 },
+    { "unk_218", offsetof(BgSpot18Basket, unk_218), FIELD_TYPE_S16, 1 },
+    { "unk_21A", offsetof(BgSpot18Basket, unk_21A), FIELD_TYPE_U8, 1 },
+    { "unk_21B", offsetof(BgSpot18Basket, unk_21B), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgSpot18Obj_Fields[] = {
+    { "unk_168", offsetof(BgSpot18Obj, unk_168), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgYdanHasi_Fields[] = {
+    { "type", offsetof(BgYdanHasi, type), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgYdanHasi, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgYdanMaruta_Fields[] = {
+    { "switchFlag", offsetof(BgYdanMaruta, switchFlag), FIELD_TYPE_U8, 1 },
+    { "unk_16A", offsetof(BgYdanMaruta, unk_16A), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor BgYdanSp_Fields[] = {
+    { "isDestroyedSwitchFlag", offsetof(BgYdanSp, isDestroyedSwitchFlag), FIELD_TYPE_U8, 1 },
+    { "burnSwitchFlag", offsetof(BgYdanSp, burnSwitchFlag), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(BgYdanSp, timer), FIELD_TYPE_S16, 1 },
+    { "unk_16C", offsetof(BgYdanSp, unk_16C), FIELD_TYPE_F32, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -3659,6 +6724,77 @@ static FieldDescriptor BossGoma_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor BossMo_Fields[] = {
+    { "tent2KillTimer", offsetof(BossMo, tent2KillTimer), FIELD_TYPE_U8, 1 },
+    { "hitCount", offsetof(BossMo, hitCount), FIELD_TYPE_U8, 1 },
+    { "tentSpawnPos", offsetof(BossMo, tentSpawnPos), FIELD_TYPE_U8, 1 },
+    { "work", offsetof(BossMo, work), FIELD_TYPE_U8, 1 },
+    { "widthIndex", offsetof(BossMo, widthIndex), FIELD_TYPE_S16, 1 },
+    { "pulsePhase", offsetof(BossMo, pulsePhase), FIELD_TYPE_S16, 1 },
+    { "xSwing", offsetof(BossMo, xSwing), FIELD_TYPE_S16, 1 },
+    { "zSwing", offsetof(BossMo, zSwing), FIELD_TYPE_S16, 1 },
+    { "cutIndex", offsetof(BossMo, cutIndex), FIELD_TYPE_S16, 1 },
+    { "meltIndex", offsetof(BossMo, meltIndex), FIELD_TYPE_S16, 1 },
+    { "linkToLeft", offsetof(BossMo, linkToLeft), FIELD_TYPE_S16, 1 },
+    { "mashCounter", offsetof(BossMo, mashCounter), FIELD_TYPE_S16, 1 },
+    { "noBubbles", offsetof(BossMo, noBubbles), FIELD_TYPE_S16, 1 },
+    { "sfxTimer", offsetof(BossMo, sfxTimer), FIELD_TYPE_S16, 1 },
+    { "timers", offsetof(BossMo, timers), FIELD_TYPE_S16, 5 },
+    { "fwork", offsetof(BossMo, fwork), FIELD_TYPE_U8, 1 },
+    { "baseAlpha", offsetof(BossMo, baseAlpha), FIELD_TYPE_F32, 1 },
+    { "cutScale", offsetof(BossMo, cutScale), FIELD_TYPE_F32, 1 },
+    { "waterTex1x", offsetof(BossMo, waterTex1x), FIELD_TYPE_F32, 1 },
+    { "waterTex1y", offsetof(BossMo, waterTex1y), FIELD_TYPE_F32, 1 },
+    { "waterTex2x", offsetof(BossMo, waterTex2x), FIELD_TYPE_F32, 1 },
+    { "waterTex2y", offsetof(BossMo, waterTex2y), FIELD_TYPE_F32, 1 },
+    { "waterLevel", offsetof(BossMo, waterLevel), FIELD_TYPE_F32, 1 },
+    { "flattenRate", offsetof(BossMo, flattenRate), FIELD_TYPE_F32, 1 },
+    { "waterTexAlpha", offsetof(BossMo, waterTexAlpha), FIELD_TYPE_F32, 1 },
+    { "waterLevelMod", offsetof(BossMo, waterLevelMod), FIELD_TYPE_F32, 1 },
+    { "baseBubblesTimer", offsetof(BossMo, baseBubblesTimer), FIELD_TYPE_S16, 1 },
+    { "attackAngleMod", offsetof(BossMo, attackAngleMod), FIELD_TYPE_S16, 1 },
+    { "unk_1D0", offsetof(BossMo, unk_1D0), FIELD_TYPE_U8, 1 },
+    { "drawActor", offsetof(BossMo, drawActor), FIELD_TYPE_U8, 1 },
+    { "linkHitTimer", offsetof(BossMo, linkHitTimer), FIELD_TYPE_U8, 1 },
+    { "targetPos", offsetof(BossMo, targetPos), FIELD_TYPE_VEC3F, 1 },
+    { "tentRippleSize", offsetof(BossMo, tentRippleSize), FIELD_TYPE_F32, 1 },
+    { "grabPosRot", offsetof(BossMo, grabPosRot), FIELD_TYPE_U8, 1 },
+    { "tentWidth", offsetof(BossMo, tentWidth), FIELD_TYPE_F32, 300 },
+    { "tentStretch", offsetof(BossMo, tentStretch), FIELD_TYPE_VEC3F, 41 },
+    { "tentScale", offsetof(BossMo, tentScale), FIELD_TYPE_VEC3F, 41 },
+    { "tentRipple", offsetof(BossMo, tentRipple), FIELD_TYPE_VEC3F, 41 },
+    { "tentRot", offsetof(BossMo, tentRot), FIELD_TYPE_VEC3S, 41 },
+    { "tentMaxAngle", offsetof(BossMo, tentMaxAngle), FIELD_TYPE_F32, 1 },
+    { "tentSpeed", offsetof(BossMo, tentSpeed), FIELD_TYPE_F32, 1 },
+    { "tentPulse", offsetof(BossMo, tentPulse), FIELD_TYPE_F32, 1 },
+    { "tentPos", offsetof(BossMo, tentPos), FIELD_TYPE_VEC3F, 41 },
+    { "cameraZoom", offsetof(BossMo, cameraZoom), FIELD_TYPE_F32, 1 },
+    { "csState", offsetof(BossMo, csState), FIELD_TYPE_S16, 1 },
+    { "csCamera", offsetof(BossMo, csCamera), FIELD_TYPE_S16, 1 },
+    { "targetIndex", offsetof(BossMo, targetIndex), FIELD_TYPE_S16, 1 },
+    { "cameraEye", offsetof(BossMo, cameraEye), FIELD_TYPE_VEC3F, 1 },
+    { "cameraAt", offsetof(BossMo, cameraAt), FIELD_TYPE_VEC3F, 1 },
+    { "cameraUp", offsetof(BossMo, cameraUp), FIELD_TYPE_VEC3F, 1 },
+    { "unk_F8C", offsetof(BossMo, unk_F8C), FIELD_TYPE_U8, 1 },
+    { "cameraEyeVel", offsetof(BossMo, cameraEyeVel), FIELD_TYPE_VEC3F, 1 },
+    { "cameraAtVel", offsetof(BossMo, cameraAtVel), FIELD_TYPE_VEC3F, 1 },
+    { "cameraNextEye", offsetof(BossMo, cameraNextEye), FIELD_TYPE_VEC3F, 1 },
+    { "cameraEyeMaxVel", offsetof(BossMo, cameraEyeMaxVel), FIELD_TYPE_VEC3F, 1 },
+    { "cameraNextAt", offsetof(BossMo, cameraNextAt), FIELD_TYPE_VEC3F, 1 },
+    { "cameraAtMaxVel", offsetof(BossMo, cameraAtMaxVel), FIELD_TYPE_VEC3F, 1 },
+    { "cameraSpeedMod", offsetof(BossMo, cameraSpeedMod), FIELD_TYPE_F32, 1 },
+    { "cameraAccel", offsetof(BossMo, cameraAccel), FIELD_TYPE_F32, 1 },
+    { "unk_FF4", offsetof(BossMo, unk_FF4), FIELD_TYPE_S8, 8 },
+    { "cameraDist", offsetof(BossMo, cameraDist), FIELD_TYPE_F32, 1 },
+    { "cameraSpeed", offsetof(BossMo, cameraSpeed), FIELD_TYPE_F32, 1 },
+    { "cameraYaw", offsetof(BossMo, cameraYaw), FIELD_TYPE_F32, 1 },
+    { "cameraYawRate", offsetof(BossMo, cameraYawRate), FIELD_TYPE_F32, 1 },
+    { "cameraYawShake", offsetof(BossMo, cameraYawShake), FIELD_TYPE_F32, 1 },
+    { "tentTipPos", offsetof(BossMo, tentTipPos), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1548", offsetof(BossMo, unk_1548), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor BossTw_Fields[] = {
     { "work", offsetof(BossTw, work), FIELD_TYPE_U8, 1 },
     { "unused_170", offsetof(BossTw, unused_170), FIELD_TYPE_U8, 1 },
@@ -3769,6 +6905,24 @@ static FieldDescriptor BossVa_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor Demo6K_Fields[] = {
+    { "unk_164", offsetof(Demo6K, unk_164), FIELD_TYPE_F32, 1 },
+    { "unk_168", offsetof(Demo6K, unk_168), FIELD_TYPE_F32, 1 },
+    { "unk_16C", offsetof(Demo6K, unk_16C), FIELD_TYPE_F32, 1 },
+    { "unk_170", offsetof(Demo6K, unk_170), FIELD_TYPE_F32, 1 },
+    { "unk_174", offsetof(Demo6K, unk_174), FIELD_TYPE_F32, 16 },
+    { "unk_1B4", offsetof(Demo6K, unk_1B4), FIELD_TYPE_F32, 16 },
+    { "unk_1F4", offsetof(Demo6K, unk_1F4), FIELD_TYPE_F32, 16 },
+    { "unk_234", offsetof(Demo6K, unk_234), FIELD_TYPE_F32, 16 },
+    { "unk_274", offsetof(Demo6K, unk_274), FIELD_TYPE_U8, 16 },
+    { "flags", offsetof(Demo6K, flags), FIELD_TYPE_U16, 1 },
+    { "timer1", offsetof(Demo6K, timer1), FIELD_TYPE_U16, 1 },
+    { "timer2", offsetof(Demo6K, timer2), FIELD_TYPE_U16, 1 },
+    { "objBankIndex", offsetof(Demo6K, objBankIndex), FIELD_TYPE_U8, 1 },
+    { "unk_293", offsetof(Demo6K, unk_293), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor DoorWarp1_Fields[] = {
     { "rutoWarpState", offsetof(DoorWarp1, rutoWarpState), FIELD_TYPE_S32, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
@@ -3812,6 +6966,23 @@ static FieldDescriptor EnAnubice_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnAnubiceFire_Fields[] = {
+    { "scale", offsetof(EnAnubiceFire, scale), FIELD_TYPE_F32, 1 },
+    { "unk_154", offsetof(EnAnubiceFire, unk_154), FIELD_TYPE_F32, 1 },
+    { "unused", offsetof(EnAnubiceFire, unused), FIELD_TYPE_S16, 1 },
+    { "unk_15A", offsetof(EnAnubiceFire, unk_15A), FIELD_TYPE_S16, 1 },
+    { "unk_15C", offsetof(EnAnubiceFire, unk_15C), FIELD_TYPE_S16, 1 },
+    { "unk_15E", offsetof(EnAnubiceFire, unk_15E), FIELD_TYPE_S16, 1 },
+    { "unk_160", offsetof(EnAnubiceFire, unk_160), FIELD_TYPE_VEC3F, 6 },
+    { "epoch", offsetof(EnAnubiceFire, epoch), FIELD_TYPE_U32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnAnubiceTag_Fields[] = {
+    { "triggerRange", offsetof(EnAnubiceTag, triggerRange), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnAttackNiw_Fields[] = {
     { "unk_254", offsetof(EnAttackNiw, unk_254), FIELD_TYPE_S16, 1 },
     { "unk_256", offsetof(EnAttackNiw, unk_256), FIELD_TYPE_S16, 1 },
@@ -3851,6 +7022,22 @@ static FieldDescriptor EnAttackNiw_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnBa_Fields[] = {
+    { "upperParams", offsetof(EnBa, upperParams), FIELD_TYPE_S16, 1 },
+    { "unk_156", offsetof(EnBa, unk_156), FIELD_TYPE_S16, 1 },
+    { "unk_158", offsetof(EnBa, unk_158), FIELD_TYPE_VEC3F, 14 },
+    { "unk_200", offsetof(EnBa, unk_200), FIELD_TYPE_VEC3F, 14 },
+    { "unk_2A8", offsetof(EnBa, unk_2A8), FIELD_TYPE_VEC3S, 14 },
+    { "unk_2FC", offsetof(EnBa, unk_2FC), FIELD_TYPE_VEC3F, 1 },
+    { "unk_308", offsetof(EnBa, unk_308), FIELD_TYPE_VEC3F, 1 },
+    { "unk_314", offsetof(EnBa, unk_314), FIELD_TYPE_F32, 1 },
+    { "unk_318", offsetof(EnBa, unk_318), FIELD_TYPE_S16, 1 },
+    { "unk_31A", offsetof(EnBa, unk_31A), FIELD_TYPE_S16, 1 },
+    { "unk_31C", offsetof(EnBa, unk_31C), FIELD_TYPE_S16, 1 },
+    { "epoch", offsetof(EnBa, epoch), FIELD_TYPE_U32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnBb_Fields[] = {
     { "moveMode", offsetof(EnBb, moveMode), FIELD_TYPE_S32, 1 },
     { "timer", offsetof(EnBb, timer), FIELD_TYPE_S32, 1 },
@@ -3876,6 +7063,19 @@ static FieldDescriptor EnBb_Fields[] = {
     { "blureIdx", offsetof(EnBb, blureIdx), FIELD_TYPE_S32, 1 },
     { "fireIceTimer", offsetof(EnBb, fireIceTimer), FIELD_TYPE_S16, 1 },
     { "dmgEffect", offsetof(EnBb, dmgEffect), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnBdfire_Fields[] = {
+    { "unk_154", offsetof(EnBdfire, unk_154), FIELD_TYPE_S16, 1 },
+    { "unk_156", offsetof(EnBdfire, unk_156), FIELD_TYPE_S16, 1 },
+    { "unk_158", offsetof(EnBdfire, unk_158), FIELD_TYPE_S16, 1 },
+    { "unk_15A", offsetof(EnBdfire, unk_15A), FIELD_TYPE_U8, 1 },
+    { "unk_188", offsetof(EnBdfire, unk_188), FIELD_TYPE_F32, 1 },
+    { "unk_18C", offsetof(EnBdfire, unk_18C), FIELD_TYPE_F32, 1 },
+    { "unk_190", offsetof(EnBdfire, unk_190), FIELD_TYPE_F32, 1 },
+    { "unk_194", offsetof(EnBdfire, unk_194), FIELD_TYPE_F32, 1 },
+    { "unk_198", offsetof(EnBdfire, unk_198), FIELD_TYPE_U8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -3936,6 +7136,50 @@ static FieldDescriptor EnBomBowlMan_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnBomBowlPit_Fields[] = {
+    { "unk_150", offsetof(EnBomBowlPit, unk_150), FIELD_TYPE_U16, 1 },
+    { "camId", offsetof(EnBomBowlPit, camId), FIELD_TYPE_S16, 1 },
+    { "unk_154", offsetof(EnBomBowlPit, unk_154), FIELD_TYPE_S16, 1 },
+    { "exItemDone", offsetof(EnBomBowlPit, exItemDone), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnBomBowlPit, timer), FIELD_TYPE_S16, 1 },
+    { "prizeIndex", offsetof(EnBomBowlPit, prizeIndex), FIELD_TYPE_S16, 1 },
+    { "start", offsetof(EnBomBowlPit, start), FIELD_TYPE_S16, 1 },
+    { "getItemId", offsetof(EnBomBowlPit, getItemId), FIELD_TYPE_S32, 1 },
+    { "status", offsetof(EnBomBowlPit, status), FIELD_TYPE_U8, 1 },
+    { "unk_168", offsetof(EnBomBowlPit, unk_168), FIELD_TYPE_VEC3F, 1 },
+    { "unk_174", offsetof(EnBomBowlPit, unk_174), FIELD_TYPE_VEC3F, 1 },
+    { "unk_180", offsetof(EnBomBowlPit, unk_180), FIELD_TYPE_VEC3F, 1 },
+    { "unk_18C", offsetof(EnBomBowlPit, unk_18C), FIELD_TYPE_VEC3F, 1 },
+    { "unk_198", offsetof(EnBomBowlPit, unk_198), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1A4", offsetof(EnBomBowlPit, unk_1A4), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1B0", offsetof(EnBomBowlPit, unk_1B0), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1BC", offsetof(EnBomBowlPit, unk_1BC), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1C8", offsetof(EnBomBowlPit, unk_1C8), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1D4", offsetof(EnBomBowlPit, unk_1D4), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1E4", offsetof(EnBomBowlPit, unk_1E4), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnBomChu_Fields[] = {
+    { "timer", offsetof(EnBomChu, timer), FIELD_TYPE_S16, 1 },
+    { "axisForwards", offsetof(EnBomChu, axisForwards), FIELD_TYPE_VEC3F, 1 },
+    { "axisUp", offsetof(EnBomChu, axisUp), FIELD_TYPE_VEC3F, 1 },
+    { "axisLeft", offsetof(EnBomChu, axisLeft), FIELD_TYPE_VEC3F, 1 },
+    { "visualJitter", offsetof(EnBomChu, visualJitter), FIELD_TYPE_F32, 1 },
+    { "blure1Index", offsetof(EnBomChu, blure1Index), FIELD_TYPE_S32, 1 },
+    { "blure2Index", offsetof(EnBomChu, blure2Index), FIELD_TYPE_S32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnBombf_Fields[] = {
+    { "isFuseEnabled", offsetof(EnBombf, isFuseEnabled), FIELD_TYPE_S32, 1 },
+    { "bumpOn", offsetof(EnBombf, bumpOn), FIELD_TYPE_U8, 1 },
+    { "flashSpeedScale", offsetof(EnBombf, flashSpeedScale), FIELD_TYPE_S16, 1 },
+    { "flashIntensity", offsetof(EnBombf, flashIntensity), FIELD_TYPE_F32, 1 },
+    { "flowerBombScale", offsetof(EnBombf, flowerBombScale), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnBox_Fields[] = {
     { "unk_1F4", offsetof(EnBox, unk_1F4), FIELD_TYPE_S16, 1 },
     { "movementFlags", offsetof(EnBox, movementFlags), FIELD_TYPE_U8, 1 },
@@ -3950,6 +7194,27 @@ static FieldDescriptor EnBox_Fields[] = {
 static FieldDescriptor EnBrob_Fields[] = {
     { "timer", offsetof(EnBrob, timer), FIELD_TYPE_S16, 1 },
     { "unk_1AE", offsetof(EnBrob, unk_1AE), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnBubble_Fields[] = {
+    { "unk_1F0", offsetof(EnBubble, unk_1F0), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1FC", offsetof(EnBubble, unk_1FC), FIELD_TYPE_VEC3F, 1 },
+    { "unk_208", offsetof(EnBubble, unk_208), FIELD_TYPE_S16, 1 },
+    { "explosionCountdown", offsetof(EnBubble, explosionCountdown), FIELD_TYPE_S16, 1 },
+    { "unk_20C", offsetof(EnBubble, unk_20C), FIELD_TYPE_S8, 4 },
+    { "graphicRotSpeed", offsetof(EnBubble, graphicRotSpeed), FIELD_TYPE_F32, 1 },
+    { "graphicEccentricity", offsetof(EnBubble, graphicEccentricity), FIELD_TYPE_F32, 1 },
+    { "unk_218", offsetof(EnBubble, unk_218), FIELD_TYPE_F32, 1 },
+    { "unk_21C", offsetof(EnBubble, unk_21C), FIELD_TYPE_F32, 1 },
+    { "expansionWidth", offsetof(EnBubble, expansionWidth), FIELD_TYPE_F32, 1 },
+    { "expansionHeight", offsetof(EnBubble, expansionHeight), FIELD_TYPE_F32, 1 },
+    { "bounceCount", offsetof(EnBubble, bounceCount), FIELD_TYPE_U8, 1 },
+    { "bounceDirection", offsetof(EnBubble, bounceDirection), FIELD_TYPE_VEC3F, 1 },
+    { "velocityFromBounce", offsetof(EnBubble, velocityFromBounce), FIELD_TYPE_VEC3F, 1 },
+    { "normalizedBumpVelocity", offsetof(EnBubble, normalizedBumpVelocity), FIELD_TYPE_VEC3F, 1 },
+    { "velocityFromBump", offsetof(EnBubble, velocityFromBump), FIELD_TYPE_VEC3F, 1 },
+    { "sinkSpeed", offsetof(EnBubble, sinkSpeed), FIELD_TYPE_F32, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -3990,6 +7255,17 @@ static FieldDescriptor EnBw_Fields[] = {
     { "unk_270", offsetof(EnBw, unk_270), FIELD_TYPE_VEC3F, 1 },
     { "unk_27C", offsetof(EnBw, unk_27C), FIELD_TYPE_VEC3F, 1 },
     { "unk_288", offsetof(EnBw, unk_288), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnChanger_Fields[] = {
+    { "leftChestNum", offsetof(EnChanger, leftChestNum), FIELD_TYPE_S16, 1 },
+    { "rightChestNum", offsetof(EnChanger, rightChestNum), FIELD_TYPE_S16, 1 },
+    { "leftChestGetItemId", offsetof(EnChanger, leftChestGetItemId), FIELD_TYPE_S16, 1 },
+    { "rightChestGetItemId", offsetof(EnChanger, rightChestGetItemId), FIELD_TYPE_S16, 1 },
+    { "chestOpened", offsetof(EnChanger, chestOpened), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnChanger, timer), FIELD_TYPE_S16, 1 },
+    { "roomChestsOpened", offsetof(EnChanger, roomChestsOpened), FIELD_TYPE_S16, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4147,6 +7423,20 @@ static FieldDescriptor EnDns_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnDntDemo_Fields[] = {
+    { "judgeTimer", offsetof(EnDntDemo, judgeTimer), FIELD_TYPE_S16, 1 },
+    { "unkTimer1", offsetof(EnDntDemo, unkTimer1), FIELD_TYPE_S16, 1 },
+    { "unkTimer2", offsetof(EnDntDemo, unkTimer2), FIELD_TYPE_S16, 1 },
+    { "debugArrowTimer", offsetof(EnDntDemo, debugArrowTimer), FIELD_TYPE_S16, 1 },
+    { "leaderSignal", offsetof(EnDntDemo, leaderSignal), FIELD_TYPE_S16, 1 },
+    { "action", offsetof(EnDntDemo, action), FIELD_TYPE_S16, 1 },
+    { "prize", offsetof(EnDntDemo, prize), FIELD_TYPE_S16, 1 },
+    { "subCamera", offsetof(EnDntDemo, subCamera), FIELD_TYPE_S16, 1 },
+    { "scrubPos", offsetof(EnDntDemo, scrubPos), FIELD_TYPE_VEC3F, 9 },
+    { "leaderPos", offsetof(EnDntDemo, leaderPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnDntJiji_Fields[] = {
     { "flowerPos", offsetof(EnDntJiji, flowerPos), FIELD_TYPE_VEC3F, 1 },
     { "isSolid", offsetof(EnDntJiji, isSolid), FIELD_TYPE_U8, 1 },
@@ -4255,10 +7545,69 @@ static FieldDescriptor EnDu_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnDyExtra_Fields[] = {
+    { "type", offsetof(EnDyExtra, type), FIELD_TYPE_S16, 1 },
+    { "trigger", offsetof(EnDyExtra, trigger), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnDyExtra, timer), FIELD_TYPE_S16, 1 },
+    { "unk_158", offsetof(EnDyExtra, unk_158), FIELD_TYPE_F32, 1 },
+    { "scale", offsetof(EnDyExtra, scale), FIELD_TYPE_VEC3F, 1 },
+    { "unk_168", offsetof(EnDyExtra, unk_168), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnEiyer_Fields[] = {
     { "timer", offsetof(EnEiyer, timer), FIELD_TYPE_S16, 1 },
     { "targetYaw", offsetof(EnEiyer, targetYaw), FIELD_TYPE_S16, 1 },
     { "basePos", offsetof(EnEiyer, basePos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnEncount2_Fields[] = {
+    { "unk150", offsetof(EnEncount2, unk150), FIELD_TYPE_U8, 1 },
+    { "deathMountainSpawnerTimer", offsetof(EnEncount2, deathMountainSpawnerTimer), FIELD_TYPE_S16, 1 },
+    { "timerBetweenRockSpawns", offsetof(EnEncount2, timerBetweenRockSpawns), FIELD_TYPE_S16, 1 },
+    { "numSpawnedRocks", offsetof(EnEncount2, numSpawnedRocks), FIELD_TYPE_S16, 1 },
+    { "isNotDeathMountain", offsetof(EnEncount2, isNotDeathMountain), FIELD_TYPE_S16, 1 },
+    { "collapseSpawnerInactive", offsetof(EnEncount2, collapseSpawnerInactive), FIELD_TYPE_S16, 1 },
+    { "particleSpawnTimer", offsetof(EnEncount2, particleSpawnTimer), FIELD_TYPE_S16, 1 },
+    { "unk_160", offsetof(EnEncount2, unk_160), FIELD_TYPE_F32, 1 },
+    { "unk164", offsetof(EnEncount2, unk164), FIELD_TYPE_U8, 1 },
+    { "unk_168", offsetof(EnEncount2, unk_168), FIELD_TYPE_F32, 1 },
+    { "unk16C", offsetof(EnEncount2, unk16C), FIELD_TYPE_U8, 1 },
+    { "unk_170", offsetof(EnEncount2, unk_170), FIELD_TYPE_F32, 1 },
+    { "unk174", offsetof(EnEncount2, unk174), FIELD_TYPE_U8, 1 },
+    { "envEffectsTimer", offsetof(EnEncount2, envEffectsTimer), FIELD_TYPE_S16, 1 },
+    { "unk_17C", offsetof(EnEncount2, unk_17C), FIELD_TYPE_F32, 1 },
+    { "isQuaking", offsetof(EnEncount2, isQuaking), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnExItem_Fields[] = {
+    { "getItemObjId", offsetof(EnExItem, getItemObjId), FIELD_TYPE_S16, 1 },
+    { "type", offsetof(EnExItem, type), FIELD_TYPE_S16, 1 },
+    { "unusedParam", offsetof(EnExItem, unusedParam), FIELD_TYPE_S16, 1 },
+    { "giDrawId", offsetof(EnExItem, giDrawId), FIELD_TYPE_S16, 1 },
+    { "stopRotate", offsetof(EnExItem, stopRotate), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnExItem, timer), FIELD_TYPE_S16, 1 },
+    { "chestKillTimer", offsetof(EnExItem, chestKillTimer), FIELD_TYPE_S16, 1 },
+    { "prizeRotateTimer", offsetof(EnExItem, prizeRotateTimer), FIELD_TYPE_S16, 1 },
+    { "killItem", offsetof(EnExItem, killItem), FIELD_TYPE_S16, 1 },
+    { "scale", offsetof(EnExItem, scale), FIELD_TYPE_F32, 1 },
+    { "unkFloat", offsetof(EnExItem, unkFloat), FIELD_TYPE_F32, 1 },
+    { "objectIdx", offsetof(EnExItem, objectIdx), FIELD_TYPE_S8, 1 },
+    { "initPos", offsetof(EnExItem, initPos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnExRuppy_Fields[] = {
+    { "colorIdx", offsetof(EnExRuppy, colorIdx), FIELD_TYPE_S16, 1 },
+    { "type", offsetof(EnExRuppy, type), FIELD_TYPE_S16, 1 },
+    { "invisible", offsetof(EnExRuppy, invisible), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnExRuppy, timer), FIELD_TYPE_S16, 1 },
+    { "rupeeValue", offsetof(EnExRuppy, rupeeValue), FIELD_TYPE_S16, 1 },
+    { "unk_15A", offsetof(EnExRuppy, unk_15A), FIELD_TYPE_S16, 1 },
+    { "galleryFlag", offsetof(EnExRuppy, galleryFlag), FIELD_TYPE_S16, 1 },
+    { "unk_160", offsetof(EnExRuppy, unk_160), FIELD_TYPE_F32, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4275,6 +7624,26 @@ static FieldDescriptor EnFd_Fields[] = {
     { "runRadius", offsetof(EnFd, runRadius), FIELD_TYPE_F32, 1 },
     { "fadeAlpha", offsetof(EnFd, fadeAlpha), FIELD_TYPE_F32, 1 },
     { "corePos", offsetof(EnFd, corePos), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnFdFire_Fields[] = {
+    { "spawnRadius", offsetof(EnFdFire, spawnRadius), FIELD_TYPE_F32, 1 },
+    { "scale", offsetof(EnFdFire, scale), FIELD_TYPE_F32, 1 },
+    { "unk_1A4", offsetof(EnFdFire, unk_1A4), FIELD_TYPE_U8, 1 },
+    { "deathTimer", offsetof(EnFdFire, deathTimer), FIELD_TYPE_S16, 1 },
+    { "tile2Y", offsetof(EnFdFire, tile2Y), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnFireRock_Fields[] = {
+    { "scale", offsetof(EnFireRock, scale), FIELD_TYPE_F32, 1 },
+    { "relativePos", offsetof(EnFireRock, relativePos), FIELD_TYPE_VEC3F, 1 },
+    { "unk_17C", offsetof(EnFireRock, unk_17C), FIELD_TYPE_VEC3F, 1 },
+    { "timer", offsetof(EnFireRock, timer), FIELD_TYPE_S16, 1 },
+    { "timer2", offsetof(EnFireRock, timer2), FIELD_TYPE_S16, 1 },
+    { "type", offsetof(EnFireRock, type), FIELD_TYPE_S16, 1 },
+    { "playerNearby", offsetof(EnFireRock, playerNearby), FIELD_TYPE_U8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4340,6 +7709,50 @@ static FieldDescriptor EnFw_Fields[] = {
     { "returnToParentTimer", offsetof(EnFw, returnToParentTimer), FIELD_TYPE_S16, 1 },
     { "turnAround", offsetof(EnFw, turnAround), FIELD_TYPE_S16, 1 },
     { "runRadius", offsetof(EnFw, runRadius), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnFz_Fields[] = {
+    { "posOrigin", offsetof(EnFz, posOrigin), FIELD_TYPE_VEC3F, 1 },
+    { "counter", offsetof(EnFz, counter), FIELD_TYPE_S16, 1 },
+    { "unusedTimer1", offsetof(EnFz, unusedTimer1), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnFz, timer), FIELD_TYPE_S16, 1 },
+    { "updateBgInfo", offsetof(EnFz, updateBgInfo), FIELD_TYPE_U8, 1 },
+    { "isMoving", offsetof(EnFz, isMoving), FIELD_TYPE_U8, 1 },
+    { "isFreezing", offsetof(EnFz, isFreezing), FIELD_TYPE_U8, 1 },
+    { "unusedCounter", offsetof(EnFz, unusedCounter), FIELD_TYPE_U8, 1 },
+    { "iceSmokeFreezingSpawnHeight", offsetof(EnFz, iceSmokeFreezingSpawnHeight), FIELD_TYPE_F32, 1 },
+    { "unusedFloat", offsetof(EnFz, unusedFloat), FIELD_TYPE_F32, 1 },
+    { "speedXZ", offsetof(EnFz, speedXZ), FIELD_TYPE_F32, 1 },
+    { "envAlpha", offsetof(EnFz, envAlpha), FIELD_TYPE_U32, 1 },
+    { "unusedNum1", offsetof(EnFz, unusedNum1), FIELD_TYPE_U16, 1 },
+    { "unusedNum2", offsetof(EnFz, unusedNum2), FIELD_TYPE_U16, 1 },
+    { "state", offsetof(EnFz, state), FIELD_TYPE_U8, 1 },
+    { "isActive", offsetof(EnFz, isActive), FIELD_TYPE_U8, 1 },
+    { "isDespawning", offsetof(EnFz, isDespawning), FIELD_TYPE_U8, 1 },
+    { "unusedTimer2", offsetof(EnFz, unusedTimer2), FIELD_TYPE_U8, 1 },
+    { "wallHitPos", offsetof(EnFz, wallHitPos), FIELD_TYPE_VEC3F, 1 },
+    { "distToTargetSq", offsetof(EnFz, distToTargetSq), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnGSwitch_Fields[] = {
+    { "type", offsetof(EnGSwitch, type), FIELD_TYPE_S16, 1 },
+    { "silverCount", offsetof(EnGSwitch, silverCount), FIELD_TYPE_S16, 1 },
+    { "switchFlag", offsetof(EnGSwitch, switchFlag), FIELD_TYPE_S16, 1 },
+    { "killTimer", offsetof(EnGSwitch, killTimer), FIELD_TYPE_S16, 1 },
+    { "colorIdx", offsetof(EnGSwitch, colorIdx), FIELD_TYPE_S16, 1 },
+    { "broken", offsetof(EnGSwitch, broken), FIELD_TYPE_S16, 1 },
+    { "numEffects", offsetof(EnGSwitch, numEffects), FIELD_TYPE_S16, 1 },
+    { "objId", offsetof(EnGSwitch, objId), FIELD_TYPE_S16, 1 },
+    { "index", offsetof(EnGSwitch, index), FIELD_TYPE_S16, 1 },
+    { "delayTimer", offsetof(EnGSwitch, delayTimer), FIELD_TYPE_S16, 1 },
+    { "waitTimer", offsetof(EnGSwitch, waitTimer), FIELD_TYPE_S16, 1 },
+    { "moveMode", offsetof(EnGSwitch, moveMode), FIELD_TYPE_S16, 1 },
+    { "moveState", offsetof(EnGSwitch, moveState), FIELD_TYPE_S16, 1 },
+    { "noteIndex", offsetof(EnGSwitch, noteIndex), FIELD_TYPE_S16, 1 },
+    { "targetPos", offsetof(EnGSwitch, targetPos), FIELD_TYPE_VEC3F, 1 },
+    { "objIndex", offsetof(EnGSwitch, objIndex), FIELD_TYPE_S8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4470,6 +7883,43 @@ static FieldDescriptor EnGoma_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnGoroiwa_Fields[] = {
+    { "prevUnitRollAxis", offsetof(EnGoroiwa, prevUnitRollAxis), FIELD_TYPE_VEC3F, 1 },
+    { "prevRollAngleDiff", offsetof(EnGoroiwa, prevRollAngleDiff), FIELD_TYPE_F32, 1 },
+    { "rollRotSpeed", offsetof(EnGoroiwa, rollRotSpeed), FIELD_TYPE_F32, 1 },
+    { "waitTimer", offsetof(EnGoroiwa, waitTimer), FIELD_TYPE_S16, 1 },
+    { "bounceCount", offsetof(EnGoroiwa, bounceCount), FIELD_TYPE_S16, 1 },
+    { "collisionDisabledTimer", offsetof(EnGoroiwa, collisionDisabledTimer), FIELD_TYPE_S16, 1 },
+    { "endWaypoint", offsetof(EnGoroiwa, endWaypoint), FIELD_TYPE_S16, 1 },
+    { "currentWaypoint", offsetof(EnGoroiwa, currentWaypoint), FIELD_TYPE_S16, 1 },
+    { "nextWaypoint", offsetof(EnGoroiwa, nextWaypoint), FIELD_TYPE_S16, 1 },
+    { "pathDirection", offsetof(EnGoroiwa, pathDirection), FIELD_TYPE_S16, 1 },
+    { "isInKokiri", offsetof(EnGoroiwa, isInKokiri), FIELD_TYPE_U8, 1 },
+    { "stateFlags", offsetof(EnGoroiwa, stateFlags), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnGs_Fields[] = {
+    { "unk_19C", offsetof(EnGs, unk_19C), FIELD_TYPE_U8, 1 },
+    { "unk_19D", offsetof(EnGs, unk_19D), FIELD_TYPE_U8, 1 },
+    { "unk_19E", offsetof(EnGs, unk_19E), FIELD_TYPE_U8, 1 },
+    { "unk_19F", offsetof(EnGs, unk_19F), FIELD_TYPE_U8, 1 },
+    { "unk_1A0", offsetof(EnGs, unk_1A0), FIELD_TYPE_VEC3S, 3 },
+    { "unk_1B4", offsetof(EnGs, unk_1B4), FIELD_TYPE_VEC3F, 2 },
+    { "unk_1CC", offsetof(EnGs, unk_1CC), FIELD_TYPE_U8, 1 },
+    { "unk_1D8", offsetof(EnGs, unk_1D8), FIELD_TYPE_VEC3F, 1 },
+    { "flashColor", offsetof(EnGs, flashColor), FIELD_TYPE_U8, 1 },
+    { "unk_1E8", offsetof(EnGs, unk_1E8), FIELD_TYPE_F32, 1 },
+    { "unk_1EC", offsetof(EnGs, unk_1EC), FIELD_TYPE_F32, 1 },
+    { "unk_1F0", offsetof(EnGs, unk_1F0), FIELD_TYPE_F32, 1 },
+    { "unk_1F4", offsetof(EnGs, unk_1F4), FIELD_TYPE_F32, 1 },
+    { "unk_1F8", offsetof(EnGs, unk_1F8), FIELD_TYPE_F32, 1 },
+    { "unk_1FC", offsetof(EnGs, unk_1FC), FIELD_TYPE_F32, 1 },
+    { "unk_200", offsetof(EnGs, unk_200), FIELD_TYPE_U16, 1 },
+    { "unk_202", offsetof(EnGs, unk_202), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnGuest_Fields[] = {
     { "unk_2C8", offsetof(EnGuest, unk_2C8), FIELD_TYPE_S16, 1 },
     { "unk_2CA", offsetof(EnGuest, unk_2CA), FIELD_TYPE_S16, 1 },
@@ -4553,6 +8003,17 @@ static FieldDescriptor EnHintnuts_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnHonotrap_Fields[] = {
+    { "timer", offsetof(EnHonotrap, timer), FIELD_TYPE_S16, 1 },
+    { "eyeState", offsetof(EnHonotrap, eyeState), FIELD_TYPE_S16, 1 },
+    { "targetPos", offsetof(EnHonotrap, targetPos), FIELD_TYPE_VEC3F, 1 },
+    { "speedMod", offsetof(EnHonotrap, speedMod), FIELD_TYPE_F32, 1 },
+    { "bobPhase", offsetof(EnHonotrap, bobPhase), FIELD_TYPE_S16, 1 },
+    { "flameScroll", offsetof(EnHonotrap, flameScroll), FIELD_TYPE_S16, 1 },
+    { "colChkFlags", offsetof(EnHonotrap, colChkFlags), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnHy_Fields[] = {
     { "unk_194", offsetof(EnHy, unk_194), FIELD_TYPE_S8, 1 },
     { "pathReverse", offsetof(EnHy, pathReverse), FIELD_TYPE_U8, 1 },
@@ -4571,6 +8032,15 @@ static FieldDescriptor EnHy_Fields[] = {
     { "unkGetItemId", offsetof(EnHy, unkGetItemId), FIELD_TYPE_S32, 1 },
     { "modelOffset", offsetof(EnHy, modelOffset), FIELD_TYPE_VEC3F, 1 },
     { "unk_330", offsetof(EnHy, unk_330), FIELD_TYPE_U16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnIceHono_Fields[] = {
+    { "alpha", offsetof(EnIceHono, alpha), FIELD_TYPE_S16, 1 },
+    { "timer", offsetof(EnIceHono, timer), FIELD_TYPE_S16, 1 },
+    { "unk_154", offsetof(EnIceHono, unk_154), FIELD_TYPE_S16, 1 },
+    { "unk_156", offsetof(EnIceHono, unk_156), FIELD_TYPE_S16, 1 },
+    { "smallFlameTargetYScale", offsetof(EnIceHono, smallFlameTargetYScale), FIELD_TYPE_F32, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4674,6 +8144,12 @@ static FieldDescriptor EnKo_Fields[] = {
     { "modelAlpha", offsetof(EnKo, modelAlpha), FIELD_TYPE_F32, 1 },
     { "unk_2E4", offsetof(EnKo, unk_2E4), FIELD_TYPE_S16, 16 },
     { "unk_304", offsetof(EnKo, unk_304), FIELD_TYPE_S16, 16 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnKusa_Fields[] = {
+    { "timer", offsetof(EnKusa, timer), FIELD_TYPE_S16, 1 },
+    { "objBankIndex", offsetof(EnKusa, objBankIndex), FIELD_TYPE_S8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -4888,6 +8364,33 @@ static FieldDescriptor EnNiwLady_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnNutsball_Fields[] = {
+    { "objBankIndex", offsetof(EnNutsball, objBankIndex), FIELD_TYPE_S8, 1 },
+    { "timer", offsetof(EnNutsball, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnNy_Fields[] = {
+    { "unk_1B0", offsetof(EnNy, unk_1B0), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(EnNy, timer), FIELD_TYPE_S16, 1 },
+    { "unk_1CA", offsetof(EnNy, unk_1CA), FIELD_TYPE_S16, 1 },
+    { "hitPlayer", offsetof(EnNy, hitPlayer), FIELD_TYPE_S16, 1 },
+    { "unk_1CE", offsetof(EnNy, unk_1CE), FIELD_TYPE_U16, 1 },
+    { "unk_1D0", offsetof(EnNy, unk_1D0), FIELD_TYPE_U8, 1 },
+    { "unk_1D1", offsetof(EnNy, unk_1D1), FIELD_TYPE_S8, 1 },
+    { "unk_1D4", offsetof(EnNy, unk_1D4), FIELD_TYPE_S32, 1 },
+    { "unk_1D8", offsetof(EnNy, unk_1D8), FIELD_TYPE_S32, 1 },
+    { "stoneTimer", offsetof(EnNy, stoneTimer), FIELD_TYPE_S32, 1 },
+    { "unk_1E0", offsetof(EnNy, unk_1E0), FIELD_TYPE_F32, 1 },
+    { "unk_1E4", offsetof(EnNy, unk_1E4), FIELD_TYPE_F32, 1 },
+    { "unk_1E8", offsetof(EnNy, unk_1E8), FIELD_TYPE_F32, 1 },
+    { "unk_1EC", offsetof(EnNy, unk_1EC), FIELD_TYPE_F32, 1 },
+    { "unk_1F0", offsetof(EnNy, unk_1F0), FIELD_TYPE_F32, 1 },
+    { "unk_1F4", offsetof(EnNy, unk_1F4), FIELD_TYPE_F32, 1 },
+    { "unk_1F8", offsetof(EnNy, unk_1F8), FIELD_TYPE_VEC3F, 16 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnOkuta_Fields[] = {
     { "timer", offsetof(EnOkuta, timer), FIELD_TYPE_S16, 1 },
     { "numShots", offsetof(EnOkuta, numShots), FIELD_TYPE_S16, 1 },
@@ -5034,6 +8537,43 @@ static FieldDescriptor EnRd_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnRr_Fields[] = {
+    { "frameCount", offsetof(EnRr, frameCount), FIELD_TYPE_S16, 1 },
+    { "actionTimer", offsetof(EnRr, actionTimer), FIELD_TYPE_S16, 1 },
+    { "scrollTimer", offsetof(EnRr, scrollTimer), FIELD_TYPE_S16, 1 },
+    { "grabTimer", offsetof(EnRr, grabTimer), FIELD_TYPE_S16, 1 },
+    { "invincibilityTimer", offsetof(EnRr, invincibilityTimer), FIELD_TYPE_S16, 1 },
+    { "effectTimer", offsetof(EnRr, effectTimer), FIELD_TYPE_S16, 1 },
+    { "ocTimer", offsetof(EnRr, ocTimer), FIELD_TYPE_S16, 1 },
+    { "segMovePhase", offsetof(EnRr, segMovePhase), FIELD_TYPE_S16, 1 },
+    { "segPhaseVel", offsetof(EnRr, segPhaseVel), FIELD_TYPE_F32, 1 },
+    { "segPhaseVelTarget", offsetof(EnRr, segPhaseVelTarget), FIELD_TYPE_F32, 1 },
+    { "segPulsePhaseDiff", offsetof(EnRr, segPulsePhaseDiff), FIELD_TYPE_F32, 1 },
+    { "segWobblePhaseDiffX", offsetof(EnRr, segWobblePhaseDiffX), FIELD_TYPE_F32, 1 },
+    { "segWobbleXTarget", offsetof(EnRr, segWobbleXTarget), FIELD_TYPE_F32, 1 },
+    { "segWobblePhaseDiffZ", offsetof(EnRr, segWobblePhaseDiffZ), FIELD_TYPE_F32, 1 },
+    { "segWobbleZTarget", offsetof(EnRr, segWobbleZTarget), FIELD_TYPE_F32, 1 },
+    { "pulseSize", offsetof(EnRr, pulseSize), FIELD_TYPE_F32, 1 },
+    { "pulseSizeTarget", offsetof(EnRr, pulseSizeTarget), FIELD_TYPE_F32, 1 },
+    { "wobbleSize", offsetof(EnRr, wobbleSize), FIELD_TYPE_F32, 1 },
+    { "wobbleSizeTarget", offsetof(EnRr, wobbleSizeTarget), FIELD_TYPE_F32, 1 },
+    { "segMoveRate", offsetof(EnRr, segMoveRate), FIELD_TYPE_F32, 1 },
+    { "shrinkRate", offsetof(EnRr, shrinkRate), FIELD_TYPE_F32, 1 },
+    { "swallowOffset", offsetof(EnRr, swallowOffset), FIELD_TYPE_F32, 1 },
+    { "reachState", offsetof(EnRr, reachState), FIELD_TYPE_U8, 1 },
+    { "isDead", offsetof(EnRr, isDead), FIELD_TYPE_U8, 1 },
+    { "eatenShield", offsetof(EnRr, eatenShield), FIELD_TYPE_U8, 1 },
+    { "eatenTunic", offsetof(EnRr, eatenTunic), FIELD_TYPE_U8, 1 },
+    { "dropType", offsetof(EnRr, dropType), FIELD_TYPE_U8, 1 },
+    { "retreat", offsetof(EnRr, retreat), FIELD_TYPE_U8, 1 },
+    { "stopScroll", offsetof(EnRr, stopScroll), FIELD_TYPE_U8, 1 },
+    { "hasPlayer", offsetof(EnRr, hasPlayer), FIELD_TYPE_S16, 1 },
+    { "mouthPos", offsetof(EnRr, mouthPos), FIELD_TYPE_VEC3F, 1 },
+    { "effectPos", offsetof(EnRr, effectPos), FIELD_TYPE_VEC3F, 5 },
+    { "unk_3C4", offsetof(EnRr, unk_3C4), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnSa_Fields[] = {
     { "unk_208", offsetof(EnSa, unk_208), FIELD_TYPE_U8, 1 },
     { "unk_209", offsetof(EnSa, unk_209), FIELD_TYPE_U8, 1 },
@@ -5063,6 +8603,30 @@ static FieldDescriptor EnSb_Fields[] = {
 
 static FieldDescriptor EnShopnuts_Fields[] = {
     { "animFlagAndTimer", offsetof(EnShopnuts, animFlagAndTimer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnSi_Fields[] = {
+    { "unk_19C", offsetof(EnSi, unk_19C), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnSiofuki_Fields[] = {
+    { "timer", offsetof(EnSiofuki, timer), FIELD_TYPE_S32, 1 },
+    { "initPosY", offsetof(EnSiofuki, initPosY), FIELD_TYPE_F32, 1 },
+    { "unk_170", offsetof(EnSiofuki, unk_170), FIELD_TYPE_F32, 1 },
+    { "unk_174", offsetof(EnSiofuki, unk_174), FIELD_TYPE_F32, 1 },
+    { "oscillation", offsetof(EnSiofuki, oscillation), FIELD_TYPE_F32, 1 },
+    { "targetHeight", offsetof(EnSiofuki, targetHeight), FIELD_TYPE_F32, 1 },
+    { "currentHeight", offsetof(EnSiofuki, currentHeight), FIELD_TYPE_F32, 1 },
+    { "splashTimer", offsetof(EnSiofuki, splashTimer), FIELD_TYPE_S32, 1 },
+    { "applySpeed", offsetof(EnSiofuki, applySpeed), FIELD_TYPE_S32, 1 },
+    { "appliedSpeed", offsetof(EnSiofuki, appliedSpeed), FIELD_TYPE_F32, 1 },
+    { "targetAppliedSpeed", offsetof(EnSiofuki, targetAppliedSpeed), FIELD_TYPE_F32, 1 },
+    { "appliedYaw", offsetof(EnSiofuki, appliedYaw), FIELD_TYPE_S16, 1 },
+    { "activeTime", offsetof(EnSiofuki, activeTime), FIELD_TYPE_S16, 1 },
+    { "maxHeight", offsetof(EnSiofuki, maxHeight), FIELD_TYPE_F32, 1 },
+    { "sfxFlags", offsetof(EnSiofuki, sfxFlags), FIELD_TYPE_U8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5151,6 +8715,12 @@ static FieldDescriptor EnSt_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnStream_Fields[] = {
+    { "unk_150", offsetof(EnStream, unk_150), FIELD_TYPE_S32, 1 },
+    { "unk_154", offsetof(EnStream, unk_154), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnSw_Fields[] = {
     { "unk_1F4", offsetof(EnSw, unk_1F4), FIELD_TYPE_U8, 1 },
     { "unk_360", offsetof(EnSw, unk_360), FIELD_TYPE_U8, 1 },
@@ -5181,6 +8751,20 @@ static FieldDescriptor EnSw_Fields[] = {
     { "unk_478", offsetof(EnSw, unk_478), FIELD_TYPE_VEC3F, 1 },
     { "unk_484", offsetof(EnSw, unk_484), FIELD_TYPE_VEC3F, 1 },
     { "unk_490", offsetof(EnSw, unk_490), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnSyatekiItm_Fields[] = {
+    { "timer", offsetof(EnSyatekiItm, timer), FIELD_TYPE_S16, 1 },
+    { "unkTimer", offsetof(EnSyatekiItm, unkTimer), FIELD_TYPE_S16, 1 },
+    { "signal", offsetof(EnSyatekiItm, signal), FIELD_TYPE_S16, 1 },
+    { "hitCount", offsetof(EnSyatekiItm, hitCount), FIELD_TYPE_S16, 1 },
+    { "roundNum", offsetof(EnSyatekiItm, roundNum), FIELD_TYPE_S16, 1 },
+    { "roundFlags", offsetof(EnSyatekiItm, roundFlags), FIELD_TYPE_S16, 6 },
+    { "targetState", offsetof(EnSyatekiItm, targetState), FIELD_TYPE_S16, 2 },
+    { "numTargets", offsetof(EnSyatekiItm, numTargets), FIELD_TYPE_S16, 1 },
+    { "targetHome", offsetof(EnSyatekiItm, targetHome), FIELD_TYPE_VEC3F, 2 },
+    { "targetFinal", offsetof(EnSyatekiItm, targetFinal), FIELD_TYPE_VEC3F, 2 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5315,9 +8899,29 @@ static FieldDescriptor EnToryo_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnTp_Fields[] = {
+    { "damageEffect", offsetof(EnTp, damageEffect), FIELD_TYPE_U8, 1 },
+    { "timer", offsetof(EnTp, timer), FIELD_TYPE_S16, 1 },
+    { "unk_15C", offsetof(EnTp, unk_15C), FIELD_TYPE_S16, 1 },
+    { "alpha", offsetof(EnTp, alpha), FIELD_TYPE_S16, 1 },
+    { "red", offsetof(EnTp, red), FIELD_TYPE_S16, 1 },
+    { "kiraSpawnTimer", offsetof(EnTp, kiraSpawnTimer), FIELD_TYPE_S16, 1 },
+    { "unk_164", offsetof(EnTp, unk_164), FIELD_TYPE_S16, 1 },
+    { "heightPhase", offsetof(EnTp, heightPhase), FIELD_TYPE_F32, 1 },
+    { "horizontalVariation", offsetof(EnTp, horizontalVariation), FIELD_TYPE_F32, 1 },
+    { "extraHeightVariation", offsetof(EnTp, extraHeightVariation), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnTr_Fields[] = {
     { "eyeIndex", offsetof(EnTr, eyeIndex), FIELD_TYPE_S16, 1 },
     { "blinkTimer", offsetof(EnTr, blinkTimer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnTuboTrap_Fields[] = {
+    { "targetY", offsetof(EnTuboTrap, targetY), FIELD_TYPE_F32, 1 },
+    { "originPos", offsetof(EnTuboTrap, originPos), FIELD_TYPE_VEC3F, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5327,6 +8931,13 @@ static FieldDescriptor EnVali_Fields[] = {
     { "timer", offsetof(EnVali, timer), FIELD_TYPE_S16, 1 },
     { "armScale", offsetof(EnVali, armScale), FIELD_TYPE_F32, 1 },
     { "floatHomeHeight", offsetof(EnVali, floatHomeHeight), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnViewer_Fields[] = {
+    { "unused", offsetof(EnViewer, unused), FIELD_TYPE_U8, 1 },
+    { "state", offsetof(EnViewer, state), FIELD_TYPE_U8, 1 },
+    { "isVisible", offsetof(EnViewer, isVisible), FIELD_TYPE_U8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5347,10 +8958,22 @@ static FieldDescriptor EnVm_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnWallTubo_Fields[] = {
+    { "timer", offsetof(EnWallTubo, timer), FIELD_TYPE_S16, 1 },
+    { "explosionCenter", offsetof(EnWallTubo, explosionCenter), FIELD_TYPE_VEC3F, 1 },
+    { "unk_164", offsetof(EnWallTubo, unk_164), FIELD_TYPE_VEC3F, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 static FieldDescriptor EnWallmas_Fields[] = {
     { "timer", offsetof(EnWallmas, timer), FIELD_TYPE_S16, 1 },
     { "switchFlag", offsetof(EnWallmas, switchFlag), FIELD_TYPE_S16, 1 },
     { "yTarget", offsetof(EnWallmas, yTarget), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnWeatherTag_Fields[] = {
+    { "unk_150", offsetof(EnWeatherTag, unk_150), FIELD_TYPE_U8, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5380,6 +9003,17 @@ static FieldDescriptor EnWf_Fields[] = {
     { "unk_4BC", offsetof(EnWf, unk_4BC), FIELD_TYPE_VEC3F, 1 },
     { "unk_4C8", offsetof(EnWf, unk_4C8), FIELD_TYPE_VEC3F, 1 },
     { "unk_4D4", offsetof(EnWf, unk_4D4), FIELD_TYPE_VEC3S, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor EnYabusameMark_Fields[] = {
+    { "typeIndex", offsetof(EnYabusameMark, typeIndex), FIELD_TYPE_S16, 1 },
+    { "subTypeIndex", offsetof(EnYabusameMark, subTypeIndex), FIELD_TYPE_S16, 1 },
+    { "worldPos", offsetof(EnYabusameMark, worldPos), FIELD_TYPE_VEC3F, 1 },
+    { "vertexA", offsetof(EnYabusameMark, vertexA), FIELD_TYPE_VEC3F, 1 },
+    { "vertexB", offsetof(EnYabusameMark, vertexB), FIELD_TYPE_VEC3F, 1 },
+    { "vertexC", offsetof(EnYabusameMark, vertexC), FIELD_TYPE_VEC3F, 1 },
+    { "vertexD", offsetof(EnYabusameMark, vertexD), FIELD_TYPE_VEC3F, 1 },
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
@@ -5436,6 +9070,178 @@ static FieldDescriptor EnZo_Fields[] = {
     { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
+static FieldDescriptor EnfHG_Fields[] = {
+    { "unk_200", offsetof(EnfHG, unk_200), FIELD_TYPE_S8, 4 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ItemEtcetera_Fields[] = {
+    { "giDrawId", offsetof(ItemEtcetera, giDrawId), FIELD_TYPE_S16, 1 },
+    { "getItemId", offsetof(ItemEtcetera, getItemId), FIELD_TYPE_S16, 1 },
+    { "objBankIndex", offsetof(ItemEtcetera, objBankIndex), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ItemOcarina_Fields[] = {
+    { "spinRotOffset", offsetof(ItemOcarina, spinRotOffset), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjBean_Fields[] = {
+    { "timer", offsetof(ObjBean, timer), FIELD_TYPE_S16, 1 },
+    { "unk_1B6", offsetof(ObjBean, unk_1B6), FIELD_TYPE_VEC3S, 1 },
+    { "unk_1C0", offsetof(ObjBean, unk_1C0), FIELD_TYPE_S16, 1 },
+    { "unk_1C2", offsetof(ObjBean, unk_1C2), FIELD_TYPE_S16, 1 },
+    { "unk_1C4", offsetof(ObjBean, unk_1C4), FIELD_TYPE_S16, 1 },
+    { "unk_1C6", offsetof(ObjBean, unk_1C6), FIELD_TYPE_S16, 1 },
+    { "unk_1C8", offsetof(ObjBean, unk_1C8), FIELD_TYPE_S16, 1 },
+    { "unk_1CA", offsetof(ObjBean, unk_1CA), FIELD_TYPE_S16, 1 },
+    { "unk_1CC", offsetof(ObjBean, unk_1CC), FIELD_TYPE_S16, 1 },
+    { "unk_1CE", offsetof(ObjBean, unk_1CE), FIELD_TYPE_S16, 1 },
+    { "leafRotFactor", offsetof(ObjBean, leafRotFactor), FIELD_TYPE_S16, 1 },
+    { "unk_1D2", offsetof(ObjBean, unk_1D2), FIELD_TYPE_U16, 1 },
+    { "stalkSizeMultiplier", offsetof(ObjBean, stalkSizeMultiplier), FIELD_TYPE_F32, 1 },
+    { "pathPoints", offsetof(ObjBean, pathPoints), FIELD_TYPE_VEC3F, 1 },
+    { "unk_1E4", offsetof(ObjBean, unk_1E4), FIELD_TYPE_F32, 1 },
+    { "posOffsetX", offsetof(ObjBean, posOffsetX), FIELD_TYPE_F32, 1 },
+    { "posOffsetZ", offsetof(ObjBean, posOffsetZ), FIELD_TYPE_F32, 1 },
+    { "pathCount", offsetof(ObjBean, pathCount), FIELD_TYPE_S16, 1 },
+    { "currentPointIndex", offsetof(ObjBean, currentPointIndex), FIELD_TYPE_S16, 1 },
+    { "nextPointIndex", offsetof(ObjBean, nextPointIndex), FIELD_TYPE_S16, 1 },
+    { "unk_1F6", offsetof(ObjBean, unk_1F6), FIELD_TYPE_U8, 1 },
+    { "stateFlags", offsetof(ObjBean, stateFlags), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjComb_Fields[] = {
+    { "unk_1B0", offsetof(ObjComb, unk_1B0), FIELD_TYPE_S16, 1 },
+    { "unk_1B2", offsetof(ObjComb, unk_1B2), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjElevator_Fields[] = {
+    { "unk_168", offsetof(ObjElevator, unk_168), FIELD_TYPE_F32, 1 },
+    { "unk_16C", offsetof(ObjElevator, unk_16C), FIELD_TYPE_F32, 1 },
+    { "unk_170", offsetof(ObjElevator, unk_170), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjIcePoly_Fields[] = {
+    { "alpha", offsetof(ObjIcePoly, alpha), FIELD_TYPE_U8, 1 },
+    { "unk_151", offsetof(ObjIcePoly, unk_151), FIELD_TYPE_U8, 1 },
+    { "meltTimer", offsetof(ObjIcePoly, meltTimer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjKibako2_Fields[] = {
+    { "collectibleFlag", offsetof(ObjKibako2, collectibleFlag), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjLift_Fields[] = {
+    { "unk_168", offsetof(ObjLift, unk_168), FIELD_TYPE_VEC3S, 1 },
+    { "timer", offsetof(ObjLift, timer), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjLightswitch_Fields[] = {
+    { "timer", offsetof(ObjLightswitch, timer), FIELD_TYPE_S16, 1 },
+    { "toggleDelay", offsetof(ObjLightswitch, toggleDelay), FIELD_TYPE_S16, 1 },
+    { "faceTextureIndex", offsetof(ObjLightswitch, faceTextureIndex), FIELD_TYPE_S16, 1 },
+    { "color", offsetof(ObjLightswitch, color), FIELD_TYPE_S16, 3 },
+    { "alpha", offsetof(ObjLightswitch, alpha), FIELD_TYPE_S16, 1 },
+    { "flameRingRot", offsetof(ObjLightswitch, flameRingRot), FIELD_TYPE_S16, 1 },
+    { "flameRingRotSpeed", offsetof(ObjLightswitch, flameRingRotSpeed), FIELD_TYPE_S16, 1 },
+    { "prevFrameACflags", offsetof(ObjLightswitch, prevFrameACflags), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjMakekinsuta_Fields[] = {
+    { "timer", offsetof(ObjMakekinsuta, timer), FIELD_TYPE_S16, 1 },
+    { "unk_152", offsetof(ObjMakekinsuta, unk_152), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjMure_Fields[] = {
+    { "chNum", offsetof(ObjMure, chNum), FIELD_TYPE_S16, 1 },
+    { "ptn", offsetof(ObjMure, ptn), FIELD_TYPE_S16, 1 },
+    { "svNum", offsetof(ObjMure, svNum), FIELD_TYPE_S16, 1 },
+    { "type", offsetof(ObjMure, type), FIELD_TYPE_S16, 1 },
+    { "childrenStates", offsetof(ObjMure, childrenStates), FIELD_TYPE_U8, 1 },
+    { "unk_1A4", offsetof(ObjMure, unk_1A4), FIELD_TYPE_S16, 1 },
+    { "unk_1A6", offsetof(ObjMure, unk_1A6), FIELD_TYPE_S16, 1 },
+    { "unk_1A8", offsetof(ObjMure, unk_1A8), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjMure2_Fields[] = {
+    { "currentActorNum", offsetof(ObjMure2, currentActorNum), FIELD_TYPE_U16, 1 },
+    { "unk_184", offsetof(ObjMure2, unk_184), FIELD_TYPE_F32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjMure3_Fields[] = {
+    { "unk_16C", offsetof(ObjMure3, unk_16C), FIELD_TYPE_U16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjOshihiki_Fields[] = {
+    { "stateFlags", offsetof(ObjOshihiki, stateFlags), FIELD_TYPE_U16, 1 },
+    { "timer", offsetof(ObjOshihiki, timer), FIELD_TYPE_S16, 1 },
+    { "yawSin", offsetof(ObjOshihiki, yawSin), FIELD_TYPE_F32, 1 },
+    { "yawCos", offsetof(ObjOshihiki, yawCos), FIELD_TYPE_F32, 1 },
+    { "pushSpeed", offsetof(ObjOshihiki, pushSpeed), FIELD_TYPE_F32, 1 },
+    { "pushDist", offsetof(ObjOshihiki, pushDist), FIELD_TYPE_F32, 1 },
+    { "direction", offsetof(ObjOshihiki, direction), FIELD_TYPE_F32, 1 },
+    { "floorBgIds", offsetof(ObjOshihiki, floorBgIds), FIELD_TYPE_S32, 5 },
+    { "floorHeights", offsetof(ObjOshihiki, floorHeights), FIELD_TYPE_F32, 5 },
+    { "highestFloor", offsetof(ObjOshihiki, highestFloor), FIELD_TYPE_S16, 1 },
+    { "cantMove", offsetof(ObjOshihiki, cantMove), FIELD_TYPE_U8, 1 },
+    { "underDistX", offsetof(ObjOshihiki, underDistX), FIELD_TYPE_F32, 1 },
+    { "underDistZ", offsetof(ObjOshihiki, underDistZ), FIELD_TYPE_F32, 1 },
+    { "color", offsetof(ObjOshihiki, color), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjRoomtimer_Fields[] = {
+    { "switchFlag", offsetof(ObjRoomtimer, switchFlag), FIELD_TYPE_U32, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjTimeblock_Fields[] = {
+    { "demoEffectTimer", offsetof(ObjTimeblock, demoEffectTimer), FIELD_TYPE_S16, 1 },
+    { "songEndTimer", offsetof(ObjTimeblock, songEndTimer), FIELD_TYPE_S16, 1 },
+    { "demoEffectFirstPartTimer", offsetof(ObjTimeblock, demoEffectFirstPartTimer), FIELD_TYPE_S16, 1 },
+    { "unk_172", offsetof(ObjTimeblock, unk_172), FIELD_TYPE_U16, 1 },
+    { "unk_174", offsetof(ObjTimeblock, unk_174), FIELD_TYPE_U8, 1 },
+    { "unk_175", offsetof(ObjTimeblock, unk_175), FIELD_TYPE_U8, 1 },
+    { "unk_176", offsetof(ObjTimeblock, unk_176), FIELD_TYPE_U8, 1 },
+    { "unk_177", offsetof(ObjTimeblock, unk_177), FIELD_TYPE_U8, 1 },
+    { "isVisible", offsetof(ObjTimeblock, isVisible), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjTsubo_Fields[] = {
+    { "objTsuboBankIndex", offsetof(ObjTsubo, objTsuboBankIndex), FIELD_TYPE_S8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ObjWarp2block_Fields[] = {
+    { "unk_16C", offsetof(ObjWarp2block, unk_16C), FIELD_TYPE_S16, 1 },
+    { "unk_16E", offsetof(ObjWarp2block, unk_16E), FIELD_TYPE_S16, 1 },
+    { "unk_170", offsetof(ObjWarp2block, unk_170), FIELD_TYPE_S16, 1 },
+    { "unk_172", offsetof(ObjWarp2block, unk_172), FIELD_TYPE_U16, 1 },
+    { "unk_174", offsetof(ObjWarp2block, unk_174), FIELD_TYPE_S16, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
+static FieldDescriptor ShotSun_Fields[] = {
+    { "hitboxPos", offsetof(ShotSun, hitboxPos), FIELD_TYPE_VEC3S, 1 },
+    { "timer", offsetof(ShotSun, timer), FIELD_TYPE_S16, 1 },
+    { "unk_1A4", offsetof(ShotSun, unk_1A4), FIELD_TYPE_U8, 1 },
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
+};
+
 // Actor sync info
 typedef struct {
     s16 actorId;
@@ -5454,30 +9260,148 @@ typedef struct {
 
 // Actor sync registry - ALL offsets computed at compile-time via offsetof()
 static ActorSyncInfo actorSyncRegistry[] = {
+    { ACTOR_ARMS_HOOK, sizeof(ArmsHook), 0, offsetof(ArmsHook, actionFunc), 0, 0, 0, 0, ArmsHook_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_ARROW_FIRE, sizeof(ArrowFire), 0, offsetof(ArrowFire, actionFunc), 0, 0, 0, 0, ArrowFire_ActionFuncs, 3, ArrowFire_Fields, 3 },
+    { ACTOR_ARROW_ICE, sizeof(ArrowIce), 0, offsetof(ArrowIce, actionFunc), 0, 0, 0, 0, ArrowIce_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_ARROW_LIGHT, sizeof(ArrowLight), 0, offsetof(ArrowLight, actionFunc), 0, 0, 0, 0, ArrowLight_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_BDAN_OBJECTS, sizeof(BgBdanObjects), 0, offsetof(BgBdanObjects, actionFunc), 0, 0, 0, 0, BgBdanObjects_ActionFuncs, 17, BgBdanObjects_Fields, 3 },
+    { ACTOR_BG_BDAN_SWITCH, sizeof(BgBdanSwitch), 0, offsetof(BgBdanSwitch, actionFunc), 0, 0, 0, 0, BgBdanSwitch_ActionFuncs, 14, BgBdanSwitch_Fields, 9 },
+    { ACTOR_BG_BOM_GUARD, sizeof(BgBomGuard), 0, offsetof(BgBomGuard, actionFunc), 0, 0, 0, 0, BgBomGuard_ActionFuncs, 1, BgBomGuard_Fields, 2 },
+    { ACTOR_BG_BOMBWALL, sizeof(BgBombwall), 0, offsetof(BgBombwall, actionFunc), 0, 0, 0, 0, BgBombwall_ActionFuncs, 2, BgBombwall_Fields, 3 },
+    { ACTOR_BG_BOWL_WALL, sizeof(BgBowlWall), 0, offsetof(BgBowlWall, actionFunc), 0, 0, 0, 0, BgBowlWall_ActionFuncs, 5, BgBowlWall_Fields, 4 },
+    { ACTOR_BG_BREAKWALL, sizeof(BgBreakwall), 0, offsetof(BgBreakwall, actionFunc), 0, 0, 0, 0, BgBreakwall_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_DDAN_JD, sizeof(BgDdanJd), 0, offsetof(BgDdanJd, actionFunc), 0, 0, 0, 0, BgDdanJd_ActionFuncs, 2, BgDdanJd_Fields, 4 },
+    { ACTOR_BG_DDAN_KD, sizeof(BgDdanKd), 0, offsetof(BgDdanKd, actionFunc), 0, 0, 0, 0, BgDdanKd_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_DODOAGO, sizeof(BgDodoago), 0, offsetof(BgDodoago, actionFunc), 0, 0, 0, 0, BgDodoago_ActionFuncs, 4, NULL, 0 },
     { ACTOR_BG_DY_YOSEIZO, sizeof(BgDyYoseizo), offsetof(BgDyYoseizo, skelAnime), offsetof(BgDyYoseizo, actionFunc), offsetof(BgDyYoseizo, jointTable), 28, offsetof(BgDyYoseizo, morphTable), 28, BgDyYoseizo_ActionFuncs, 16, BgDyYoseizo_Fields, 33 },
+    { ACTOR_BG_GANON_OTYUKA, sizeof(BgGanonOtyuka), 0, offsetof(BgGanonOtyuka, actionFunc), 0, 0, 0, 0, BgGanonOtyuka_ActionFuncs, 2, BgGanonOtyuka_Fields, 13 },
+    { ACTOR_BG_GATE_SHUTTER, sizeof(BgGateShutter), 0, offsetof(BgGateShutter, actionFunc), 0, 0, 0, 0, BgGateShutter_ActionFuncs, 4, BgGateShutter_Fields, 3 },
+    { ACTOR_BG_GJYO_BRIDGE, sizeof(BgGjyoBridge), 0, offsetof(BgGjyoBridge, actionFunc), 0, 0, 0, 0, BgGjyoBridge_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_GND_FIREMEIRO, sizeof(BgGndFiremeiro), 0, offsetof(BgGndFiremeiro, actionFunc), 0, 0, 0, 0, BgGndFiremeiro_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_GND_ICEBLOCK, sizeof(BgGndIceblock), 0, offsetof(BgGndIceblock, actionFunc), 0, 0, 0, 0, BgGndIceblock_ActionFuncs, 5, BgGndIceblock_Fields, 1 },
+    { ACTOR_BG_GND_SOULMEIRO, sizeof(BgGndSoulmeiro), 0, offsetof(BgGndSoulmeiro, actionFunc), 0, 0, 0, 0, BgGndSoulmeiro_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_HAKA, sizeof(BgHaka), 0, offsetof(BgHaka, actionFunc), 0, 0, 0, 0, BgHaka_ActionFuncs, 4, NULL, 0 },
+    { ACTOR_BG_HAKA_GATE, sizeof(BgHakaGate), 0, offsetof(BgHakaGate, actionFunc), 0, 0, 0, 0, BgHakaGate_ActionFuncs, 10, BgHakaGate_Fields, 6 },
+    { ACTOR_BG_HAKA_HUTA, sizeof(BgHakaHuta), 0, offsetof(BgHakaHuta, actionFunc), 0, 0, 0, 0, BgHakaHuta_ActionFuncs, 5, BgHakaHuta_Fields, 2 },
+    { ACTOR_BG_HAKA_MEGANE, sizeof(BgHakaMegane), 0, offsetof(BgHakaMegane, actionFunc), 0, 0, 0, 0, BgHakaMegane_ActionFuncs, 3, BgHakaMegane_Fields, 3 },
+    { ACTOR_BG_HAKA_MEGANEBG, sizeof(BgHakaMeganeBG), 0, offsetof(BgHakaMeganeBG, actionFunc), 0, 0, 0, 0, BgHakaMeganeBG_ActionFuncs, 8, BgHakaMeganeBG_Fields, 2 },
+    { ACTOR_BG_HAKA_SGAMI, sizeof(BgHakaSgami), 0, offsetof(BgHakaSgami, actionFunc), 0, 0, 0, 0, BgHakaSgami_ActionFuncs, 2, BgHakaSgami_Fields, 4 },
+    { ACTOR_BG_HAKA_SHIP, sizeof(BgHakaShip), 0, offsetof(BgHakaShip, actionFunc), 0, 0, 0, 0, BgHakaShip_ActionFuncs, 7, BgHakaShip_Fields, 4 },
+    { ACTOR_BG_HAKA_TRAP, sizeof(BgHakaTrap), 0, offsetof(BgHakaTrap, actionFunc), 0, 0, 0, 0, BgHakaTrap_ActionFuncs, 9, BgHakaTrap_Fields, 4 },
+    { ACTOR_BG_HAKA_TUBO, sizeof(BgHakaTubo), 0, offsetof(BgHakaTubo, actionFunc), 0, 0, 0, 0, BgHakaTubo_ActionFuncs, 2, BgHakaTubo_Fields, 2 },
+    { ACTOR_BG_HAKA_WATER, sizeof(BgHakaWater), 0, offsetof(BgHakaWater, actionFunc), 0, 0, 0, 0, BgHakaWater_ActionFuncs, 2, BgHakaWater_Fields, 1 },
+    { ACTOR_BG_HAKA_ZOU, sizeof(BgHakaZou), 0, offsetof(BgHakaZou, actionFunc), 0, 0, 0, 0, BgHakaZou_ActionFuncs, 9, BgHakaZou_Fields, 3 },
+    { ACTOR_BG_HEAVY_BLOCK, sizeof(BgHeavyBlock), 0, offsetof(BgHeavyBlock, actionFunc), 0, 0, 0, 0, BgHeavyBlock_ActionFuncs, 6, NULL, 0 },
+    { ACTOR_BG_HIDAN_CURTAIN, sizeof(BgHidanCurtain), 0, offsetof(BgHidanCurtain, actionFunc), 0, 0, 0, 0, BgHidanCurtain_ActionFuncs, 7, BgHidanCurtain_Fields, 6 },
+    { ACTOR_BG_HIDAN_DALM, sizeof(BgHidanDalm), 0, offsetof(BgHidanDalm, actionFunc), 0, 0, 0, 0, BgHidanDalm_ActionFuncs, 2, BgHidanDalm_Fields, 1 },
+    { ACTOR_BG_HIDAN_FIREWALL, sizeof(BgHidanFirewall), 0, offsetof(BgHidanFirewall, actionFunc), 0, 0, 0, 0, BgHidanFirewall_ActionFuncs, 3, BgHidanFirewall_Fields, 1 },
+    { ACTOR_BG_HIDAN_FSLIFT, sizeof(BgHidanFslift), 0, offsetof(BgHidanFslift, actionFunc), 0, 0, 0, 0, BgHidanFslift_ActionFuncs, 3, BgHidanFslift_Fields, 2 },
+    { ACTOR_BG_HIDAN_FWBIG, sizeof(BgHidanFwbig), 0, offsetof(BgHidanFwbig, actionFunc), 0, 0, 0, 0, BgHidanFwbig_ActionFuncs, 7, BgHidanFwbig_Fields, 3 },
+    { ACTOR_BG_HIDAN_HROCK, sizeof(BgHidanHrock), 0, offsetof(BgHidanHrock, actionFunc), 0, 0, 0, 0, BgHidanHrock_ActionFuncs, 4, BgHidanHrock_Fields, 2 },
+    { ACTOR_BG_HIDAN_KOUSI, sizeof(BgHidanKousi), 0, offsetof(BgHidanKousi, actionFunc), 0, 0, 0, 0, BgHidanKousi_ActionFuncs, 5, BgHidanKousi_Fields, 1 },
+    { ACTOR_BG_HIDAN_ROCK, sizeof(BgHidanRock), 0, offsetof(BgHidanRock, actionFunc), 0, 0, 0, 0, BgHidanRock_ActionFuncs, 8, BgHidanRock_Fields, 5 },
+    { ACTOR_BG_HIDAN_SIMA, sizeof(BgHidanSima), 0, offsetof(BgHidanSima, actionFunc), 0, 0, 0, 0, BgHidanSima_ActionFuncs, 5, BgHidanSima_Fields, 1 },
+    { ACTOR_BG_HIDAN_SYOKU, sizeof(BgHidanSyoku), 0, offsetof(BgHidanSyoku, actionFunc), 0, 0, 0, 0, BgHidanSyoku_ActionFuncs, 4, BgHidanSyoku_Fields, 2 },
+    { ACTOR_BG_ICE_OBJECTS, sizeof(BgIceObjects), 0, offsetof(BgIceObjects, actionFunc), 0, 0, 0, 0, BgIceObjects_ActionFuncs, 4, BgIceObjects_Fields, 1 },
+    { ACTOR_BG_ICE_SHELTER, sizeof(BgIceShelter), 0, offsetof(BgIceShelter, actionFunc), 0, 0, 0, 0, BgIceShelter_ActionFuncs, 2, BgIceShelter_Fields, 1 },
+    { ACTOR_BG_ICE_SHUTTER, sizeof(BgIceShutter), 0, offsetof(BgIceShutter, actionFunc), 0, 0, 0, 0, BgIceShutter_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_BG_ICE_TURARA, sizeof(BgIceTurara), 0, offsetof(BgIceTurara, actionFunc), 0, 0, 0, 0, BgIceTurara_ActionFuncs, 5, BgIceTurara_Fields, 1 },
+    { ACTOR_BG_INGATE, sizeof(BgInGate), 0, offsetof(BgInGate, actionFunc), 0, 0, 0, 0, BgInGate_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_BG_JYA_1FLIFT, sizeof(BgJya1flift), 0, offsetof(BgJya1flift, actionFunc), 0, 0, 0, 0, BgJya1flift_ActionFuncs, 4, BgJya1flift_Fields, 4 },
+    { ACTOR_BG_JYA_AMISHUTTER, sizeof(BgJyaAmishutter), 0, offsetof(BgJyaAmishutter, actionFunc), 0, 0, 0, 0, BgJyaAmishutter_ActionFuncs, 4, NULL, 0 },
+    { ACTOR_BG_JYA_BOMBCHUIWA, sizeof(BgJyaBombchuiwa), 0, offsetof(BgJyaBombchuiwa, actionFunc), 0, 0, 0, 0, BgJyaBombchuiwa_ActionFuncs, 2, BgJyaBombchuiwa_Fields, 3 },
+    { ACTOR_BG_JYA_COBRA, sizeof(BgJyaCobra), 0, offsetof(BgJyaCobra, actionFunc), 0, 0, 0, 0, BgJyaCobra_ActionFuncs, 2, BgJyaCobra_Fields, 10 },
+    { ACTOR_BG_JYA_HAHENIRON, sizeof(BgJyaHaheniron), 0, offsetof(BgJyaHaheniron, actionFunc), 0, 0, 0, 0, BgJyaHaheniron_ActionFuncs, 3, BgJyaHaheniron_Fields, 1 },
+    { ACTOR_BG_JYA_IRONOBJ, sizeof(BgJyaIronobj), 0, offsetof(BgJyaIronobj, actionFunc), 0, 0, 0, 0, BgJyaIronobj_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_BG_JYA_KANAAMI, sizeof(BgJyaKanaami), 0, offsetof(BgJyaKanaami, actionFunc), 0, 0, 0, 0, BgJyaKanaami_ActionFuncs, 2, BgJyaKanaami_Fields, 2 },
+    { ACTOR_BG_JYA_LIFT, sizeof(BgJyaLift), 0, offsetof(BgJyaLift, actionFunc), 0, 0, 0, 0, BgJyaLift_ActionFuncs, 2, BgJyaLift_Fields, 3 },
+    { ACTOR_BG_JYA_MEGAMI, sizeof(BgJyaMegami), 0, offsetof(BgJyaMegami, actionFunc), 0, 0, 0, 0, BgJyaMegami_ActionFuncs, 2, BgJyaMegami_Fields, 3 },
+    { ACTOR_BG_JYA_ZURERUKABE, sizeof(BgJyaZurerukabe), 0, offsetof(BgJyaZurerukabe, actionFunc), 0, 0, 0, 0, BgJyaZurerukabe_ActionFuncs, 2, BgJyaZurerukabe_Fields, 4 },
+    { ACTOR_BG_MIZU_BWALL, sizeof(BgMizuBwall), 0, offsetof(BgMizuBwall, actionFunc), 0, 0, 0, 0, BgMizuBwall_ActionFuncs, 3, BgMizuBwall_Fields, 7 },
+    { ACTOR_BG_MIZU_SHUTTER, sizeof(BgMizuShutter), 0, offsetof(BgMizuShutter, actionFunc), 0, 0, 0, 0, BgMizuShutter_ActionFuncs, 4, BgMizuShutter_Fields, 5 },
+    { ACTOR_BG_MIZU_UZU, sizeof(BgMizuUzu), 0, offsetof(BgMizuUzu, actionFunc), 0, 0, 0, 0, BgMizuUzu_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_BG_MIZU_WATER, sizeof(BgMizuWater), 0, offsetof(BgMizuWater, actionFunc), 0, 0, 0, 0, BgMizuWater_ActionFuncs, 2, BgMizuWater_Fields, 4 },
+    { ACTOR_BG_MJIN, sizeof(BgMjin), 0, offsetof(BgMjin, actionFunc), 0, 0, 0, 0, BgMjin_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_BG_MORI_BIGST, sizeof(BgMoriBigst), 0, offsetof(BgMoriBigst, actionFunc), 0, 0, 0, 0, BgMoriBigst_ActionFuncs, 5, BgMoriBigst_Fields, 2 },
+    { ACTOR_BG_MORI_ELEVATOR, sizeof(BgMoriElevator), 0, offsetof(BgMoriElevator, actionFunc), 0, 0, 0, 0, BgMoriElevator_ActionFuncs, 5, BgMoriElevator_Fields, 5 },
+    { ACTOR_BG_MORI_HASHIGO, sizeof(BgMoriHashigo), 0, offsetof(BgMoriHashigo, actionFunc), 0, 0, 0, 0, BgMoriHashigo_ActionFuncs, 4, BgMoriHashigo_Fields, 3 },
+    { ACTOR_BG_MORI_HASHIRA4, sizeof(BgMoriHashira4), 0, offsetof(BgMoriHashira4, actionFunc), 0, 0, 0, 0, BgMoriHashira4_ActionFuncs, 4, BgMoriHashira4_Fields, 3 },
+    { ACTOR_BG_MORI_HINERI, sizeof(BgMoriHineri), 0, offsetof(BgMoriHineri, actionFunc), 0, 0, 0, 0, BgMoriHineri_ActionFuncs, 6, BgMoriHineri_Fields, 4 },
+    { ACTOR_BG_MORI_IDOMIZU, sizeof(BgMoriIdomizu), 0, offsetof(BgMoriIdomizu, actionFunc), 0, 0, 0, 0, BgMoriIdomizu_ActionFuncs, 2, BgMoriIdomizu_Fields, 5 },
+    { ACTOR_BG_MORI_KAITENKABE, sizeof(BgMoriKaitenkabe), 0, offsetof(BgMoriKaitenkabe, actionFunc), 0, 0, 0, 0, BgMoriKaitenkabe_ActionFuncs, 3, BgMoriKaitenkabe_Fields, 6 },
+    { ACTOR_BG_MORI_RAKKATENJO, sizeof(BgMoriRakkatenjo), 0, offsetof(BgMoriRakkatenjo, actionFunc), 0, 0, 0, 0, BgMoriRakkatenjo_ActionFuncs, 5, BgMoriRakkatenjo_Fields, 4 },
+    { ACTOR_BG_PO_EVENT, sizeof(BgPoEvent), 0, offsetof(BgPoEvent, actionFunc), 0, 0, 0, 0, BgPoEvent_ActionFuncs, 14, BgPoEvent_Fields, 4 },
+    { ACTOR_BG_PUSHBOX, sizeof(BgPushbox), 0, offsetof(BgPushbox, actionFunc), 0, 0, 0, 0, BgPushbox_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_BG_RELAY_OBJECTS, sizeof(BgRelayObjects), 0, offsetof(BgRelayObjects, actionFunc), 0, 0, 0, 0, BgRelayObjects_ActionFuncs, 6, BgRelayObjects_Fields, 3 },
+    { ACTOR_BG_SPOT00_HANEBASI, sizeof(BgSpot00Hanebasi), 0, offsetof(BgSpot00Hanebasi, actionFunc), 0, 0, 0, 0, BgSpot00Hanebasi_ActionFuncs, 4, BgSpot00Hanebasi_Fields, 1 },
+    { ACTOR_BG_SPOT01_FUSYA, sizeof(BgSpot01Fusya), 0, offsetof(BgSpot01Fusya, actionFunc), 0, 0, 0, 0, BgSpot01Fusya_ActionFuncs, 1, BgSpot01Fusya_Fields, 4 },
+    { ACTOR_BG_SPOT01_IDOMIZU, sizeof(BgSpot01Idomizu), 0, offsetof(BgSpot01Idomizu, actionFunc), 0, 0, 0, 0, BgSpot01Idomizu_ActionFuncs, 1, BgSpot01Idomizu_Fields, 2 },
+    { ACTOR_BG_SPOT01_IDOSOKO, sizeof(BgSpot01Idosoko), 0, offsetof(BgSpot01Idosoko, actionFunc), 0, 0, 0, 0, BgSpot01Idosoko_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_BG_SPOT01_OBJECTS2, sizeof(BgSpot01Objects2), 0, offsetof(BgSpot01Objects2, actionFunc), 0, 0, 0, 0, BgSpot01Objects2_ActionFuncs, 2, BgSpot01Objects2_Fields, 3 },
+    { ACTOR_BG_SPOT02_OBJECTS, sizeof(BgSpot02Objects), 0, offsetof(BgSpot02Objects, actionFunc), 0, 0, 0, 0, BgSpot02Objects_ActionFuncs, 7, BgSpot02Objects_Fields, 6 },
+    { ACTOR_BG_SPOT03_TAKI, sizeof(BgSpot03Taki), 0, offsetof(BgSpot03Taki, actionFunc), 0, 0, 0, 0, BgSpot03Taki_ActionFuncs, 1, BgSpot03Taki_Fields, 5 },
+    { ACTOR_BG_SPOT05_SOKO, sizeof(BgSpot05Soko), 0, offsetof(BgSpot05Soko, actionFunc), 0, 0, 0, 0, BgSpot05Soko_ActionFuncs, 3, BgSpot05Soko_Fields, 1 },
+    { ACTOR_BG_SPOT06_OBJECTS, sizeof(BgSpot06Objects), 0, offsetof(BgSpot06Objects, actionFunc), 0, 0, 0, 0, BgSpot06Objects_ActionFuncs, 11, BgSpot06Objects_Fields, 3 },
+    { ACTOR_BG_SPOT07_TAKI, sizeof(BgSpot07Taki), 0, offsetof(BgSpot07Taki, actionFunc), 0, 0, 0, 0, BgSpot07Taki_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_BG_SPOT08_ICEBLOCK, sizeof(BgSpot08Iceblock), 0, offsetof(BgSpot08Iceblock, actionFunc), 0, 0, 0, 0, BgSpot08Iceblock_ActionFuncs, 3, BgSpot08Iceblock_Fields, 9 },
+    { ACTOR_BG_SPOT11_OASIS, sizeof(BgSpot11Oasis), 0, offsetof(BgSpot11Oasis, actionFunc), 0, 0, 0, 0, BgSpot11Oasis_ActionFuncs, 3, BgSpot11Oasis_Fields, 2 },
+    { ACTOR_BG_SPOT12_GATE, sizeof(BgSpot12Gate), 0, offsetof(BgSpot12Gate, actionFunc), 0, 0, 0, 0, BgSpot12Gate_ActionFuncs, 4, BgSpot12Gate_Fields, 1 },
+    { ACTOR_BG_SPOT12_SAKU, sizeof(BgSpot12Saku), 0, offsetof(BgSpot12Saku, actionFunc), 0, 0, 0, 0, BgSpot12Saku_ActionFuncs, 3, BgSpot12Saku_Fields, 1 },
+    { ACTOR_BG_SPOT15_RRBOX, sizeof(BgSpot15Rrbox), 0, offsetof(BgSpot15Rrbox, actionFunc), 0, 0, 0, 0, BgSpot15Rrbox_ActionFuncs, 4, BgSpot15Rrbox_Fields, 7 },
+    { ACTOR_BG_SPOT15_SAKU, sizeof(BgSpot15Saku), 0, offsetof(BgSpot15Saku, actionFunc), 0, 0, 0, 0, BgSpot15Saku_ActionFuncs, 3, BgSpot15Saku_Fields, 3 },
+    { ACTOR_BG_SPOT16_BOMBSTONE, sizeof(BgSpot16Bombstone), 0, offsetof(BgSpot16Bombstone, actionFunc), 0, 0, 0, 0, BgSpot16Bombstone_ActionFuncs, 4, BgSpot16Bombstone_Fields, 8 },
+    { ACTOR_BG_SPOT18_BASKET, sizeof(BgSpot18Basket), 0, offsetof(BgSpot18Basket, actionFunc), 0, 0, 0, 0, BgSpot18Basket_ActionFuncs, 6, BgSpot18Basket_Fields, 10 },
+    { ACTOR_BG_SPOT18_OBJ, sizeof(BgSpot18Obj), 0, offsetof(BgSpot18Obj, actionFunc), 0, 0, 0, 0, BgSpot18Obj_ActionFuncs, 4, BgSpot18Obj_Fields, 1 },
+    { ACTOR_BG_SPOT18_SHUTTER, sizeof(BgSpot18Shutter), 0, offsetof(BgSpot18Shutter, actionFunc), 0, 0, 0, 0, BgSpot18Shutter_ActionFuncs, 5, NULL, 0 },
+    { ACTOR_BG_TOKI_HIKARI, sizeof(BgTokiHikari), 0, offsetof(BgTokiHikari, actionFunc), 0, 0, 0, 0, BgTokiHikari_ActionFuncs, 4, NULL, 0 },
+    { ACTOR_BG_YDAN_HASI, sizeof(BgYdanHasi), 0, offsetof(BgYdanHasi, actionFunc), 0, 0, 0, 0, BgYdanHasi_ActionFuncs, 6, BgYdanHasi_Fields, 2 },
+    { ACTOR_BG_YDAN_MARUTA, sizeof(BgYdanMaruta), 0, offsetof(BgYdanMaruta, actionFunc), 0, 0, 0, 0, BgYdanMaruta_ActionFuncs, 5, BgYdanMaruta_Fields, 2 },
+    { ACTOR_BG_YDAN_SP, sizeof(BgYdanSp), 0, offsetof(BgYdanSp, actionFunc), 0, 0, 0, 0, BgYdanSp_ActionFuncs, 6, BgYdanSp_Fields, 4 },
     { ACTOR_BOSS_FD2, sizeof(BossFd2), offsetof(BossFd2, skelAnime), offsetof(BossFd2, actionFunc), 0, 0, 0, 0, BossFd2_ActionFuncs, 9, BossFd2_Fields, 14 },
     { ACTOR_BOSS_GANON, sizeof(BossGanon), offsetof(BossGanon, skelAnime), offsetof(BossGanon, actionFunc), 0, 0, 0, 0, BossGanon_ActionFuncs, 13, BossGanon_Fields, 83 },
     { ACTOR_BOSS_GANON2, sizeof(BossGanon2), offsetof(BossGanon2, skelAnime), offsetof(BossGanon2, actionFunc), 0, 0, 0, 0, BossGanon2_ActionFuncs, 10, BossGanon2_Fields, 76 },
     { ACTOR_BOSS_GANONDROF, sizeof(BossGanondrof), offsetof(BossGanondrof, skelAnime), offsetof(BossGanondrof, actionFunc), 0, 0, 0, 0, BossGanondrof_ActionFuncs, 9, BossGanondrof_Fields, 30 },
     { ACTOR_BOSS_GOMA, sizeof(BossGoma), offsetof(BossGoma, skelanime), offsetof(BossGoma, actionFunc), 0, 0, 0, 0, BossGoma_ActionFuncs, 18, BossGoma_Fields, 47 },
+    { ACTOR_BOSS_MO, sizeof(BossMo), 0, offsetof(BossMo, actionFunc), 0, 0, 0, 0, BossMo_ActionFuncs, 1, BossMo_Fields, 67 },
     { ACTOR_BOSS_TW, sizeof(BossTw), offsetof(BossTw, skelAnime), offsetof(BossTw, actionFunc), 0, 0, 0, 0, BossTw_ActionFuncs, 26, BossTw_Fields, 73 },
     { ACTOR_BOSS_VA, sizeof(BossVa), offsetof(BossVa, skelAnime), offsetof(BossVa, actionFunc), 0, 0, 0, 0, BossVa_ActionFuncs, 22, BossVa_Fields, 29 },
+    { ACTOR_DEMO_6K, sizeof(Demo6K), 0, offsetof(Demo6K, initActionFunc), 0, 0, 0, 0, Demo6K_ActionFuncs, 4, Demo6K_Fields, 14 },
+    { ACTOR_DEMO_SHD, sizeof(DemoShd), 0, offsetof(DemoShd, actionFunc), 0, 0, 0, 0, DemoShd_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_DOOR_ANA, sizeof(DoorAna), 0, offsetof(DoorAna, actionFunc), 0, 0, 0, 0, DoorAna_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_DOOR_GERUDO, sizeof(DoorGerudo), 0, offsetof(DoorGerudo, actionFunc), 0, 0, 0, 0, DoorGerudo_ActionFuncs, 3, NULL, 0 },
     { ACTOR_DOOR_KILLER, sizeof(DoorKiller), offsetof(DoorKiller, skelAnime), offsetof(DoorKiller, actionFunc), offsetof(DoorKiller, jointTable), 9, 0, 0, DoorKiller_ActionFuncs, 8, NULL, 0 },
+    { ACTOR_DOOR_SHUTTER, sizeof(DoorShutter), 0, offsetof(DoorShutter, actionFunc), 0, 0, 0, 0, DoorShutter_ActionFuncs, 14, NULL, 0 },
     { ACTOR_DOOR_WARP1, sizeof(DoorWarp1), offsetof(DoorWarp1, skelAnime), offsetof(DoorWarp1, actionFunc), 0, 0, 0, 0, DoorWarp1_ActionFuncs, 22, DoorWarp1_Fields, 1 },
+    { ACTOR_EFC_ERUPC, sizeof(EfcErupc), 0, offsetof(EfcErupc, actionFunc), 0, 0, 0, 0, EfcErupc_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_EFF_DUST, sizeof(EffDust), 0, offsetof(EffDust, actionFunc), 0, 0, 0, 0, EffDust_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_ELF_MSG, sizeof(ElfMsg), 0, offsetof(ElfMsg, actionFunc), 0, 0, 0, 0, ElfMsg_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_ELF_MSG2, sizeof(ElfMsg2), 0, offsetof(ElfMsg2, actionFunc), 0, 0, 0, 0, ElfMsg2_ActionFuncs, 3, NULL, 0 },
     { ACTOR_EN_AM, sizeof(EnAm), offsetof(EnAm, skelAnime), offsetof(EnAm, actionFunc), offsetof(EnAm, jointTable), 14, offsetof(EnAm, morphTable), 14, EnAm_ActionFuncs, 10, EnAm_Fields, 10 },
     { ACTOR_EN_ANI, sizeof(EnAni), offsetof(EnAni, skelAnime), offsetof(EnAni, actionFunc), offsetof(EnAni, jointTable), 16, offsetof(EnAni, morphTable), 16, EnAni_ActionFuncs, 6, NULL, 0 },
     { ACTOR_EN_ANUBICE, sizeof(EnAnubice), offsetof(EnAnubice, skelAnime), offsetof(EnAnubice, actionFunc), offsetof(EnAnubice, jointTable), 22, offsetof(EnAnubice, morphTable), 22, EnAnubice_ActionFuncs, 8, EnAnubice_Fields, 20 },
+    { ACTOR_EN_ANUBICE_FIRE, sizeof(EnAnubiceFire), 0, offsetof(EnAnubiceFire, actionFunc), 0, 0, 0, 0, EnAnubiceFire_ActionFuncs, 3, EnAnubiceFire_Fields, 8 },
+    { ACTOR_EN_ANUBICE_TAG, sizeof(EnAnubiceTag), 0, offsetof(EnAnubiceTag, actionFunc), 0, 0, 0, 0, EnAnubiceTag_ActionFuncs, 2, EnAnubiceTag_Fields, 1 },
     { ACTOR_EN_ARROW, sizeof(EnArrow), offsetof(EnArrow, skelAnime), offsetof(EnArrow, actionFunc), 0, 0, 0, 0, EnArrow_ActionFuncs, 4, NULL, 0 },
     { ACTOR_EN_ATTACK_NIW, sizeof(EnAttackNiw), offsetof(EnAttackNiw, skelAnime), offsetof(EnAttackNiw, actionFunc), offsetof(EnAttackNiw, jointTable), 16, offsetof(EnAttackNiw, morphTable), 16, EnAttackNiw_ActionFuncs, 3, EnAttackNiw_Fields, 35 },
+    { ACTOR_EN_BA, sizeof(EnBa), 0, offsetof(EnBa, actionFunc), 0, 0, 0, 0, EnBa_ActionFuncs, 5, EnBa_Fields, 12 },
     { ACTOR_EN_BB, sizeof(EnBb), offsetof(EnBb, skelAnime), offsetof(EnBb, actionFunc), offsetof(EnBb, jointTable), 16, offsetof(EnBb, morphTable), 16, EnBb_ActionFuncs, 9, EnBb_Fields, 24 },
+    { ACTOR_EN_BDFIRE, sizeof(EnBdfire), 0, offsetof(EnBdfire, actionFunc), 0, 0, 0, 0, EnBdfire_ActionFuncs, 2, EnBdfire_Fields, 9 },
     { ACTOR_EN_BIGOKUTA, sizeof(EnBigokuta), offsetof(EnBigokuta, skelAnime), offsetof(EnBigokuta, actionFunc), offsetof(EnBigokuta, jointTable), 20, offsetof(EnBigokuta, morphTable), 20, EnBigokuta_ActionFuncs, 13, EnBigokuta_Fields, 5 },
     { ACTOR_EN_BILI, sizeof(EnBili), offsetof(EnBili, skelAnime), offsetof(EnBili, actionFunc), offsetof(EnBili, jointTable), 5, offsetof(EnBili, morphTable), 5, EnBili_ActionFuncs, 11, EnBili_Fields, 3 },
     { ACTOR_EN_BIRD, sizeof(EnBird), offsetof(EnBird, skelAnime), offsetof(EnBird, actionFunc), 0, 0, 0, 0, EnBird_ActionFuncs, 2, EnBird_Fields, 14 },
+    { ACTOR_EN_BLKOBJ, sizeof(EnBlkobj), 0, offsetof(EnBlkobj, actionFunc), 0, 0, 0, 0, EnBlkobj_ActionFuncs, 4, NULL, 0 },
+    { ACTOR_EN_BOM, sizeof(EnBom), 0, offsetof(EnBom, actionFunc), 0, 0, 0, 0, EnBom_ActionFuncs, 3, NULL, 0 },
     { ACTOR_EN_BOM_BOWL_MAN, sizeof(EnBomBowlMan), offsetof(EnBomBowlMan, skelAnime), offsetof(EnBomBowlMan, actionFunc), offsetof(EnBomBowlMan, jointTable), 11, offsetof(EnBomBowlMan, morphTable), 11, EnBomBowlMan_ActionFuncs, 15, EnBomBowlMan_Fields, 19 },
+    { ACTOR_EN_BOM_BOWL_PIT, sizeof(EnBomBowlPit), 0, offsetof(EnBomBowlPit, actionFunc), 0, 0, 0, 0, EnBomBowlPit_ActionFuncs, 8, EnBomBowlPit_Fields, 20 },
+    { ACTOR_EN_BOM_CHU, sizeof(EnBomChu), 0, offsetof(EnBomChu, actionFunc), 0, 0, 0, 0, EnBomChu_ActionFuncs, 3, EnBomChu_Fields, 7 },
+    { ACTOR_EN_BOMBF, sizeof(EnBombf), 0, offsetof(EnBombf, actionFunc), 0, 0, 0, 0, EnBombf_ActionFuncs, 4, EnBombf_Fields, 5 },
+    { ACTOR_EN_BOOM, sizeof(EnBoom), 0, offsetof(EnBoom, actionFunc), 0, 0, 0, 0, EnBoom_ActionFuncs, 1, NULL, 0 },
     { ACTOR_EN_BOX, sizeof(EnBox), offsetof(EnBox, skelanime), offsetof(EnBox, actionFunc), offsetof(EnBox, jointTable), 5, offsetof(EnBox, morphTable), 5, EnBox_ActionFuncs, 9, EnBox_Fields, 7 },
     { ACTOR_EN_BROB, sizeof(EnBrob), offsetof(EnBrob, skelAnime), offsetof(EnBrob, actionFunc), offsetof(EnBrob, jointTable), 10, offsetof(EnBrob, morphTable), 10, EnBrob_ActionFuncs, 6, EnBrob_Fields, 2 },
+    { ACTOR_EN_BUBBLE, sizeof(EnBubble), 0, offsetof(EnBubble, actionFunc), 0, 0, 0, 0, EnBubble_ActionFuncs, 3, EnBubble_Fields, 17 },
     { ACTOR_EN_BUTTE, sizeof(EnButte), offsetof(EnButte, skelAnime), offsetof(EnButte, actionFunc), offsetof(EnButte, jointTable), 8, offsetof(EnButte, morphTable), 8, EnButte_ActionFuncs, 4, EnButte_Fields, 9 },
     { ACTOR_EN_BW, sizeof(EnBw), offsetof(EnBw, skelAnime), offsetof(EnBw, actionFunc), offsetof(EnBw, jointTable), 12, offsetof(EnBw, morphTable), 12, EnBw_ActionFuncs, 9, EnBw_Fields, 23 },
+    { ACTOR_EN_CHANGER, sizeof(EnChanger), 0, offsetof(EnChanger, actionFunc), 0, 0, 0, 0, EnChanger_ActionFuncs, 3, EnChanger_Fields, 7 },
     { ACTOR_EN_COW, sizeof(EnCow), offsetof(EnCow, skelAnime), offsetof(EnCow, actionFunc), offsetof(EnCow, jointTable), 6, offsetof(EnCow, morphTable), 6, EnCow_ActionFuncs, 8, NULL, 0 },
     { ACTOR_EN_CROW, sizeof(EnCrow), offsetof(EnCrow, skelAnime), offsetof(EnCrow, actionFunc), offsetof(EnCrow, jointTable), 9, offsetof(EnCrow, morphTable), 9, EnCrow_ActionFuncs, 6, EnCrow_Fields, 3 },
     { ACTOR_EN_CS, sizeof(EnCs), offsetof(EnCs, skelAnime), offsetof(EnCs, actionFunc), offsetof(EnCs, jointTable), 16, offsetof(EnCs, morphTable), 16, EnCs_ActionFuncs, 3, EnCs_Fields, 15 },
@@ -5489,6 +9413,7 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_DHA, sizeof(EnDha), offsetof(EnDha, skelAnime), offsetof(EnDha, actionFunc), offsetof(EnDha, jointTable), 4, offsetof(EnDha, morphTable), 4, EnDha_ActionFuncs, 3, EnDha_Fields, 8 },
     { ACTOR_EN_DIVING_GAME, sizeof(EnDivingGame), offsetof(EnDivingGame, skelAnime), offsetof(EnDivingGame, actionFunc), offsetof(EnDivingGame, jointTable), 20, offsetof(EnDivingGame, morphTable), 20, EnDivingGame_ActionFuncs, 16, EnDivingGame_Fields, 31 },
     { ACTOR_EN_DNS, sizeof(EnDns), offsetof(EnDns, skelAnime), offsetof(EnDns, actionFunc), offsetof(EnDns, jointTable), 18, offsetof(EnDns, morphTable), 18, EnDns_ActionFuncs, 9, EnDns_Fields, 6 },
+    { ACTOR_EN_DNT_DEMO, sizeof(EnDntDemo), 0, offsetof(EnDntDemo, actionFunc), 0, 0, 0, 0, EnDntDemo_ActionFuncs, 3, EnDntDemo_Fields, 10 },
     { ACTOR_EN_DNT_JIJI, sizeof(EnDntJiji), offsetof(EnDntJiji, skelAnime), offsetof(EnDntJiji, actionFunc), offsetof(EnDntJiji, jointTable), 13, offsetof(EnDntJiji, morphTable), 13, EnDntJiji_ActionFuncs, 21, EnDntJiji_Fields, 14 },
     { ACTOR_EN_DNT_NOMAL, sizeof(EnDntNomal), offsetof(EnDntNomal, skelAnime), offsetof(EnDntNomal, actionFunc), offsetof(EnDntNomal, jointTable), 11, offsetof(EnDntNomal, morphTable), 11, EnDntNomal_ActionFuncs, 32, EnDntNomal_Fields, 24 },
     { ACTOR_EN_DODOJR, sizeof(EnDodojr), offsetof(EnDodojr, skelAnime), offsetof(EnDodojr, actionFunc), offsetof(EnDodojr, jointTable), 15, offsetof(EnDodojr, morphTable), 15, EnDodojr_ActionFuncs, 15, EnDodojr_Fields, 8 },
@@ -5497,14 +9422,22 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_DOOR, sizeof(EnDoor), offsetof(EnDoor, skelAnime), offsetof(EnDoor, actionFunc), offsetof(EnDoor, jointTable), 5, offsetof(EnDoor, morphTable), 5, EnDoor_ActionFuncs, 8, NULL, 0 },
     { ACTOR_EN_DS, sizeof(EnDs), offsetof(EnDs, skelAnime), offsetof(EnDs, actionFunc), offsetof(EnDs, jointTable), 6, offsetof(EnDs, morphTable), 6, EnDs_ActionFuncs, 13, NULL, 0 },
     { ACTOR_EN_DU, sizeof(EnDu), offsetof(EnDu, skelAnime), offsetof(EnDu, actionFunc), 0, 0, 0, 0, EnDu_ActionFuncs, 12, EnDu_Fields, 13 },
+    { ACTOR_EN_DY_EXTRA, sizeof(EnDyExtra), 0, offsetof(EnDyExtra, actionFunc), 0, 0, 0, 0, EnDyExtra_ActionFuncs, 2, EnDyExtra_Fields, 6 },
     { ACTOR_EN_EIYER, sizeof(EnEiyer), offsetof(EnEiyer, skelanime), offsetof(EnEiyer, actionFunc), offsetof(EnEiyer, jointTable), 19, offsetof(EnEiyer, morphTable), 19, EnEiyer_ActionFuncs, 13, EnEiyer_Fields, 3 },
     { ACTOR_EN_ELF, sizeof(EnElf), offsetof(EnElf, skelAnime), offsetof(EnElf, actionFunc), offsetof(EnElf, jointTable), 15, offsetof(EnElf, morphTable), 15, EnElf_ActionFuncs, 7, NULL, 0 },
+    { ACTOR_EN_ENCOUNT2, sizeof(EnEncount2), 0, offsetof(EnEncount2, actionFunc), 0, 0, 0, 0, EnEncount2_ActionFuncs, 2, EnEncount2_Fields, 16 },
+    { ACTOR_EN_EX_ITEM, sizeof(EnExItem), 0, offsetof(EnExItem, actionFunc), 0, 0, 0, 0, EnExItem_ActionFuncs, 9, EnExItem_Fields, 13 },
+    { ACTOR_EN_EX_RUPPY, sizeof(EnExRuppy), 0, offsetof(EnExRuppy, actionFunc), 0, 0, 0, 0, EnExRuppy_ActionFuncs, 8, EnExRuppy_Fields, 8 },
     { ACTOR_EN_FD, sizeof(EnFd), offsetof(EnFd, skelAnime), offsetof(EnFd, actionFunc), offsetof(EnFd, jointTable), 27, offsetof(EnFd, morphTable), 27, EnFd_ActionFuncs, 7, EnFd_Fields, 12 },
+    { ACTOR_EN_FD_FIRE, sizeof(EnFdFire), 0, offsetof(EnFdFire, actionFunc), 0, 0, 0, 0, EnFdFire_ActionFuncs, 4, EnFdFire_Fields, 5 },
+    { ACTOR_EN_FIRE_ROCK, sizeof(EnFireRock), 0, offsetof(EnFireRock, actionFunc), 0, 0, 0, 0, EnFireRock_ActionFuncs, 4, EnFireRock_Fields, 7 },
     { ACTOR_EN_FIREFLY, sizeof(EnFirefly), offsetof(EnFirefly, skelAnime), offsetof(EnFirefly, actionFunc), offsetof(EnFirefly, jointTable), 28, offsetof(EnFirefly, morphTable), 28, EnFirefly_ActionFuncs, 10, EnFirefly_Fields, 5 },
     { ACTOR_EN_FISH, sizeof(EnFish), offsetof(EnFish, skelAnime), offsetof(EnFish, actionFunc), offsetof(EnFish, jointTable), 7, offsetof(EnFish, morphTable), 7, EnFish_ActionFuncs, 8, EnFish_Fields, 5 },
     { ACTOR_EN_FR, sizeof(EnFr), offsetof(EnFr, skelAnime), offsetof(EnFr, actionFunc), offsetof(EnFr, jointTable), 24, offsetof(EnFr, morphTable), 24, EnFr_ActionFuncs, 22, EnFr_Fields, 26 },
     { ACTOR_EN_FU, sizeof(EnFu), offsetof(EnFu, skelanime), offsetof(EnFu, actionFunc), offsetof(EnFu, jointTable), 16, offsetof(EnFu, morphTable), 16, EnFu_ActionFuncs, 7, NULL, 0 },
     { ACTOR_EN_FW, sizeof(EnFw), offsetof(EnFw, skelAnime), offsetof(EnFw, actionFunc), offsetof(EnFw, jointTable), 11, offsetof(EnFw, morphTable), 11, EnFw_ActionFuncs, 4, EnFw_Fields, 13 },
+    { ACTOR_EN_FZ, sizeof(EnFz), 0, offsetof(EnFz, actionFunc), 0, 0, 0, 0, EnFz_ActionFuncs, 10, EnFz_Fields, 20 },
+    { ACTOR_EN_G_SWITCH, sizeof(EnGSwitch), 0, offsetof(EnGSwitch, actionFunc), 0, 0, 0, 0, EnGSwitch_ActionFuncs, 7, EnGSwitch_Fields, 16 },
     { ACTOR_EN_GB, sizeof(EnGb), offsetof(EnGb, skelAnime), offsetof(EnGb, actionFunc), offsetof(EnGb, jointTable), 12, offsetof(EnGb, morphTable), 12, EnGb_ActionFuncs, 8, EnGb_Fields, 4 },
     { ACTOR_EN_GE1, sizeof(EnGe1), offsetof(EnGe1, skelAnime), offsetof(EnGe1, actionFunc), offsetof(EnGe1, jointTable), 22, offsetof(EnGe1, morphTable), 22, EnGe1_ActionFuncs, 25, NULL, 0 },
     { ACTOR_EN_GE2, sizeof(EnGe2), offsetof(EnGe2, skelAnime), offsetof(EnGe2, actionFunc), offsetof(EnGe2, jointTable), 22, offsetof(EnGe2, morphTable), 22, EnGe2_ActionFuncs, 5, NULL, 0 },
@@ -5515,22 +9448,29 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_GO, sizeof(EnGo), offsetof(EnGo, skelAnime), offsetof(EnGo, actionFunc), offsetof(EnGo, jointTable), 18, offsetof(EnGo, morphTable), 18, EnGo_ActionFuncs, 17, EnGo_Fields, 11 },
     { ACTOR_EN_GO2, sizeof(EnGo2), offsetof(EnGo2, skelAnime), offsetof(EnGo2, actionFunc), offsetof(EnGo2, jointTable), 18, offsetof(EnGo2, morphTable), 18, EnGo2_ActionFuncs, 13, EnGo2_Fields, 26 },
     { ACTOR_EN_GOMA, sizeof(EnGoma), offsetof(EnGoma, skelanime), offsetof(EnGoma, actionFunc), offsetof(EnGoma, jointTable), 24, offsetof(EnGoma, morphTable), 24, EnGoma_ActionFuncs, 15, EnGoma_Fields, 23 },
+    { ACTOR_EN_GOROIWA, sizeof(EnGoroiwa), 0, offsetof(EnGoroiwa, actionFunc), 0, 0, 0, 0, EnGoroiwa_ActionFuncs, 5, EnGoroiwa_Fields, 12 },
+    { ACTOR_EN_GS, sizeof(EnGs), 0, offsetof(EnGs, actionFunc), 0, 0, 0, 0, EnGs_ActionFuncs, 7, EnGs_Fields, 17 },
     { ACTOR_EN_GUEST, sizeof(EnGuest), offsetof(EnGuest, skelAnime), offsetof(EnGuest, actionFunc), offsetof(EnGuest, jointTable), 16, offsetof(EnGuest, morphTable), 16, EnGuest_ActionFuncs, 2, EnGuest_Fields, 7 },
     { ACTOR_EN_HEISHI2, sizeof(EnHeishi2), offsetof(EnHeishi2, skelAnime), offsetof(EnHeishi2, actionFunc), offsetof(EnHeishi2, jointTable), 17, offsetof(EnHeishi2, morphTable), 17, EnHeishi2_ActionFuncs, 30, EnHeishi2_Fields, 30 },
     { ACTOR_EN_HEISHI3, sizeof(EnHeishi3), offsetof(EnHeishi3, skelAnime), offsetof(EnHeishi3, actionFunc), offsetof(EnHeishi3, jointTable), 17, offsetof(EnHeishi3, morphTable), 17, EnHeishi3_ActionFuncs, 7, EnHeishi3_Fields, 11 },
     { ACTOR_EN_HEISHI4, sizeof(EnHeishi4), offsetof(EnHeishi4, skelAnime), offsetof(EnHeishi4, actionFunc), offsetof(EnHeishi4, jointTable), 17, offsetof(EnHeishi4, morphTable), 17, EnHeishi4_ActionFuncs, 12, EnHeishi4_Fields, 12 },
     { ACTOR_EN_HINTNUTS, sizeof(EnHintnuts), offsetof(EnHintnuts, skelAnime), offsetof(EnHintnuts, actionFunc), offsetof(EnHintnuts, jointTable), 10, offsetof(EnHintnuts, morphTable), 10, EnHintnuts_ActionFuncs, 11, EnHintnuts_Fields, 3 },
+    { ACTOR_EN_HOLL, sizeof(EnHoll), 0, offsetof(EnHoll, actionFunc), 0, 0, 0, 0, EnHoll_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_EN_HONOTRAP, sizeof(EnHonotrap), 0, offsetof(EnHonotrap, actionFunc), 0, 0, 0, 0, EnHonotrap_ActionFuncs, 9, EnHonotrap_Fields, 7 },
     { ACTOR_EN_HS2, sizeof(EnHs2), offsetof(EnHs2, skelAnime), offsetof(EnHs2, actionFunc), offsetof(EnHs2, jointTable), 16, offsetof(EnHs2, morphTable), 16, EnHs2_ActionFuncs, 1, NULL, 0 },
     { ACTOR_EN_HY, sizeof(EnHy), offsetof(EnHy, skelAnime), offsetof(EnHy, actionFunc), offsetof(EnHy, jointTable), 16, offsetof(EnHy, morphTable), 16, EnHy_ActionFuncs, 9, EnHy_Fields, 17 },
+    { ACTOR_EN_ICE_HONO, sizeof(EnIceHono), 0, offsetof(EnIceHono, actionFunc), 0, 0, 0, 0, EnIceHono_ActionFuncs, 4, EnIceHono_Fields, 5 },
     { ACTOR_EN_IK, sizeof(EnIk), offsetof(EnIk, skelAnime), offsetof(EnIk, actionFunc), offsetof(EnIk, jointTable), 30, offsetof(EnIk, morphTable), 30, EnIk_ActionFuncs, 11, EnIk_Fields, 6 },
     { ACTOR_EN_IN, sizeof(EnIn), offsetof(EnIn, skelAnime), offsetof(EnIn, actionFunc), offsetof(EnIn, jointTable), 20, offsetof(EnIn, morphTable), 20, EnIn_ActionFuncs, 14, EnIn_Fields, 20 },
     { ACTOR_EN_INSECT, sizeof(EnInsect), offsetof(EnInsect, skelAnime), offsetof(EnInsect, actionFunc), offsetof(EnInsect, jointTable), 24, offsetof(EnInsect, morphTable), 24, EnInsect_ActionFuncs, 8, EnInsect_Fields, 9 },
+    { ACTOR_EN_ISHI, sizeof(EnIshi), 0, offsetof(EnIshi, actionFunc), 0, 0, 0, 0, EnIshi_ActionFuncs, 3, NULL, 0 },
     { ACTOR_EN_JJ, sizeof(EnJj), offsetof(EnJj, skelAnime), offsetof(EnJj, actionFunc), offsetof(EnJj, jointTable), 22, offsetof(EnJj, morphTable), 22, EnJj_ActionFuncs, 5, EnJj_Fields, 7 },
     { ACTOR_EN_KAKASI, sizeof(EnKakasi), offsetof(EnKakasi, skelanime), 0, 0, 0, 0, 0, EnKakasi_ActionFuncs, 6, NULL, 0 },
     { ACTOR_EN_KAKASI2, sizeof(EnKakasi2), offsetof(EnKakasi2, skelAnime), offsetof(EnKakasi2, actionFunc), 0, 0, 0, 0, EnKakasi2_ActionFuncs, 5, EnKakasi2_Fields, 5 },
     { ACTOR_EN_KAKASI3, sizeof(EnKakasi3), offsetof(EnKakasi3, skelAnime), offsetof(EnKakasi3, actionFunc), 0, 0, 0, 0, EnKakasi3_ActionFuncs, 10, EnKakasi3_Fields, 15 },
     { ACTOR_EN_KAREBABA, sizeof(EnKarebaba), offsetof(EnKarebaba, skelAnime), offsetof(EnKarebaba, actionFunc), offsetof(EnKarebaba, jointTable), 8, offsetof(EnKarebaba, morphTable), 8, EnKarebaba_ActionFuncs, 10, NULL, 0 },
     { ACTOR_EN_KO, sizeof(EnKo), offsetof(EnKo, skelAnime), offsetof(EnKo, actionFunc), offsetof(EnKo, jointTable), 16, offsetof(EnKo, morphTable), 16, EnKo_ActionFuncs, 6, EnKo_Fields, 13 },
+    { ACTOR_EN_KUSA, sizeof(EnKusa), 0, offsetof(EnKusa, actionFunc), 0, 0, 0, 0, EnKusa_ActionFuncs, 8, EnKusa_Fields, 2 },
     { ACTOR_EN_KZ, sizeof(EnKz), offsetof(EnKz, skelanime), offsetof(EnKz, actionFunc), offsetof(EnKz, jointTable), 12, offsetof(EnKz, morphTable), 12, EnKz_ActionFuncs, 7, EnKz_Fields, 10 },
     { ACTOR_EN_MA1, sizeof(EnMa1), offsetof(EnMa1, skelAnime), offsetof(EnMa1, actionFunc), 0, 0, 0, 0, EnMa1_ActionFuncs, 8, EnMa1_Fields, 4 },
     { ACTOR_EN_MA2, sizeof(EnMa2), offsetof(EnMa2, skelAnime), offsetof(EnMa2, actionFunc), 0, 0, 0, 0, EnMa2_ActionFuncs, 4, EnMa2_Fields, 6 },
@@ -5545,6 +9485,10 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_NIW, sizeof(EnNiw), offsetof(EnNiw, skelAnime), offsetof(EnNiw, actionFunc), offsetof(EnNiw, jointTable), 16, offsetof(EnNiw, morphTable), 16, EnNiw_ActionFuncs, 17, EnNiw_Fields, 46 },
     { ACTOR_EN_NIW_GIRL, sizeof(EnNiwGirl), offsetof(EnNiwGirl, skelAnime), offsetof(EnNiwGirl, actionFunc), offsetof(EnNiwGirl, jointTable), 17, offsetof(EnNiwGirl, morphTable), 17, EnNiwGirl_ActionFuncs, 4, EnNiwGirl_Fields, 12 },
     { ACTOR_EN_NIW_LADY, sizeof(EnNiwLady), offsetof(EnNiwLady, skelAnime), offsetof(EnNiwLady, actionFunc), offsetof(EnNiwLady, jointTable), 16, offsetof(EnNiwLady, morphTable), 16, EnNiwLady_ActionFuncs, 12, EnNiwLady_Fields, 24 },
+    { ACTOR_EN_NUTSBALL, sizeof(EnNutsball), 0, offsetof(EnNutsball, actionFunc), 0, 0, 0, 0, EnNutsball_ActionFuncs, 2, EnNutsball_Fields, 2 },
+    { ACTOR_EN_NY, sizeof(EnNy), 0, offsetof(EnNy, actionFunc), 0, 0, 0, 0, EnNy_ActionFuncs, 8, EnNy_Fields, 17 },
+    { ACTOR_EN_OE2, sizeof(EnOE2), 0, offsetof(EnOE2, actionFunc), 0, 0, 0, 0, EnOE2_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_EN_OKARINA_EFFECT, sizeof(EnOkarinaEffect), 0, offsetof(EnOkarinaEffect, actionFunc), 0, 0, 0, 0, EnOkarinaEffect_ActionFuncs, 2, NULL, 0 },
     { ACTOR_EN_OKUTA, sizeof(EnOkuta), offsetof(EnOkuta, skelAnime), offsetof(EnOkuta, actionFunc), offsetof(EnOkuta, jointTable), 38, offsetof(EnOkuta, morphTable), 38, EnOkuta_ActionFuncs, 9, EnOkuta_Fields, 4 },
     { ACTOR_EN_OSSAN, sizeof(EnOssan), offsetof(EnOssan, skelAnime), offsetof(EnOssan, actionFunc), 0, 0, 0, 0, EnOssan_ActionFuncs, 2, EnOssan_Fields, 34 },
     { ACTOR_EN_OWL, sizeof(EnOwl), offsetof(EnOwl, skelAnime), offsetof(EnOwl, actionFunc), offsetof(EnOwl, jointTable), 21, offsetof(EnOwl, morphTable), 21, EnOwl_ActionFuncs, 37, NULL, 0 },
@@ -5555,15 +9499,21 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_PO_SISTERS, sizeof(EnPoSisters), offsetof(EnPoSisters, skelAnime), offsetof(EnPoSisters, actionFunc), offsetof(EnPoSisters, jointTable), 12, offsetof(EnPoSisters, morphTable), 12, EnPoSisters_ActionFuncs, 25, EnPoSisters_Fields, 11 },
     { ACTOR_EN_POH, sizeof(EnPoh), offsetof(EnPoh, skelAnime), offsetof(EnPoh, actionFunc), offsetof(EnPoh, jointTable), 21, offsetof(EnPoh, morphTable), 21, EnPoh_ActionFuncs, 19, EnPoh_Fields, 9 },
     { ACTOR_EN_RD, sizeof(EnRd), offsetof(EnRd, skelAnime), offsetof(EnRd, actionFunc), offsetof(EnRd, jointTable), 26, offsetof(EnRd, morphTable), 26, EnRd_ActionFuncs, 12, EnRd_Fields, 12 },
+    { ACTOR_EN_RR, sizeof(EnRr), 0, offsetof(EnRr, actionFunc), 0, 0, 0, 0, EnRr_ActionFuncs, 7, EnRr_Fields, 33 },
     { ACTOR_EN_SA, sizeof(EnSa), offsetof(EnSa, skelAnime), offsetof(EnSa, actionFunc), offsetof(EnSa, jointTable), 17, offsetof(EnSa, morphTable), 17, EnSa_ActionFuncs, 5, EnSa_Fields, 12 },
     { ACTOR_EN_SB, sizeof(EnSb), offsetof(EnSb, skelAnime), offsetof(EnSb, actionFunc), 0, 0, 0, 0, EnSb_ActionFuncs, 7, EnSb_Fields, 7 },
+    { ACTOR_EN_SCENE_CHANGE, sizeof(EnSceneChange), 0, offsetof(EnSceneChange, actionFunc), 0, 0, 0, 0, EnSceneChange_ActionFuncs, 1, NULL, 0 },
     { ACTOR_EN_SHOPNUTS, sizeof(EnShopnuts), offsetof(EnShopnuts, skelAnime), offsetof(EnShopnuts, actionFunc), offsetof(EnShopnuts, jointTable), 18, offsetof(EnShopnuts, morphTable), 18, EnShopnuts_ActionFuncs, 6, EnShopnuts_Fields, 1 },
+    { ACTOR_EN_SI, sizeof(EnSi), 0, offsetof(EnSi, actionFunc), 0, 0, 0, 0, EnSi_ActionFuncs, 3, EnSi_Fields, 1 },
+    { ACTOR_EN_SIOFUKI, sizeof(EnSiofuki), 0, offsetof(EnSiofuki, actionFunc), 0, 0, 0, 0, EnSiofuki_ActionFuncs, 5, EnSiofuki_Fields, 15 },
     { ACTOR_EN_SKB, sizeof(EnSkb), offsetof(EnSkb, skelAnime), offsetof(EnSkb, actionFunc), offsetof(EnSkb, jointTable), 20, offsetof(EnSkb, morphTable), 20, EnSkb_ActionFuncs, 8, EnSkb_Fields, 1 },
     { ACTOR_EN_SKJ, sizeof(EnSkj), offsetof(EnSkj, skelAnime), offsetof(EnSkj, actionFunc), offsetof(EnSkj, jointTable), 19, offsetof(EnSkj, morphTable), 19, EnSkj_ActionFuncs, 12, EnSkj_Fields, 20 },
     { ACTOR_EN_SSH, sizeof(EnSsh), offsetof(EnSsh, skelAnime), offsetof(EnSsh, actionFunc), offsetof(EnSsh, jointTable), 30, offsetof(EnSsh, morphTable), 30, EnSsh_ActionFuncs, 7, EnSsh_Fields, 20 },
     { ACTOR_EN_ST, sizeof(EnSt), offsetof(EnSt, skelAnime), offsetof(EnSt, actionFunc), offsetof(EnSt, jointTable), 30, offsetof(EnSt, morphTable), 30, EnSt_ActionFuncs, 9, EnSt_Fields, 28 },
     { ACTOR_EN_STH, sizeof(EnSth), offsetof(EnSth, skelAnime), offsetof(EnSth, actionFunc), offsetof(EnSth, jointTable), 16, offsetof(EnSth, morphTable), 16, EnSth_ActionFuncs, 8, NULL, 0 },
+    { ACTOR_EN_STREAM, sizeof(EnStream), 0, offsetof(EnStream, actionFunc), 0, 0, 0, 0, EnStream_ActionFuncs, 2, EnStream_Fields, 2 },
     { ACTOR_EN_SW, sizeof(EnSw), offsetof(EnSw, skelAnime), offsetof(EnSw, actionFunc), offsetof(EnSw, jointTable), 30, offsetof(EnSw, morphTable), 30, EnSw_ActionFuncs, 10, EnSw_Fields, 29 },
+    { ACTOR_EN_SYATEKI_ITM, sizeof(EnSyatekiItm), 0, offsetof(EnSyatekiItm, actionFunc), 0, 0, 0, 0, EnSyatekiItm_ActionFuncs, 6, EnSyatekiItm_Fields, 10 },
     { ACTOR_EN_SYATEKI_MAN, sizeof(EnSyatekiMan), offsetof(EnSyatekiMan, skelAnime), offsetof(EnSyatekiMan, actionFunc), offsetof(EnSyatekiMan, jointTable), 9, offsetof(EnSyatekiMan, morphTable), 9, EnSyatekiMan_ActionFuncs, 11, EnSyatekiMan_Fields, 11 },
     { ACTOR_EN_SYATEKI_NIW, sizeof(EnSyatekiNiw), offsetof(EnSyatekiNiw, skelAnime), offsetof(EnSyatekiNiw, actionFunc), offsetof(EnSyatekiNiw, jointTable), 16, offsetof(EnSyatekiNiw, morphTable), 16, EnSyatekiNiw_ActionFuncs, 6, EnSyatekiNiw_Fields, 38 },
     { ACTOR_EN_TA, sizeof(EnTa), offsetof(EnTa, skelAnime), offsetof(EnTa, actionFunc), offsetof(EnTa, jointTable), 17, offsetof(EnTa, morphTable), 17, EnTa_ActionFuncs, 9, EnTa_Fields, 12 },
@@ -5572,15 +9522,47 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_TG, sizeof(EnTg), offsetof(EnTg, skelAnime), offsetof(EnTg, actionFunc), 0, 0, 0, 0, EnTg_ActionFuncs, 1, EnTg_Fields, 1 },
     { ACTOR_EN_TITE, sizeof(EnTite), offsetof(EnTite, skelAnime), offsetof(EnTite, actionFunc), offsetof(EnTite, jointTable), 25, offsetof(EnTite, morphTable), 25, EnTite_ActionFuncs, 10, EnTite_Fields, 9 },
     { ACTOR_EN_TORYO, sizeof(EnToryo), offsetof(EnToryo, skelAnime), offsetof(EnToryo, actionFunc), offsetof(EnToryo, jointTable), 17, offsetof(EnToryo, morphTable), 17, EnToryo_ActionFuncs, 1, EnToryo_Fields, 4 },
+    { ACTOR_EN_TP, sizeof(EnTp), 0, offsetof(EnTp, actionFunc), 0, 0, 0, 0, EnTp_ActionFuncs, 7, EnTp_Fields, 10 },
     { ACTOR_EN_TR, sizeof(EnTr), offsetof(EnTr, skelAnime), offsetof(EnTr, actionFunc), offsetof(EnTr, jointTable), 27, offsetof(EnTr, morphTable), 27, EnTr_ActionFuncs, 10, EnTr_Fields, 2 },
+    { ACTOR_EN_TUBO_TRAP, sizeof(EnTuboTrap), 0, offsetof(EnTuboTrap, actionFunc), 0, 0, 0, 0, EnTuboTrap_ActionFuncs, 3, EnTuboTrap_Fields, 2 },
     { ACTOR_EN_VALI, sizeof(EnVali), offsetof(EnVali, skelAnime), offsetof(EnVali, actionFunc), offsetof(EnVali, jointTable), 29, offsetof(EnVali, morphTable), 29, EnVali_ActionFuncs, 11, EnVali_Fields, 5 },
+    { ACTOR_EN_VIEWER, sizeof(EnViewer), 0, offsetof(EnViewer, actionFunc), 0, 0, 0, 0, EnViewer_ActionFuncs, 2, EnViewer_Fields, 3 },
     { ACTOR_EN_VM, sizeof(EnVm), offsetof(EnVm, skelAnime), offsetof(EnVm, actionFunc), offsetof(EnVm, jointTable), 11, offsetof(EnVm, morphTable), 11, EnVm_ActionFuncs, 4, EnVm_Fields, 13 },
+    { ACTOR_EN_WALL_TUBO, sizeof(EnWallTubo), 0, offsetof(EnWallTubo, actionFunc), 0, 0, 0, 0, EnWallTubo_ActionFuncs, 3, EnWallTubo_Fields, 3 },
     { ACTOR_EN_WALLMAS, sizeof(EnWallmas), offsetof(EnWallmas, skelAnime), offsetof(EnWallmas, actionFunc), offsetof(EnWallmas, jointTable), 25, offsetof(EnWallmas, morphTable), 25, EnWallmas_ActionFuncs, 14, EnWallmas_Fields, 3 },
+    { ACTOR_EN_WEATHER_TAG, sizeof(EnWeatherTag), 0, offsetof(EnWeatherTag, actionFunc), 0, 0, 0, 0, EnWeatherTag_ActionFuncs, 15, EnWeatherTag_Fields, 1 },
     { ACTOR_EN_WEIYER, sizeof(EnWeiyer), offsetof(EnWeiyer, skelAnime), offsetof(EnWeiyer, actionFunc), offsetof(EnWeiyer, jointTable), 19, offsetof(EnWeiyer, morphTable), 19, EnWeiyer_ActionFuncs, 11, EnWeiyer_Fields, 4 },
     { ACTOR_EN_WF, sizeof(EnWf), offsetof(EnWf, skelAnime), offsetof(EnWf, actionFunc), offsetof(EnWf, jointTable), 34, offsetof(EnWf, morphTable), 34, EnWf_ActionFuncs, 14, EnWf_Fields, 17 },
+    { ACTOR_EN_YABUSAME_MARK, sizeof(EnYabusameMark), 0, offsetof(EnYabusameMark, actionFunc), 0, 0, 0, 0, EnYabusameMark_ActionFuncs, 1, EnYabusameMark_Fields, 7 },
     { ACTOR_EN_ZF, sizeof(EnZf), offsetof(EnZf, skelAnime), offsetof(EnZf, actionFunc), offsetof(EnZf, jointTable), 49, offsetof(EnZf, morphTable), 49, EnZf_ActionFuncs, 18, EnZf_Fields, 19 },
     { ACTOR_EN_ZL4, sizeof(EnZl4), offsetof(EnZl4, skelAnime), offsetof(EnZl4, actionFunc), offsetof(EnZl4, jointTable), 18, offsetof(EnZl4, morphTable), 18, EnZl4_ActionFuncs, 3, EnZl4_Fields, 12 },
     { ACTOR_EN_ZO, sizeof(EnZo), offsetof(EnZo, skelAnime), offsetof(EnZo, actionFunc), offsetof(EnZo, jointTable), 20, offsetof(EnZo, morphTable), 20, EnZo_ActionFuncs, 5, EnZo_Fields, 10 },
+    { ACTOR_EN_FHG, sizeof(EnfHG), 0, offsetof(EnfHG, actionFunc), 0, 0, 0, 0, EnfHG_ActionFuncs, 6, EnfHG_Fields, 1 },
+    { ACTOR_ITEM_ETCETERA, sizeof(ItemEtcetera), 0, offsetof(ItemEtcetera, futureActionFunc), 0, 0, 0, 0, ItemEtcetera_ActionFuncs, 2, ItemEtcetera_Fields, 3 },
+    { ACTOR_ITEM_INBOX, sizeof(ItemInbox), 0, offsetof(ItemInbox, actionFunc), 0, 0, 0, 0, ItemInbox_ActionFuncs, 1, NULL, 0 },
+    { ACTOR_ITEM_OCARINA, sizeof(ItemOcarina), 0, offsetof(ItemOcarina, actionFunc), 0, 0, 0, 0, ItemOcarina_ActionFuncs, 7, ItemOcarina_Fields, 1 },
+    { ACTOR_ITEM_SHIELD, sizeof(ItemShield), 0, offsetof(ItemShield, actionFunc), 0, 0, 0, 0, ItemShield_ActionFuncs, 4, NULL, 0 },
+    { ACTOR_OBJ_BEAN, sizeof(ObjBean), 0, offsetof(ObjBean, actionFunc), 0, 0, 0, 0, ObjBean_ActionFuncs, 17, ObjBean_Fields, 22 },
+    { ACTOR_OBJ_COMB, sizeof(ObjComb), 0, offsetof(ObjComb, actionFunc), 0, 0, 0, 0, ObjComb_ActionFuncs, 1, ObjComb_Fields, 2 },
+    { ACTOR_OBJ_ELEVATOR, sizeof(ObjElevator), 0, offsetof(ObjElevator, actionFunc), 0, 0, 0, 0, ObjElevator_ActionFuncs, 2, ObjElevator_Fields, 3 },
+    { ACTOR_OBJ_HSBLOCK, sizeof(ObjHsblock), 0, offsetof(ObjHsblock, actionFunc), 0, 0, 0, 0, ObjHsblock_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_OBJ_ICE_POLY, sizeof(ObjIcePoly), 0, offsetof(ObjIcePoly, actionFunc), 0, 0, 0, 0, ObjIcePoly_ActionFuncs, 2, ObjIcePoly_Fields, 3 },
+    { ACTOR_OBJ_KIBAKO, sizeof(ObjKibako), 0, offsetof(ObjKibako, actionFunc), 0, 0, 0, 0, ObjKibako_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_OBJ_KIBAKO2, sizeof(ObjKibako2), 0, offsetof(ObjKibako2, actionFunc), 0, 0, 0, 0, ObjKibako2_ActionFuncs, 2, ObjKibako2_Fields, 1 },
+    { ACTOR_OBJ_LIFT, sizeof(ObjLift), 0, offsetof(ObjLift, actionFunc), 0, 0, 0, 0, ObjLift_ActionFuncs, 3, ObjLift_Fields, 2 },
+    { ACTOR_OBJ_LIGHTSWITCH, sizeof(ObjLightswitch), 0, offsetof(ObjLightswitch, actionFunc), 0, 0, 0, 0, ObjLightswitch_ActionFuncs, 6, ObjLightswitch_Fields, 8 },
+    { ACTOR_OBJ_MAKEKINSUTA, sizeof(ObjMakekinsuta), 0, offsetof(ObjMakekinsuta, actionFunc), 0, 0, 0, 0, ObjMakekinsuta_ActionFuncs, 2, ObjMakekinsuta_Fields, 2 },
+    { ACTOR_OBJ_MURE, sizeof(ObjMure), 0, offsetof(ObjMure, actionFunc), 0, 0, 0, 0, ObjMure_ActionFuncs, 3, ObjMure_Fields, 8 },
+    { ACTOR_OBJ_MURE2, sizeof(ObjMure2), 0, offsetof(ObjMure2, actionFunc), 0, 0, 0, 0, ObjMure2_ActionFuncs, 3, ObjMure2_Fields, 2 },
+    { ACTOR_OBJ_MURE3, sizeof(ObjMure3), 0, offsetof(ObjMure3, actionFunc), 0, 0, 0, 0, ObjMure3_ActionFuncs, 3, ObjMure3_Fields, 1 },
+    { ACTOR_OBJ_OSHIHIKI, sizeof(ObjOshihiki), 0, offsetof(ObjOshihiki, actionFunc), 0, 0, 0, 0, ObjOshihiki_ActionFuncs, 4, ObjOshihiki_Fields, 14 },
+    { ACTOR_OBJ_ROOMTIMER, sizeof(ObjRoomtimer), 0, offsetof(ObjRoomtimer, actionFunc), 0, 0, 0, 0, ObjRoomtimer_ActionFuncs, 2, ObjRoomtimer_Fields, 1 },
+    { ACTOR_OBJ_TIMEBLOCK, sizeof(ObjTimeblock), 0, offsetof(ObjTimeblock, actionFunc), 0, 0, 0, 0, ObjTimeblock_ActionFuncs, 4, ObjTimeblock_Fields, 9 },
+    { ACTOR_OBJ_TSUBO, sizeof(ObjTsubo), 0, offsetof(ObjTsubo, actionFunc), 0, 0, 0, 0, ObjTsubo_ActionFuncs, 4, ObjTsubo_Fields, 1 },
+    { ACTOR_OBJ_WARP2BLOCK, sizeof(ObjWarp2block), 0, offsetof(ObjWarp2block, actionFunc), 0, 0, 0, 0, ObjWarp2block_ActionFuncs, 3, ObjWarp2block_Fields, 5 },
+    { ACTOR_OCEFF_SPOT, sizeof(OceffSpot), 0, offsetof(OceffSpot, actionFunc), 0, 0, 0, 0, OceffSpot_ActionFuncs, 3, NULL, 0 },
+    { ACTOR_OCEFF_STORM, sizeof(OceffStorm), 0, offsetof(OceffStorm, actionFunc), 0, 0, 0, 0, OceffStorm_ActionFuncs, 2, NULL, 0 },
+    { ACTOR_SHOT_SUN, sizeof(ShotSun), 0, offsetof(ShotSun, actionFunc), 0, 0, 0, 0, ShotSun_ActionFuncs, 4, ShotSun_Fields, 3 },
     { -1, 0, 0, 0, 0, 0, 0, 0, NULL, 0, NULL, 0 }  // Terminator
 };
 

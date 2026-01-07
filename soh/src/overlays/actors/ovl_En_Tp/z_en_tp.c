@@ -7,6 +7,7 @@
 #include "z_en_tp.h"
 #include "objects/object_tp/object_tp.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS 0
 
@@ -241,7 +242,11 @@ void EnTp_Head_SetupApproachPlayer(EnTp* this) {
 }
 
 void EnTp_Head_ApproachPlayer(EnTp* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
 
     Math_SmoothStepToF(&this->actor.world.pos.y, player->actor.world.pos.y + 30.0f, 1.0f, 0.5f, 0.0f);
     Audio_PlaySoundGeneral(NA_SE_EN_TAIL_FLY - SFX_FLAG, &this->actor.projectedPos, 4, &gSfxDefaultFreqAndVolScale,
@@ -664,6 +669,14 @@ void EnTp_Update(Actor* thisx, PlayState* play) {
 
     if (this->actor.colChkInfo.health != 0) {
         EnTp_UpdateDamage(this, play);
+    }
+
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
     }
 
     this->actionFunc(this, play);

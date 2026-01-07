@@ -6,6 +6,7 @@
 
 #include "z_en_anubice_tag.h"
 #include "vt.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -78,12 +79,19 @@ void EnAnubiceTag_ManageAnubis(EnAnubiceTag* this, PlayState* play) {
         return;
     }
 
-    if (this->actor.xzDistToPlayer < (200.0f + this->triggerRange)) {
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+    s16 yawToTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
+
+    if (distToTarget < (200.0f + this->triggerRange)) {
         if (!anubis->isLinkOutOfRange) {
             if (!anubis->isKnockedback) {
                 anubis->isMirroringLink = true;
-                offset.x = -Math_SinS(this->actor.yawTowardsPlayer) * this->actor.xzDistToPlayer;
-                offset.z = -Math_CosS(this->actor.yawTowardsPlayer) * this->actor.xzDistToPlayer;
+                offset.x = -Math_SinS(yawToTarget) * distToTarget;
+                offset.z = -Math_CosS(yawToTarget) * distToTarget;
                 Math_ApproachF(&anubis->actor.world.pos.x, (this->actor.world.pos.x + offset.x), 0.3f, 10.0f);
                 Math_ApproachF(&anubis->actor.world.pos.z, (this->actor.world.pos.z + offset.z), 0.3f, 10.0f);
                 return;
