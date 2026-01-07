@@ -11,94 +11,143 @@ extern "C" {
 extern PlayState* gPlayState;
 }
 
-// Map of actor IDs to skelAnime offsets within their struct
-static const std::map<s16, size_t> actorSkelAnimeOffsets = {
-    // Enemies - Offset 0x014C (most common)
-    { ACTOR_EN_TITE, 0x014C },      // Tektite
-    { ACTOR_EN_PEEHAT, 0x014C },    // Peahat
-    { ACTOR_EN_DEKUNUTS, 0x014C },  // Deku Scrub
-    { ACTOR_EN_DODONGO, 0x014C },   // Dodongo
-    { ACTOR_EN_ST, 0x014C },        // Skulltula
-    { ACTOR_EN_BB, 0x014C },        // Bubble
-    { ACTOR_EN_POH, 0x014C },       // Poe
-    { ACTOR_EN_OKUTA, 0x014C },     // Octorok
-    { ACTOR_EN_WALLMAS, 0x014C },   // Wallmaster
-    { ACTOR_EN_FLOORMAS, 0x014C },  // Floormaster
-    { ACTOR_EN_ZF, 0x014C },        // Lizalfos
-    { ACTOR_EN_VALI, 0x014C },      // Bari
-    { ACTOR_EN_BILI, 0x014C },      // Biri
-    { ACTOR_EN_DODOJR, 0x014C },    // Baby Dodongo
-    { ACTOR_EN_BW, 0x014C },        // Torch Slug
-    { ACTOR_EN_SW, 0x014C },        // Skullwalltula
-    { ACTOR_EN_SB, 0x014C },        // Shell Blade
-    { ACTOR_EN_WEIYER, 0x014C },    // Stinger
-    { ACTOR_EN_IK, 0x014C },        // Iron Knuckle
-    { ACTOR_EN_FW, 0x014C },        // Flare Dancer core
-    { ACTOR_EN_FD, 0x014C },        // Flare Dancer
-    { ACTOR_EN_DH, 0x014C },        // Dead Hand
-    { ACTOR_EN_DHA, 0x014C },       // Dead Hand's Hand
-    { ACTOR_EN_VM, 0x014C },        // Beamos
-    { ACTOR_EN_SKB, 0x014C },       // Stalchild
-    { ACTOR_EN_SKJ, 0x014C },       // Skull Kid
-    { ACTOR_EN_KAREBABA, 0x014C },  // Withered Deku Baba
-    { ACTOR_EN_ANUBICE, 0x014C },   // Anubis
-    { ACTOR_EN_HINTNUTS, 0x014C },  // Hint Deku Scrub
-    { ACTOR_EN_SHOPNUTS, 0x014C },  // Business Deku Scrub
-    { ACTOR_EN_DNS, 0x014C },       // Deku Salesman
-    { ACTOR_EN_BIGOKUTA, 0x014C },  // Big Octo
-    { ACTOR_EN_PO_FIELD, 0x014C },  // Big Poe
-    { ACTOR_EN_PO_DESERT, 0x014C }, // Desert Poe
-    { ACTOR_EN_PO_SISTERS, 0x014C },// Poe Sisters
-    { ACTOR_EN_PO_RELAY, 0x014C },  // Poe Guide
-    { ACTOR_EN_SSH, 0x014C },       // Cursed Spider
-    { ACTOR_EN_GOMA, 0x014C },      // Gohma Larva
-    { ACTOR_EN_BUBBLE, 0x014C },    // Shabom
-    { ACTOR_EN_REEBA, 0x014C },     // Leever
-    { ACTOR_EN_EIYER, 0x014C },     // Stinger water
-    { ACTOR_EN_NY, 0x014C },        // Spike
-    { ACTOR_EN_FZ, 0x014C },        // Freezard
-    { ACTOR_EN_RR, 0x014C },        // Like-Like
-    { ACTOR_EN_BA, 0x014C },        // Tentacle
-    { ACTOR_EN_TORCH2, 0x014C },    // Dark Link
+// Map of actor IDs to skelAnime EXTRA offsets beyond sizeof(Actor)
+// Header files assume Actor is 0x14C bytes, but actual sizeof(Actor) differs!
+// Real offset = sizeof(Actor) + extra_offset
+//
+// If header says 0x14C -> extra = 0
+// If header says 0x0164 -> extra = 0x0164 - 0x014C = 0x18
+// If header says 0x0170 -> extra = 0x0170 - 0x014C = 0x24
+// etc.
+static const std::map<s16, size_t> actorSkelAnimeExtraOffsets = {
+    // Enemies - Header offset 0x014C -> extra = 0
+    { ACTOR_EN_TITE, 0 },           // Tektite
+    { ACTOR_EN_PEEHAT, 0 },         // Peahat
+    { ACTOR_EN_DEKUNUTS, 0 },       // Deku Scrub
+    { ACTOR_EN_DODONGO, 0 },        // Dodongo
+    { ACTOR_EN_ST, 0 },             // Skulltula
+    { ACTOR_EN_BB, 0 },             // Bubble
+    { ACTOR_EN_POH, 0 },            // Poe
+    { ACTOR_EN_OKUTA, 0 },          // Octorok
+    { ACTOR_EN_WALLMAS, 0 },        // Wallmaster
+    { ACTOR_EN_FLOORMAS, 0 },       // Floormaster
+    { ACTOR_EN_ZF, 0 },             // Lizalfos
+    { ACTOR_EN_VALI, 0 },           // Bari
+    { ACTOR_EN_BILI, 0 },           // Biri
+    { ACTOR_EN_DODOJR, 0 },         // Baby Dodongo
+    { ACTOR_EN_BW, 0 },             // Torch Slug
+    { ACTOR_EN_SW, 0 },             // Skullwalltula
+    { ACTOR_EN_SB, 0 },             // Shell Blade
+    { ACTOR_EN_WEIYER, 0 },         // Stinger
+    { ACTOR_EN_IK, 0 },             // Iron Knuckle
+    { ACTOR_EN_FW, 0 },             // Flare Dancer core
+    { ACTOR_EN_FD, 0 },             // Flare Dancer
+    { ACTOR_EN_DH, 0 },             // Dead Hand
+    { ACTOR_EN_DHA, 0 },            // Dead Hand's Hand
+    { ACTOR_EN_VM, 0 },             // Beamos
+    { ACTOR_EN_SKB, 0 },            // Stalchild
+    { ACTOR_EN_SKJ, 0 },            // Skull Kid
+    { ACTOR_EN_KAREBABA, 0 },       // Withered Deku Baba
+    { ACTOR_EN_ANUBICE, 0 },        // Anubis
+    { ACTOR_EN_HINTNUTS, 0 },       // Hint Deku Scrub
+    { ACTOR_EN_SHOPNUTS, 0 },       // Business Deku Scrub
+    { ACTOR_EN_DNS, 0 },            // Deku Salesman
+    { ACTOR_EN_BIGOKUTA, 0 },       // Big Octo
+    { ACTOR_EN_PO_FIELD, 0 },       // Big Poe
+    { ACTOR_EN_PO_DESERT, 0 },      // Desert Poe
+    { ACTOR_EN_PO_SISTERS, 0 },     // Poe Sisters
+    { ACTOR_EN_PO_RELAY, 0 },       // Poe Guide
+    { ACTOR_EN_SSH, 0 },            // Cursed Spider
+    { ACTOR_EN_GOMA, 0 },           // Gohma Larva
+    { ACTOR_EN_BUBBLE, 0 },         // Shabom
+    { ACTOR_EN_REEBA, 0 },          // Leever
+    { ACTOR_EN_EIYER, 0 },          // Stinger water
+    { ACTOR_EN_NY, 0 },             // Spike
+    { ACTOR_EN_FZ, 0 },             // Freezard
+    { ACTOR_EN_RR, 0 },             // Like-Like
+    { ACTOR_EN_BA, 0 },             // Tentacle
+    { ACTOR_EN_TORCH2, 0 },         // Dark Link
 
-    // Offset 0x0164
-    { ACTOR_EN_AM, 0x0164 },        // Armos
-    { ACTOR_EN_BROB, 0x0164 },      // Beamos different
-    { ACTOR_EN_JJ, 0x0164 },        // Jabu Jabu
+    // Header offset 0x0164 -> extra = 0x18
+    { ACTOR_EN_AM, 0x18 },          // Armos
+    { ACTOR_EN_BROB, 0x18 },        // Beamos different
+    { ACTOR_EN_JJ, 0x18 },          // Jabu Jabu
 
-    // Offset 0x0170
-    { ACTOR_EN_FIREFLY, 0x0170 },   // Keese
+    // Header offset 0x0170 -> extra = 0x24
+    { ACTOR_EN_FIREFLY, 0x24 },     // Keese
 
-    // Offset 0x017C
-    { ACTOR_EN_DEKUBABA, 0x017C },  // Deku Baba
-    { ACTOR_EN_CROW, 0x017C },      // Guay
+    // Header offset 0x017C -> extra = 0x30
+    { ACTOR_EN_DEKUBABA, 0x30 },    // Deku Baba
+    { ACTOR_EN_CROW, 0x30 },        // Guay
 
-    // Offset 0x0188
-    { ACTOR_EN_TEST, 0x0188 },      // Stalfos
-    { ACTOR_EN_RD, 0x0188 },        // ReDead/Gibdo
-    { ACTOR_EN_WF, 0x0188 },        // Wolfos
-    { ACTOR_EN_GELDB, 0x0188 },     // Gerudo Fighter
+    // Header offset 0x0188 -> extra = 0x3C
+    { ACTOR_EN_TEST, 0x3C },        // Stalfos
+    { ACTOR_EN_RD, 0x3C },          // ReDead/Gibdo
+    { ACTOR_EN_WF, 0x3C },          // Wolfos
+    { ACTOR_EN_GELDB, 0x3C },       // Gerudo Fighter
 
-    // Offset 0x018C
-    { ACTOR_EN_MB, 0x018C },        // Moblin
+    // Header offset 0x018C -> extra = 0x40
+    { ACTOR_EN_MB, 0x40 },          // Moblin
 
-    // Bosses
-    { ACTOR_BOSS_GOMA, 0x014C },
-    { ACTOR_BOSS_DODONGO, 0x014C },
-    { ACTOR_BOSS_VA, 0x014C },
-    { ACTOR_BOSS_GANONDROF, 0x014C },
-    { ACTOR_BOSS_FD, 0x014C },
-    { ACTOR_BOSS_FD2, 0x014C },
-    { ACTOR_BOSS_SST, 0x014C },
-    { ACTOR_BOSS_GANON2, 0x014C },
-    { ACTOR_BOSS_GANON, 0x0150 },
-    { ACTOR_BOSS_TW, 0x0568 },
+    // Bosses - Header offset 0x014C -> extra = 0
+    { ACTOR_BOSS_GOMA, 0 },
+    { ACTOR_BOSS_DODONGO, 0 },
+    { ACTOR_BOSS_VA, 0 },
+    { ACTOR_BOSS_GANONDROF, 0 },
+    { ACTOR_BOSS_FD, 0 },
+    { ACTOR_BOSS_FD2, 0 },
+    { ACTOR_BOSS_SST, 0 },
+    { ACTOR_BOSS_GANON2, 0 },
+    { ACTOR_BOSS_GANON, 0x04 },     // Header 0x0150 -> extra = 0x04
+    { ACTOR_BOSS_TW, 0x41C },       // Header 0x0568 -> extra = 0x41C
+
+    // NPCs - Type A: skelAnime right after Actor (extra = 0)
+    { ACTOR_EN_SA, 0 },             // Saria
+    { ACTOR_EN_MD, 0 },             // Mido
+    { ACTOR_EN_MA1, 0 },            // Malon child
+    { ACTOR_EN_MA2, 0 },            // Malon adult
+    { ACTOR_EN_MA3, 0 },            // Malon child castle
+    { ACTOR_EN_ZL1, 0 },            // Zelda child
+    { ACTOR_EN_ZL2, 0 },            // Zelda escape
+    { ACTOR_EN_ZL3, 0 },            // Zelda adult
+    { ACTOR_EN_ZL4, 0 },            // Impa and Zelda
+    { ACTOR_EN_RU1, 0 },            // Ruto child
+    { ACTOR_EN_RU2, 0 },            // Ruto adult
+    { ACTOR_EN_NB, 0 },             // Nabooru
+    { ACTOR_EN_TA, 0 },             // Talon
+    { ACTOR_EN_IN, 0 },             // Ingo
+    { ACTOR_EN_KZ, 0 },             // King Zora
+    { ACTOR_EN_GO, 0 },             // Goron
+    { ACTOR_EN_GO2, 0 },            // Goron rolling
+    { ACTOR_EN_ZO, 0 },             // Zora
+    { ACTOR_EN_KO, 0 },             // Kokiri
+    { ACTOR_EN_TK, 0 },             // Dampe
+    { ACTOR_EN_DAIKU, 0 },          // Carpenter
+    { ACTOR_EN_DAIKU_KAKARIKO, 0 }, // Carpenter Kakariko
+    { ACTOR_EN_TORYO, 0 },          // Carpenter Boss
+    { ACTOR_EN_HEISHI1, 0 },        // Castle guard
+    { ACTOR_EN_HEISHI2, 0 },        // Kakariko guard
+    { ACTOR_EN_HEISHI3, 0 },        // Castle guard
+    { ACTOR_EN_HEISHI4, 0 },        // Guard
+    { ACTOR_EN_CS, 0 },             // Graveyard boy
+    { ACTOR_EN_NIW, 0 },            // Cucco
+    { ACTOR_EN_DOG, 0 },            // Dog
+    { ACTOR_EN_FR, 0 },             // Frog
+
+    // NPCs - Type B: skelAnime has 0x4C extra bytes (header 0x198 -> extra = 0x4C)
+    { ACTOR_EN_OWL, 0x4C },         // Kaepora Gaebora
+    { ACTOR_EN_GE1, 0x4C },         // Gerudo white
+    { ACTOR_EN_GE2, 0x4C },         // Gerudo guard
+    { ACTOR_EN_GE3, 0x4C },         // Gerudo purple
+    { ACTOR_EN_HS, 0x4C },          // Grog
+    { ACTOR_EN_HS2, 0x4C },         // Carpenter's son
 };
 
 // List of actor categories to sync
 static const std::set<s16> syncableCategories = {
     ACTORCAT_ENEMY,
     ACTORCAT_BOSS,
+    ACTORCAT_NPC,
 };
 
 /**
@@ -179,14 +228,17 @@ Actor* Anchor::FindActorByUniqueId(u32 uniqueId) {
 
 /**
  * Get the skelAnime pointer for an actor if it's a known type.
+ * Uses sizeof(Actor) + extra_offset because header offsets assume wrong Actor size.
  */
 SkelAnime* Anchor::GetActorSkelAnime(Actor* actor) {
     if (actor == nullptr) return nullptr;
 
-    auto it = actorSkelAnimeOffsets.find(actor->id);
-    if (it == actorSkelAnimeOffsets.end()) return nullptr;
+    auto it = actorSkelAnimeExtraOffsets.find(actor->id);
+    if (it == actorSkelAnimeExtraOffsets.end()) return nullptr;
 
-    return reinterpret_cast<SkelAnime*>(reinterpret_cast<uintptr_t>(actor) + it->second);
+    // Real offset = sizeof(Actor) + extra offset for this actor type
+    size_t realOffset = sizeof(Actor) + it->second;
+    return reinterpret_cast<SkelAnime*>(reinterpret_cast<uintptr_t>(actor) + realOffset);
 }
 
 /**
@@ -210,46 +262,57 @@ void Anchor::SendPacket_WorldSnapshot() {
 
     // Detect scene change - reset sync state
     if (gPlayState->sceneNum != lastSnapshotSceneNum) {
+        SPDLOG_INFO("[Anchor] Scene changed from {} to {}, resetting snapshot state",
+                    lastSnapshotSceneNum, gPlayState->sceneNum);
         lastSnapshotSceneNum = gPlayState->sceneNum;
         hasReceivedSnapshotThisScene = false;
     }
 
     // Check if there are other players in the same scene
     bool hasOthersInScene = false;
+    static int clientsLogCounter = 0;
+    bool shouldLogClients = (++clientsLogCounter >= 180);  // Every 3 seconds
+    if (shouldLogClients) {
+        clientsLogCounter = 0;
+        SPDLOG_INFO("[Anchor] My sceneNum={}, checking {} clients:", gPlayState->sceneNum, clients.size());
+    }
     for (auto& [clientId, client] : clients) {
+        if (shouldLogClients) {
+            SPDLOG_INFO("[Anchor]   Client {}: name={}, sceneNum={}, online={}, isSaveLoaded={}, self={}",
+                        clientId, client.name, client.sceneNum, client.online, client.isSaveLoaded, client.self);
+        }
         if (client.sceneNum == gPlayState->sceneNum && client.online &&
             client.isSaveLoaded && !client.self) {
             hasOthersInScene = true;
-            break;
         }
     }
-    if (!hasOthersInScene) return;
+    if (!hasOthersInScene) {
+        return;
+    }
 
     // Wait until we've received at least one snapshot from others before broadcasting
     // This ensures we don't overwrite existing state when entering a scene
-    // EXCEPTION: If we have the lowest priority hash among players in this scene, we go first
+    // EXCEPTION: If we have the lowest sessionId among players in this scene, we go first
     // This prevents deadlock when multiple players enter simultaneously
-    // Priority hash = hash(clientId + name) to handle same-PC clients with same config
     if (!hasReceivedSnapshotThisScene) {
-        std::string ownName = CVarGetString(CVAR_REMOTE_ANCHOR("Name"), "");
-        size_t ownPriorityHash = std::hash<std::string>{}(std::to_string(ownClientId) + ownName);
-
         bool hasLowerPriority = false;
         for (auto& [clientId, client] : clients) {
             if (client.sceneNum == gPlayState->sceneNum && client.online &&
                 client.isSaveLoaded && !client.self) {
-                size_t clientPriorityHash = std::hash<std::string>{}(std::to_string(clientId) + client.name);
-                if (clientPriorityHash < ownPriorityHash) {
+                // Use sessionId for priority - lower sessionId goes first
+                if (client.sessionId != 0 && client.sessionId < sessionId) {
                     hasLowerPriority = true;
                     break;
                 }
             }
         }
-        // If someone with a lower priority hash is in the scene, wait for them
+        // If someone with a lower sessionId is in the scene, wait for them to send first
         if (hasLowerPriority) {
             return;
         }
-        // Otherwise, we have priority - start broadcasting
+        // Otherwise, we have priority - mark as ready and start broadcasting
+        SPDLOG_INFO("[Anchor] I have priority (sessionId={}), starting to broadcast", sessionId);
+        hasReceivedSnapshotThisScene = true;  // Prevent re-checking priority every frame
     }
 
     // Rate limit: send at ~15Hz (every 4 frames at 60fps)
@@ -264,9 +327,20 @@ void Anchor::SendPacket_WorldSnapshot() {
     payload["quiet"] = true;  // Don't log these frequent packets
 
     // Broadcast ALL actors - receivers will decide which state to apply
+    int enemyCount = 0, bossCount = 0, npcCount = 0;
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
+            if (cat == ACTORCAT_ENEMY) enemyCount++;
+            if (cat == ACTORCAT_BOSS) bossCount++;
+            if (cat == ACTORCAT_NPC) npcCount++;
+
+            // Skip DummyPlayers (other network players)
+            if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+                actor = actor->next;
+                continue;
+            }
+
             if (actor->update != NULL) {
                 nlohmann::json actorJson;
 
@@ -279,11 +353,13 @@ void Anchor::SendPacket_WorldSnapshot() {
                 actorJson["hp"] = actor->colChkInfo.health;
                 actorJson["dead"] = 0;
 
-                // Animation state if available
-                SkelAnime* skelAnime = GetActorSkelAnime(actor);
-                if (skelAnime != nullptr) {
-                    actorJson["animFrame"] = skelAnime->curFrame;
-                    actorJson["animSpeed"] = skelAnime->playSpeed;
+                // Animation state if available and we have a known offset
+                if (actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
+                    SkelAnime* skelAnime = GetActorSkelAnime(actor);
+                    if (skelAnime != nullptr && skelAnime->animation != nullptr) {
+                        actorJson["animFrame"] = skelAnime->curFrame;
+                        actorJson["animSpeed"] = skelAnime->playSpeed;
+                    }
                 }
 
                 payload["actors"].push_back(actorJson);
@@ -292,10 +368,10 @@ void Anchor::SendPacket_WorldSnapshot() {
         }
     }
 
-    // Only send if we have actors to sync
-    if (!payload["actors"].empty()) {
-        SendJsonToRemote(payload);
-    }
+    // Always send snapshot (even if empty) to unblock other players waiting for us
+    SPDLOG_INFO("[Anchor] Sending WORLD_SNAPSHOT with {} actors (enemies={}, bosses={}, npcs={})",
+                payload["actors"].size(), enemyCount, bossCount, npcCount);
+    SendJsonToRemote(payload);
 }
 
 /**
@@ -313,6 +389,8 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     hasReceivedSnapshotThisScene = true;
 
     uint32_t senderClientId = payload["clientId"].get<uint32_t>();
+    SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
+                senderClientId, payload["actors"].size());
 
     for (const auto& actorJson : payload["actors"]) {
         u32 uniqueId = actorJson["uid"].get<u32>();
@@ -357,13 +435,20 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // Apply health immediately
         actor->colChkInfo.health = health;
 
-        // Apply animation if available
-        if (actorJson.contains("animFrame")) {
+        // Apply animation if available and we have a known offset for this actor type
+        if (actorJson.contains("animFrame") && actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
             SkelAnime* skelAnime = GetActorSkelAnime(actor);
-            if (skelAnime != nullptr) {
-                skelAnime->curFrame = actorJson["animFrame"].get<f32>();
-                if (actorJson.contains("animSpeed")) {
-                    skelAnime->playSpeed = actorJson["animSpeed"].get<f32>();
+            if (skelAnime != nullptr && skelAnime->animation != nullptr) {
+                f32 animFrame = actorJson["animFrame"].get<f32>();
+                // Sanity check - animFrame should be reasonable (0 to 10000)
+                if (animFrame >= 0.0f && animFrame < 10000.0f) {
+                    skelAnime->curFrame = animFrame;
+                    if (actorJson.contains("animSpeed")) {
+                        f32 animSpeed = actorJson["animSpeed"].get<f32>();
+                        if (animSpeed >= -10.0f && animSpeed <= 10.0f) {
+                            skelAnime->playSpeed = animSpeed;
+                        }
+                    }
                 }
             }
         }

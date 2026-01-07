@@ -31,6 +31,7 @@ typedef struct {
     bool isGameComplete;
     s16 sceneNum;
     s32 entranceIndex;
+    uint64_t sessionId;  // Random ID generated at startup for priority tie-breaking
 
     // Only available in PLAYER_UPDATE packets
     s32 linkAge;
@@ -105,6 +106,7 @@ class Anchor : public Network {
     std::mutex incomingPacketQueueMutex;
     std::queue<nlohmann::json> outgoingPacketQueue;
     std::mutex outgoingPacketQueueMutex;
+    uint64_t sessionId = 0;  // Random ID generated at startup for priority tie-breaking
 
     nlohmann::json PrepClientState();
     nlohmann::json PrepRoomState();

@@ -18,6 +18,13 @@ void Anchor::Enable() {
                     CVarGetInteger(CVAR_REMOTE_ANCHOR("Port"), 43383));
     ownClientId = CVarGetInteger(CVAR_REMOTE_ANCHOR("LastClientId"), 0);
     roomState.ownerClientId = 0;
+
+    // Generate a random session ID for priority tie-breaking in world sync
+    // This helps distinguish multiple clients on the same PC with the same config
+    sessionId = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    sessionId ^= (uint64_t)rand() << 32;  // Add some randomness
+    SPDLOG_INFO("[Anchor] Session ID: {}", sessionId);
 }
 
 void Anchor::Disable() {

@@ -27,6 +27,7 @@ nlohmann::json Anchor::PrepClientState() {
     payload["clientVersion"] = clientVersion;
     payload["teamId"] = CVarGetString(CVAR_REMOTE_ANCHOR("TeamId"), "default");
     payload["online"] = true;
+    payload["sessionId"] = sessionId;
 
     if (IsSaveLoaded()) {
         payload["seed"] = IS_RANDO ? Rando::Context::GetInstance()->GetSeed() : 0;
@@ -69,5 +70,9 @@ void Anchor::HandlePacket_UpdateClientState(nlohmann::json payload) {
         clients[clientId].isGameComplete = client.isGameComplete;
         clients[clientId].sceneNum = client.sceneNum;
         clients[clientId].entranceIndex = client.entranceIndex;
+        // sessionId is optional for backward compatibility
+        if (payload["state"].contains("sessionId")) {
+            clients[clientId].sessionId = payload["state"]["sessionId"].get<uint64_t>();
+        }
     }
 }
