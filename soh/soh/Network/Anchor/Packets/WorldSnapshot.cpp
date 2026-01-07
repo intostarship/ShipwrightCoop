@@ -674,11 +674,21 @@ void Anchor::SendPacket_WorldSnapshot() {
     }
 
     // Detect destroyed actors: were in lastSentActorInfo but not in currentSentActorInfo
+    // IMPORTANT: Only mark as destroyed if the actor is ACTUALLY dead (doesn't exist anymore)
+    // Not just if we stopped owning it (ownership can transfer to another player)
     for (auto& [networkId, info] : lastSentActorInfo) {
         if (currentSentActorInfo.find(networkId) == currentSentActorInfo.end()) {
-            // This actor was alive last frame but isn't now - it's destroyed
-            // Only add if not already in destroyedActors
-            if (destroyedActors.find(networkId) == destroyedActors.end()) {
+            // We stopped sending this actor - check if it's ACTUALLY dead or just ownership changed
+            Actor* actor = FindActorByNetworkId(networkId);
+            if (actor == nullptr) {
+                // Try to find by type + position
+                actor = FindActorByTypeAndPosition(info.actorId, info.params, info.homePos);
+            }
+
+            // Only mark as destroyed if actor doesn't exist OR is dead (update == NULL)
+            bool isActuallyDead = (actor == nullptr || actor->update == nullptr);
+
+            if (isActuallyDead && destroyedActors.find(networkId) == destroyedActors.end()) {
                 destroyedActors[networkId] = info;
                 SPDLOG_INFO("[Anchor] Detected destroyed actor: id={} networkId={} room={}",
                             info.actorId, networkId, info.room);
