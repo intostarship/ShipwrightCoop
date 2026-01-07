@@ -480,6 +480,13 @@ void Anchor::SendPacket_WorldSnapshot() {
     }
     payload["infTable"] = infTable;
 
+    // Include time of day and weather - synced from host (lowest sessionId)
+    // This ensures all players see the same day/night cycle and weather
+    payload["dayTime"] = gSaveContext.dayTime;
+    payload["nightFlag"] = gSaveContext.nightFlag;
+    payload["totalDays"] = gSaveContext.totalDays;
+    payload["weatherMode"] = gWeatherMode;
+
     // Send only actors we OWN (we're the closest player to them)
     // Receivers will apply this state because we're the authority
     int enemyCount = 0, bossCount = 0, npcCount = 0, ownedCount = 0;
@@ -636,6 +643,47 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         auto& infFlags = payload["infTable"];
         for (size_t i = 0; i < infFlags.size() && i < ARRAY_COUNT(gSaveContext.infTable); i++) {
             gSaveContext.infTable[i] |= infFlags[i].get<u16>();
+        }
+    }
+
+    // Apply time of day and weather ONLY if sender is the host (lowest sessionId)
+    // This ensures everyone sees the same day/night cycle and weather
+    if (payload.contains("dayTime")) {
+        // Check if sender has the lowest sessionId among all online clients in this scene
+        bool senderIsHost = true;
+        uint64_t senderSessionId = 0;
+
+        // Get sender's sessionId
+        if (clients.contains(senderClientId)) {
+            senderSessionId = clients[senderClientId].sessionId;
+        }
+
+        // Check if any other client (including us) has a lower sessionId
+        for (auto& [clientId, client] : clients) {
+            if (client.sceneNum == gPlayState->sceneNum && client.online && client.isSaveLoaded) {
+                if (client.sessionId != 0 && client.sessionId < senderSessionId) {
+                    senderIsHost = false;
+                    break;
+                }
+            }
+        }
+
+        // Also check our own sessionId
+        if (sessionId != 0 && sessionId < senderSessionId) {
+            senderIsHost = false;
+        }
+
+        if (senderIsHost && senderSessionId != 0) {
+            gSaveContext.dayTime = payload["dayTime"].get<u16>();
+            if (payload.contains("nightFlag")) {
+                gSaveContext.nightFlag = payload["nightFlag"].get<s32>();
+            }
+            if (payload.contains("totalDays")) {
+                gSaveContext.totalDays = payload["totalDays"].get<s32>();
+            }
+            if (payload.contains("weatherMode")) {
+                gWeatherMode = payload["weatherMode"].get<u8>();
+            }
         }
     }
 
