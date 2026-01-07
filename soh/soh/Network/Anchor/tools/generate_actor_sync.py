@@ -315,16 +315,18 @@ def parse_source(source_path: Path, actor_info: ActorInfo) -> None:
     action_funcs = set()
 
     # Function names to skip (not real action functions)
-    skip_names = {'actionFunc', 'NULL', 'func', 'Function', 'Callback'}
+    skip_names = {'actionFunc', 'NULL', 'func', 'Function', 'Callback', 'arg1', 'arg0'}
+    # Prefixes that indicate macros, not real functions
+    skip_prefixes = ('SKJ_ACTION_',)
 
     for match in setup_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name not in skip_names:
+        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes):
             action_funcs.add(func_name)
 
     for match in direct_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name not in skip_names:
+        if func_name not in skip_names and not any(func_name.startswith(p) for p in skip_prefixes):
             action_funcs.add(func_name)
 
     actor_info.action_funcs = sorted(list(action_funcs))
@@ -387,11 +389,13 @@ def generate_c_code(actors: List[ActorInfo]) -> str:
     lines.append("#include <stdint.h>")
     lines.append("")
 
-    # Forward declarations for action functions
+    # Forward declarations for action functions (in C files, need extern "C")
     lines.append("// Forward declarations for action functions")
+    lines.append("extern \"C\" {")
     for actor in actors:
         for func in actor.action_funcs:
             lines.append(f"void {func}(struct {actor.name}*, PlayState*);")
+    lines.append("}")
     lines.append("")
 
     # Function tables

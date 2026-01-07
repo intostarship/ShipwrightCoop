@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 // Forward declarations for action functions
+extern "C" {
 void BgDyYoseizo_CheckMagicAcquired(struct BgDyYoseizo*, PlayState*);
 void BgDyYoseizo_ChooseType(struct BgDyYoseizo*, PlayState*);
 void BgDyYoseizo_CompleteSpinGrow_NoReward(struct BgDyYoseizo*, PlayState*);
@@ -1089,35 +1090,6 @@ void EnSkj_WaitForOfferResponse(struct EnSkj*, PlayState*);
 void EnSkj_WaitForPlayback(struct EnSkj*, PlayState*);
 void EnSkj_WaitToGiveReward(struct EnSkj*, PlayState*);
 void EnSkj_WonOcarinaMiniGame(struct EnSkj*, PlayState*);
-void SKJ_ACTION_FADE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_FIGHT(struct EnSkj*, PlayState*);
-void SKJ_ACTION_NEEDLE_RECOVER(struct EnSkj*, PlayState*);
-void SKJ_ACTION_OCARINA_GAME_IDLE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_OCARINA_GAME_LEAVE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_OCARINA_GAME_PLAY(struct EnSkj*, PlayState*);
-void SKJ_ACTION_OCARINA_GAME_WAIT_FOR_PLAYER(struct EnSkj*, PlayState*);
-void SKJ_ACTION_PICK_NEXT_FIHGT_ACTION(struct EnSkj*, PlayState*);
-void SKJ_ACTION_RESET_FIGHT(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_AFTER_SONG(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_ASK_FOR_MASK(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_CHANGE_MODE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_IDLE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_START_TRADE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_TAKE_MASK(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_FOR_LANDING(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_FOR_LANDING_ANIM(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_FOR_SONG(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_FOR_TEXT(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_IN_RANGE(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WAIT_MASK_TEXT(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WALK_TO_PLAYER(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_SONG_WRONG_SONG(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SARIA_TALK(struct EnSkj*, PlayState*);
-void SKJ_ACTION_SPAWN_DEATH_EFFECT(struct EnSkj*, PlayState*);
-void SKJ_ACTION_UNK14(struct EnSkj*, PlayState*);
-void SKJ_ACTION_WAIT_FOR_DEATH_ANIM(struct EnSkj*, PlayState*);
-void SKJ_ACTION_WAIT_FOR_LAND_ANIM(struct EnSkj*, PlayState*);
-void SKJ_ACTION_WAIT_TO_SHOOT_NEEDLE(struct EnSkj*, PlayState*);
 void EnSsh_Drop(struct EnSsh*, PlayState*);
 void EnSsh_Idle(struct EnSsh*, PlayState*);
 void EnSsh_Land(struct EnSsh*, PlayState*);
@@ -1171,7 +1143,6 @@ void func_80B128D8(struct EnSyatekiNiw*, PlayState*);
 void func_80B129EC(struct EnSyatekiNiw*, PlayState*);
 void EnTa_RunCuccoGame(struct EnTa*, PlayState*);
 void EnTa_TalkGeneralInLonLonHouse(struct EnTa*, PlayState*);
-void arg1(struct EnTa*, PlayState*);
 void func_80B15100(struct EnTa*, PlayState*);
 void func_80B15260(struct EnTa*, PlayState*);
 void func_80B153D4(struct EnTa*, PlayState*);
@@ -1313,6 +1284,7 @@ void EnZo_Standing(struct EnZo*, PlayState*);
 void EnZo_Submerged(struct EnZo*, PlayState*);
 void EnZo_Surface(struct EnZo*, PlayState*);
 void EnZo_TreadWater(struct EnZo*, PlayState*);
+}
 
 // Action function tables
 static void* BgDyYoseizo_ActionFuncs[] = {
@@ -2818,35 +2790,6 @@ static void* EnSkj_ActionFuncs[] = {
     (void*)EnSkj_WaitForPlayback,
     (void*)EnSkj_WaitToGiveReward,
     (void*)EnSkj_WonOcarinaMiniGame,
-    (void*)SKJ_ACTION_FADE,
-    (void*)SKJ_ACTION_FIGHT,
-    (void*)SKJ_ACTION_NEEDLE_RECOVER,
-    (void*)SKJ_ACTION_OCARINA_GAME_IDLE,
-    (void*)SKJ_ACTION_OCARINA_GAME_LEAVE,
-    (void*)SKJ_ACTION_OCARINA_GAME_PLAY,
-    (void*)SKJ_ACTION_OCARINA_GAME_WAIT_FOR_PLAYER,
-    (void*)SKJ_ACTION_PICK_NEXT_FIHGT_ACTION,
-    (void*)SKJ_ACTION_RESET_FIGHT,
-    (void*)SKJ_ACTION_SARIA_SONG_AFTER_SONG,
-    (void*)SKJ_ACTION_SARIA_SONG_ASK_FOR_MASK,
-    (void*)SKJ_ACTION_SARIA_SONG_CHANGE_MODE,
-    (void*)SKJ_ACTION_SARIA_SONG_IDLE,
-    (void*)SKJ_ACTION_SARIA_SONG_START_TRADE,
-    (void*)SKJ_ACTION_SARIA_SONG_TAKE_MASK,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_FOR_LANDING,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_FOR_LANDING_ANIM,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_FOR_SONG,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_FOR_TEXT,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_IN_RANGE,
-    (void*)SKJ_ACTION_SARIA_SONG_WAIT_MASK_TEXT,
-    (void*)SKJ_ACTION_SARIA_SONG_WALK_TO_PLAYER,
-    (void*)SKJ_ACTION_SARIA_SONG_WRONG_SONG,
-    (void*)SKJ_ACTION_SARIA_TALK,
-    (void*)SKJ_ACTION_SPAWN_DEATH_EFFECT,
-    (void*)SKJ_ACTION_UNK14,
-    (void*)SKJ_ACTION_WAIT_FOR_DEATH_ANIM,
-    (void*)SKJ_ACTION_WAIT_FOR_LAND_ANIM,
-    (void*)SKJ_ACTION_WAIT_TO_SHOOT_NEEDLE,
     NULL  // Terminator
 };
 
@@ -2928,7 +2871,6 @@ static void* EnSyatekiNiw_ActionFuncs[] = {
 static void* EnTa_ActionFuncs[] = {
     (void*)EnTa_RunCuccoGame,
     (void*)EnTa_TalkGeneralInLonLonHouse,
-    (void*)arg1,
     (void*)func_80B15100,
     (void*)func_80B15260,
     (void*)func_80B153D4,
@@ -5354,14 +5296,14 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_SB, 0x208, 0x14C, 0x190, 0, 0, EnSb_ActionFuncs, 7, EnSb_Fields, 7 },
     { ACTOR_EN_SHOPNUTS, 0x2BC, 0x14C, 0x190, 18, 18, EnShopnuts_ActionFuncs, 6, EnShopnuts_Fields, 1 },
     { ACTOR_EN_SKB, 0x344, 0x14C, 0x284, 20, 20, EnSkb_ActionFuncs, 8, EnSkb_Fields, 1 },
-    { ACTOR_EN_SKJ, 0x300, 0x14C, 0x274, 19, 19, EnSkj_ActionFuncs, 41, EnSkj_Fields, 20 },
+    { ACTOR_EN_SKJ, 0x300, 0x14C, 0x274, 19, 19, EnSkj_ActionFuncs, 12, EnSkj_Fields, 20 },
     { ACTOR_EN_SSH, 0x5D4, 0x14C, 0x2F8, 30, 30, EnSsh_ActionFuncs, 7, EnSsh_Fields, 20 },
     { ACTOR_EN_ST, 0x57C, 0x14C, 0x190, 30, 30, EnSt_ActionFuncs, 9, EnSt_Fields, 28 },
     { ACTOR_EN_STH, 0x2BC, 0x198, 0x2B8, 16, 16, EnSth_ActionFuncs, 8, NULL, 0 },
     { ACTOR_EN_SW, 0x4D8, 0x14C, 0x190, 30, 30, EnSw_ActionFuncs, 10, EnSw_Fields, 29 },
     { ACTOR_EN_SYATEKI_MAN, 0x22C, 0x14C, 0x1FC, 9, 9, EnSyatekiMan_ActionFuncs, 11, EnSyatekiMan_Fields, 11 },
     { ACTOR_EN_SYATEKI_NIW, 0x38, 0x14C, 0x250, 16, 16, EnSyatekiNiw_ActionFuncs, 6, EnSyatekiNiw_Fields, 38 },
-    { ACTOR_EN_TA, 0x2E8, 0x14C, 0x25C, 17, 17, EnTa_ActionFuncs, 10, EnTa_Fields, 12 },
+    { ACTOR_EN_TA, 0x2E8, 0x14C, 0x25C, 17, 17, EnTa_ActionFuncs, 9, EnTa_Fields, 12 },
     { ACTOR_EN_TAKARA_MAN, 0x238, 0x150, 0x14C, 10, 10, EnTakaraMan_ActionFuncs, 6, EnTakaraMan_Fields, 12 },
     { ACTOR_EN_TEST, 0x928, 0x188, 0x7CC, 61, 61, EnTest_ActionFuncs, 26, EnTest_Fields, 12 },
     { ACTOR_EN_TG, 0x20C, 0x14C, 0x190, 0, 0, EnTg_ActionFuncs, 1, EnTg_Fields, 1 },
