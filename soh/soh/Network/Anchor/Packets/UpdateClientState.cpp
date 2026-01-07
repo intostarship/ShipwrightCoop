@@ -55,24 +55,32 @@ void Anchor::SendPacket_UpdateClientState() {
 }
 
 void Anchor::HandlePacket_UpdateClientState(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-
-    if (clients.contains(clientId)) {
-        AnchorClient client = payload["state"].get<AnchorClient>();
-        clients[clientId].clientId = clientId;
-        clients[clientId].name = client.name;
-        clients[clientId].color = client.color;
-        clients[clientId].clientVersion = client.clientVersion;
-        clients[clientId].teamId = client.teamId;
-        clients[clientId].online = client.online;
-        clients[clientId].seed = client.seed;
-        clients[clientId].isSaveLoaded = client.isSaveLoaded;
-        clients[clientId].isGameComplete = client.isGameComplete;
-        clients[clientId].sceneNum = client.sceneNum;
-        clients[clientId].entranceIndex = client.entranceIndex;
-        // sessionId is optional for backward compatibility
-        if (payload["state"].contains("sessionId")) {
-            clients[clientId].sessionId = payload["state"]["sessionId"].get<uint64_t>();
+    try {
+        if (!payload.contains("clientId") || !payload.contains("state")) {
+            return;
         }
+
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+
+        if (clients.contains(clientId)) {
+            AnchorClient client = payload["state"].get<AnchorClient>();
+            clients[clientId].clientId = clientId;
+            clients[clientId].name = client.name;
+            clients[clientId].color = client.color;
+            clients[clientId].clientVersion = client.clientVersion;
+            clients[clientId].teamId = client.teamId;
+            clients[clientId].online = client.online;
+            clients[clientId].seed = client.seed;
+            clients[clientId].isSaveLoaded = client.isSaveLoaded;
+            clients[clientId].isGameComplete = client.isGameComplete;
+            clients[clientId].sceneNum = client.sceneNum;
+            clients[clientId].entranceIndex = client.entranceIndex;
+            // sessionId is optional for backward compatibility
+            if (payload["state"].contains("sessionId")) {
+                clients[clientId].sessionId = payload["state"]["sessionId"].get<uint64_t>();
+            }
+        }
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_UpdateClientState: {}", e.what());
     }
 }

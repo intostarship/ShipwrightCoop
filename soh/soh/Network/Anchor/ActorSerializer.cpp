@@ -347,7 +347,7 @@ static void DeserializeField(const nlohmann::json& state, Actor* actor, FieldDes
             }
             break;
         case FIELD_TYPE_VEC3F:
-            if (field->arraySize == 1) {
+            if (field->arraySize == 1 && value.contains("x") && value.contains("y") && value.contains("z")) {
                 Vec3f* v = reinterpret_cast<Vec3f*>(ptr);
                 v->x = value["x"].get<f32>();
                 v->y = value["y"].get<f32>();
@@ -355,15 +355,17 @@ static void DeserializeField(const nlohmann::json& state, Actor* actor, FieldDes
             } else if (value.is_array()) {
                 size_t count = std::min(value.size(), (size_t)field->arraySize);
                 for (size_t i = 0; i < count; i++) {
-                    Vec3f* v = &reinterpret_cast<Vec3f*>(ptr)[i];
-                    v->x = value[i]["x"].get<f32>();
-                    v->y = value[i]["y"].get<f32>();
-                    v->z = value[i]["z"].get<f32>();
+                    if (value[i].contains("x") && value[i].contains("y") && value[i].contains("z")) {
+                        Vec3f* v = &reinterpret_cast<Vec3f*>(ptr)[i];
+                        v->x = value[i]["x"].get<f32>();
+                        v->y = value[i]["y"].get<f32>();
+                        v->z = value[i]["z"].get<f32>();
+                    }
                 }
             }
             break;
         case FIELD_TYPE_VEC3S:
-            if (field->arraySize == 1) {
+            if (field->arraySize == 1 && value.contains("x") && value.contains("y") && value.contains("z")) {
                 Vec3s* v = reinterpret_cast<Vec3s*>(ptr);
                 v->x = value["x"].get<s16>();
                 v->y = value["y"].get<s16>();
@@ -371,10 +373,12 @@ static void DeserializeField(const nlohmann::json& state, Actor* actor, FieldDes
             } else if (value.is_array()) {
                 size_t count = std::min(value.size(), (size_t)field->arraySize);
                 for (size_t i = 0; i < count; i++) {
-                    Vec3s* v = &reinterpret_cast<Vec3s*>(ptr)[i];
-                    v->x = value[i]["x"].get<s16>();
-                    v->y = value[i]["y"].get<s16>();
-                    v->z = value[i]["z"].get<s16>();
+                    if (value[i].contains("x") && value[i].contains("y") && value[i].contains("z")) {
+                        Vec3s* v = &reinterpret_cast<Vec3s*>(ptr)[i];
+                        v->x = value[i]["x"].get<s16>();
+                        v->y = value[i]["y"].get<s16>();
+                        v->z = value[i]["z"].get<s16>();
+                    }
                 }
             }
             break;
@@ -397,29 +401,33 @@ void DeserializeActorState(Actor* actor, const nlohmann::json& state) {
     }
 
     // Deserialize jointTable
-    if (state.contains("jointTable")) {
+    if (state.contains("jointTable") && state["jointTable"].is_array()) {
         Vec3s* jointTable = GetActorJointTable(actor, syncInfo);
         if (jointTable != nullptr) {
             const auto& joints = state["jointTable"];
             size_t count = std::min(joints.size(), (size_t)syncInfo->jointCount);
             for (size_t i = 0; i < count; i++) {
-                jointTable[i].x = joints[i]["x"].get<s16>();
-                jointTable[i].y = joints[i]["y"].get<s16>();
-                jointTable[i].z = joints[i]["z"].get<s16>();
+                if (joints[i].contains("x") && joints[i].contains("y") && joints[i].contains("z")) {
+                    jointTable[i].x = joints[i]["x"].get<s16>();
+                    jointTable[i].y = joints[i]["y"].get<s16>();
+                    jointTable[i].z = joints[i]["z"].get<s16>();
+                }
             }
         }
     }
 
     // Deserialize morphTable
-    if (state.contains("morphTable")) {
+    if (state.contains("morphTable") && state["morphTable"].is_array()) {
         Vec3s* morphTable = GetActorMorphTable(actor, syncInfo);
         if (morphTable != nullptr) {
             const auto& morphs = state["morphTable"];
             size_t count = std::min(morphs.size(), (size_t)syncInfo->morphCount);
             for (size_t i = 0; i < count; i++) {
-                morphTable[i].x = morphs[i]["x"].get<s16>();
-                morphTable[i].y = morphs[i]["y"].get<s16>();
-                morphTable[i].z = morphs[i]["z"].get<s16>();
+                if (morphs[i].contains("x") && morphs[i].contains("y") && morphs[i].contains("z")) {
+                    morphTable[i].x = morphs[i]["x"].get<s16>();
+                    morphTable[i].y = morphs[i]["y"].get<s16>();
+                    morphTable[i].z = morphs[i]["z"].get<s16>();
+                }
             }
         }
     }

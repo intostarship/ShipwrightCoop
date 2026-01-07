@@ -43,13 +43,24 @@ void Anchor::SendPacket_UpdateRoomState() {
 }
 
 void Anchor::HandlePacket_UpdateRoomState(nlohmann::json payload) {
-    if (!payload.contains("state")) {
-        return;
-    }
+    try {
+        if (!payload.contains("state")) {
+            return;
+        }
 
-    roomState.ownerClientId = payload["state"]["ownerClientId"].get<uint32_t>();
-    roomState.pvpMode = payload["state"]["pvpMode"].get<u8>();
-    roomState.showLocationsMode = payload["state"]["showLocationsMode"].get<u8>();
-    roomState.teleportMode = payload["state"]["teleportMode"].get<u8>();
-    roomState.syncItemsAndFlags = payload["state"]["syncItemsAndFlags"].get<u8>();
+        const auto& state = payload["state"];
+        if (!state.contains("ownerClientId") || !state.contains("pvpMode") ||
+            !state.contains("showLocationsMode") || !state.contains("teleportMode") ||
+            !state.contains("syncItemsAndFlags")) {
+            return;
+        }
+
+        roomState.ownerClientId = state["ownerClientId"].get<uint32_t>();
+        roomState.pvpMode = state["pvpMode"].get<u8>();
+        roomState.showLocationsMode = state["showLocationsMode"].get<u8>();
+        roomState.teleportMode = state["teleportMode"].get<u8>();
+        roomState.syncItemsAndFlags = state["syncItemsAndFlags"].get<u8>();
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_UpdateRoomState: {}", e.what());
+    }
 }

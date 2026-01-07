@@ -23,12 +23,20 @@ void Anchor::SendPacket_RequestTeleport(uint32_t clientId) {
 }
 
 void Anchor::HandlePacket_RequestTeleport(nlohmann::json payload) {
-    if (!IsSaveLoaded()) {
-        return;
-    }
+    try {
+        if (!IsSaveLoaded()) {
+            return;
+        }
 
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    SendPacket_TeleportTo(clientId);
+        if (!payload.contains("clientId")) {
+            return;
+        }
+
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        SendPacket_TeleportTo(clientId);
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_RequestTeleport: {}", e.what());
+    }
 }
 
 // Reusable function to check if teleporting to a client is allowed

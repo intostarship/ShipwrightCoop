@@ -33,27 +33,35 @@ void Anchor::SendPacket_TeleportTo(uint32_t clientId) {
 }
 
 void Anchor::HandlePacket_TeleportTo(nlohmann::json payload) {
-    if (!IsSaveLoaded()) {
-        return;
+    try {
+        if (!IsSaveLoaded() || gPlayState == nullptr) {
+            return;
+        }
+
+        if (!payload.contains("entranceIndex") || !payload.contains("roomIndex") || !payload.contains("posRot")) {
+            return;
+        }
+
+        s32 entranceIndex = payload["entranceIndex"].get<s32>();
+        s8 roomIndex = payload["roomIndex"].get<s8>();
+        PosRot posRot = payload["posRot"].get<PosRot>();
+
+        gPlayState->nextEntranceIndex = entranceIndex;
+        gPlayState->transitionTrigger = TRANS_TRIGGER_START;
+        gPlayState->transitionType = TRANS_TYPE_INSTANT;
+        gSaveContext.respawn[RESPAWN_MODE_DOWN].entranceIndex = entranceIndex;
+        gSaveContext.respawn[RESPAWN_MODE_DOWN].roomIndex = roomIndex;
+        gSaveContext.respawn[RESPAWN_MODE_DOWN].pos = posRot.pos;
+        gSaveContext.respawn[RESPAWN_MODE_DOWN].yaw = posRot.rot.y;
+        gSaveContext.respawn[RESPAWN_MODE_DOWN].playerParams = 0xDFF;
+        gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
+        gSaveContext.respawnFlag = 1;
+        static HOOK_ID hookId = 0;
+        hookId = REGISTER_VB_SHOULD(VB_INFLICT_VOID_DAMAGE, {
+            *should = false;
+            GameInteractor::Instance->UnregisterGameHookForID<GameInteractor::OnVanillaBehavior>(hookId);
+        });
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_TeleportTo: {}", e.what());
     }
-
-    s32 entranceIndex = payload["entranceIndex"].get<s32>();
-    s8 roomIndex = payload["roomIndex"].get<s8>();
-    PosRot posRot = payload["posRot"].get<PosRot>();
-
-    gPlayState->nextEntranceIndex = entranceIndex;
-    gPlayState->transitionTrigger = TRANS_TRIGGER_START;
-    gPlayState->transitionType = TRANS_TYPE_INSTANT;
-    gSaveContext.respawn[RESPAWN_MODE_DOWN].entranceIndex = entranceIndex;
-    gSaveContext.respawn[RESPAWN_MODE_DOWN].roomIndex = roomIndex;
-    gSaveContext.respawn[RESPAWN_MODE_DOWN].pos = posRot.pos;
-    gSaveContext.respawn[RESPAWN_MODE_DOWN].yaw = posRot.rot.y;
-    gSaveContext.respawn[RESPAWN_MODE_DOWN].playerParams = 0xDFF;
-    gSaveContext.nextTransitionType = TRANS_TYPE_FADE_BLACK_FAST;
-    gSaveContext.respawnFlag = 1;
-    static HOOK_ID hookId = 0;
-    hookId = REGISTER_VB_SHOULD(VB_INFLICT_VOID_DAMAGE, {
-        *should = false;
-        GameInteractor::Instance->UnregisterGameHookForID<GameInteractor::OnVanillaBehavior>(hookId);
-    });
 }

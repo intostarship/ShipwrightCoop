@@ -29,37 +29,53 @@ void Anchor::SendPacket_DamagePlayer(u32 clientId, u8 damageEffect, u8 damage) {
 }
 
 void Anchor::HandlePacket_DamagePlayer(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    if (!clients.contains(clientId) || clients[clientId].player == nullptr) {
-        return;
-    }
-
-    AnchorClient& anchorClient = clients[clientId];
-    Player* otherPlayer = anchorClient.player;
-    Player* self = GET_PLAYER(gPlayState);
-
-    // Prevent incoming damage during cutscenes or item get sequences
-    if (Player_InBlockingCsMode(gPlayState, self) || self->stateFlags1 & PLAYER_STATE1_IN_ITEM_CS ||
-        self->stateFlags1 & PLAYER_STATE1_GETTING_ITEM) {
-        return;
-    }
-
-    u8 damageEffect = payload["damageEffect"].get<u8>();
-    u8 damage = payload["damage"].get<u8>();
-
-    self->actor.colChkInfo.damage = damage * 8; // Arbitrary number currently, need to fine tune
-
-    if (damageEffect == DUMMY_PLAYER_HIT_RESPONSE_FIRE) {
-        for (int i = 0; i < ARRAY_COUNT(self->bodyFlameTimers); i++) {
-            self->bodyFlameTimers[i] = Rand_S16Offset(0, 200);
+    try {
+        if (!payload.contains("clientId") || !payload.contains("damageEffect") || !payload.contains("damage")) {
+            return;
         }
-        self->bodyIsBurning = true;
-    } else if (damageEffect == DUMMY_PLAYER_HIT_RESPONSE_STUN) {
-        self->actor.freezeTimer = 20;
-        Actor_SetColorFilter(&self->actor, 0, 0xFF, 0, 24);
-        return;
-    }
 
-    func_80837C0C(gPlayState, self, damageEffect, 4.0f, 5.0f,
-                  Actor_WorldYawTowardActor(&otherPlayer->actor, &self->actor), 20);
+        if (gPlayState == nullptr) {
+            return;
+        }
+
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        if (!clients.contains(clientId) || clients[clientId].player == nullptr) {
+            return;
+        }
+
+        AnchorClient& anchorClient = clients[clientId];
+        Player* otherPlayer = anchorClient.player;
+        Player* self = GET_PLAYER(gPlayState);
+
+        if (self == nullptr) {
+            return;
+        }
+
+        // Prevent incoming damage during cutscenes or item get sequences
+        if (Player_InBlockingCsMode(gPlayState, self) || self->stateFlags1 & PLAYER_STATE1_IN_ITEM_CS ||
+            self->stateFlags1 & PLAYER_STATE1_GETTING_ITEM) {
+            return;
+        }
+
+        u8 damageEffect = payload["damageEffect"].get<u8>();
+        u8 damage = payload["damage"].get<u8>();
+
+        self->actor.colChkInfo.damage = damage * 8; // Arbitrary number currently, need to fine tune
+
+        if (damageEffect == DUMMY_PLAYER_HIT_RESPONSE_FIRE) {
+            for (int i = 0; i < ARRAY_COUNT(self->bodyFlameTimers); i++) {
+                self->bodyFlameTimers[i] = Rand_S16Offset(0, 200);
+            }
+            self->bodyIsBurning = true;
+        } else if (damageEffect == DUMMY_PLAYER_HIT_RESPONSE_STUN) {
+            self->actor.freezeTimer = 20;
+            Actor_SetColorFilter(&self->actor, 0, 0xFF, 0, 24);
+            return;
+        }
+
+        func_80837C0C(gPlayState, self, damageEffect, 4.0f, 5.0f,
+                      Actor_WorldYawTowardActor(&otherPlayer->actor, &self->actor), 20);
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_DamagePlayer: {}", e.what());
+    }
 }

@@ -45,64 +45,76 @@ void Anchor::SendPacket_GiveItem(u16 modId, s16 getItemId) {
 }
 
 void Anchor::HandlePacket_GiveItem(nlohmann::json payload) {
-    if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
-        return;
-    }
-
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    AnchorClient& client = clients[clientId];
-    u16 modId = payload["modId"].get<u16>();
-    u16 getItemId = payload["getItemId"].get<u16>();
-
-    GetItemEntry getItemEntry;
-    if (modId == MOD_NONE) {
-        getItemEntry = ItemTableManager::Instance->RetrieveItemEntry(MOD_NONE, getItemId);
-    } else {
-        getItemEntry = Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(getItemId)).GetGIEntry_Copy();
-    }
-
-    if (getItemEntry.modIndex == MOD_NONE) {
-        if (getItemEntry.getItemId == GI_SWORD_BGS) {
-            gSaveContext.bgsFlag = true;
+    try {
+        if (!IsSaveLoaded() || !roomState.syncItemsAndFlags || gPlayState == nullptr) {
+            return;
         }
-        Item_Give(gPlayState, getItemEntry.itemId);
-    } else if (getItemEntry.modIndex == MOD_RANDOMIZER) {
-        if (getItemEntry.getItemId == RG_ICE_TRAP) {
-            gSaveContext.ship.pendingIceTrapCount++;
-            incomingIceTrapsFromAnchor++;
+
+        if (!payload.contains("clientId") || !payload.contains("modId") || !payload.contains("getItemId")) {
+            return;
+        }
+
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        if (!clients.contains(clientId)) {
+            return;
+        }
+
+        AnchorClient& client = clients[clientId];
+        u16 modId = payload["modId"].get<u16>();
+        u16 getItemId = payload["getItemId"].get<u16>();
+
+        GetItemEntry getItemEntry;
+        if (modId == MOD_NONE) {
+            getItemEntry = ItemTableManager::Instance->RetrieveItemEntry(MOD_NONE, getItemId);
         } else {
-            Randomizer_Item_Give(gPlayState, getItemEntry);
+            getItemEntry = Rando::StaticData::RetrieveItem(static_cast<RandomizerGet>(getItemId)).GetGIEntry_Copy();
         }
-    }
 
-    // Full heal if getting a heart container or piece
-    if (getItemEntry.gid == GID_HEART_CONTAINER || getItemEntry.gid == GID_HEART_PIECE) {
-        gSaveContext.healthAccumulator = 0x140;
-    }
-
-    // Handle if the player gets a 4th heart piece (usually handled in z_message)
-    s32 heartPieces = (s32)(gSaveContext.inventory.questItems & 0xF0000000) >> (QUEST_HEART_PIECE + 4);
-    if (heartPieces >= 4) {
-        gSaveContext.inventory.questItems &= ~0xF0000000;
-        gSaveContext.inventory.questItems += (heartPieces % 4) << (QUEST_HEART_PIECE + 4);
-        gSaveContext.healthCapacity += 0x10 * (heartPieces / 4);
-        gSaveContext.health += 0x10 * (heartPieces / 4);
-    }
-
-    if (getItemEntry.getItemCategory != ITEM_CATEGORY_JUNK) {
         if (getItemEntry.modIndex == MOD_NONE) {
-            Notification::Emit({
-                .itemIcon = GetTextureForItemId(getItemEntry.itemId),
-                .prefix = client.name,
-                .message = "found",
-                .suffix = SohUtils::GetItemName(getItemEntry.itemId),
-            });
+            if (getItemEntry.getItemId == GI_SWORD_BGS) {
+                gSaveContext.bgsFlag = true;
+            }
+            Item_Give(gPlayState, getItemEntry.itemId);
         } else if (getItemEntry.modIndex == MOD_RANDOMIZER) {
-            Notification::Emit({
-                .prefix = client.name,
-                .message = "found",
-                .suffix = Rando::StaticData::RetrieveItem((RandomizerGet)getItemEntry.getItemId).GetName().english,
-            });
+            if (getItemEntry.getItemId == RG_ICE_TRAP) {
+                gSaveContext.ship.pendingIceTrapCount++;
+                incomingIceTrapsFromAnchor++;
+            } else {
+                Randomizer_Item_Give(gPlayState, getItemEntry);
+            }
         }
+
+        // Full heal if getting a heart container or piece
+        if (getItemEntry.gid == GID_HEART_CONTAINER || getItemEntry.gid == GID_HEART_PIECE) {
+            gSaveContext.healthAccumulator = 0x140;
+        }
+
+        // Handle if the player gets a 4th heart piece (usually handled in z_message)
+        s32 heartPieces = (s32)(gSaveContext.inventory.questItems & 0xF0000000) >> (QUEST_HEART_PIECE + 4);
+        if (heartPieces >= 4) {
+            gSaveContext.inventory.questItems &= ~0xF0000000;
+            gSaveContext.inventory.questItems += (heartPieces % 4) << (QUEST_HEART_PIECE + 4);
+            gSaveContext.healthCapacity += 0x10 * (heartPieces / 4);
+            gSaveContext.health += 0x10 * (heartPieces / 4);
+        }
+
+        if (getItemEntry.getItemCategory != ITEM_CATEGORY_JUNK) {
+            if (getItemEntry.modIndex == MOD_NONE) {
+                Notification::Emit({
+                    .itemIcon = GetTextureForItemId(getItemEntry.itemId),
+                    .prefix = client.name,
+                    .message = "found",
+                    .suffix = SohUtils::GetItemName(getItemEntry.itemId),
+                });
+            } else if (getItemEntry.modIndex == MOD_RANDOMIZER) {
+                Notification::Emit({
+                    .prefix = client.name,
+                    .message = "found",
+                    .suffix = Rando::StaticData::RetrieveItem((RandomizerGet)getItemEntry.getItemId).GetName().english,
+                });
+            }
+        }
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_GiveItem: {}", e.what());
     }
 }
