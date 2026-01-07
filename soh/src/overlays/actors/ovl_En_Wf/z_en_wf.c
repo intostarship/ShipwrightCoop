@@ -434,7 +434,11 @@ void EnWf_Wait(EnWf* this, PlayState* play) {
     s32 pad;
     s16 angle;
 
-    player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    player = (Player*)targetActor;
     SkelAnime_Update(&this->skelAnime);
 
     if (this->unk_2E2 != 0) {
@@ -651,7 +655,11 @@ void EnWf_RunAroundPlayer(EnWf* this, PlayState* play) {
     s32 animPrevFrame;
     s32 animFrameSpeedDiff;
     s32 animSpeed;
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
 
     Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer + this->runAngle, 1, 4000, 1);
 
@@ -818,7 +826,11 @@ void EnWf_SetupRecoilFromBlockedSlash(EnWf* this) {
 }
 
 void EnWf_RecoilFromBlockedSlash(EnWf* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s16 angle1 = player->actor.shape.rot.y - this->actor.shape.rot.y;
     s16 angle2 = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
 
@@ -1087,7 +1099,11 @@ void EnWf_SetupSidestep(EnWf* this, PlayState* play) {
 
     Animation_Change(&this->skelAnime, &gWolfosRunningAnim, 1.0f, 0.0f, lastFrame, ANIMMODE_LOOP_INTERP, -4.0f);
 
-    player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    player = (Player*)targetActor;
     angle = player->actor.shape.rot.y + this->runAngle;
 
     if (Math_SinS(angle - this->actor.yawTowardsPlayer) > 0.0f) {

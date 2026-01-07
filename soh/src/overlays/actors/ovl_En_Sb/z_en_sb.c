@@ -8,6 +8,7 @@
 #include "vt.h"
 #include "objects/object_sb/object_sb.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE)
 
@@ -390,7 +391,7 @@ s32 EnSb_UpdateDamage(EnSb* this, PlayState* play) {
             case 15: // explosions, arrow, hammer, ice arrow, light arrow, spirit arrow, shadow arrow
                 if (EnSb_IsVulnerable(this)) {
                     hitY = this->collider.info.bumper.hitPos.y - this->actor.world.pos.y;
-                    yawDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
+                    yawDiff = Actor_WorldYawTowardActor(&this->actor, &GET_PLAYER(play)->actor) - this->actor.shape.rot.y;
                     if ((hitY < 30.0f) && (hitY > 10.0f) && (yawDiff >= -0x1FFF) && (yawDiff < 0x2000)) {
                         Actor_ApplyDamage(&this->actor);
                         Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 0x50);
@@ -408,7 +409,7 @@ s32 EnSb_UpdateDamage(EnSb* this, PlayState* play) {
             case 13: // all sword damage
                 if (EnSb_IsVulnerable(this)) {
                     hitY = this->collider.info.bumper.hitPos.y - this->actor.world.pos.y;
-                    yawDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
+                    yawDiff = Actor_WorldYawTowardActor(&this->actor, &GET_PLAYER(play)->actor) - this->actor.shape.rot.y;
                     if ((hitY < 30.0f) && (hitY > 10.0f) && (yawDiff >= -0x1FFF) && (yawDiff < 0x2000)) {
                         Actor_ApplyDamage(&this->actor);
                         Actor_SetColorFilter(&this->actor, 0x4000, 0xFF, 0x2000, 0x50);
@@ -464,6 +465,14 @@ void EnSb_Update(Actor* thisx, PlayState* play) {
         Actor_SetFocus(&this->actor, 20.0f);
         Actor_SetScale(&this->actor, 0.006f);
         Actor_MoveXZGravity(&this->actor);
+
+        // Anchor: Target closest player for AI logic
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer != NULL) {
+            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+        }
+
         this->actionFunc(this, play);
         Actor_UpdateBgCheckInfo(play, &this->actor, 20.0f, 20.0f, 20.0f, 5);
         EnSb_UpdateDamage(this, play);

@@ -5,6 +5,7 @@
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Network/Anchor/AnchorHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -536,7 +537,8 @@ void EnDodongo_Walk(EnDodongo* this, PlayState* play) {
     if (targetPlayer == NULL) {
         targetPlayer = &GET_PLAYER(play)->actor;
     }
-    s16 yawDiff = (s16)(this->actor.yawTowardsPlayer - this->actor.shape.rot.y);
+    s16 yawToTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
+    s16 yawDiff = (s16)(yawToTarget - this->actor.shape.rot.y);
 
     yawDiff = ABS(yawDiff);
 
@@ -570,9 +572,13 @@ void EnDodongo_Walk(EnDodongo* this, PlayState* play) {
     }
 
     if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 400.0f) {
-        Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 1, 0x1F4, 0);
+        Math_SmoothStepToS(&this->actor.world.rot.y, yawToTarget, 1, 0x1F4, 0);
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
-        if ((this->actor.xzDistToPlayer < 100.0f) && (yawDiff < 0x1388) && (this->actor.yDistToPlayer < 60.0f)) {
+        
+        f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
+
+        if ((distToTarget < 100.0f) && (yawDiff < 0x1388) && (yDistToTarget < 60.0f)) {
             EnDodongo_SetupBreatheFire(this);
         }
     } else {

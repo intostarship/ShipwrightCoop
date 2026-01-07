@@ -11,6 +11,7 @@
 #include "objects/object_reeba/object_reeba.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -171,7 +172,11 @@ void EnReeba_Destroy(Actor* thisx, PlayState* play) {
 
 void func_80AE4F40(EnReeba* this, PlayState* play) {
     f32 frames = Animation_GetLastFrame(&object_reeba_Anim_0001E4);
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s16 playerSpeed;
 
     Animation_Change(&this->skelanime, &object_reeba_Anim_0001E4, 2.0f, 0.0f, frames, ANIMMODE_LOOP, -10.0f);
@@ -198,7 +203,11 @@ void func_80AE4F40(EnReeba* this, PlayState* play) {
 }
 
 void func_80AE5054(EnReeba* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     f32 playerLinearVel;
 
     SkelAnime_Update(&this->skelanime);
@@ -587,6 +596,15 @@ void EnReeba_Update(Actor* thisx, PlayState* play2) {
     Player* player = GET_PLAYER(play);
 
     func_80AE5EDC(this, play);
+
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+    }
+
     this->actionfunc(this, play);
     Actor_SetScale(&this->actor, this->scale);
 

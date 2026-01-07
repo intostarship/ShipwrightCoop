@@ -8,6 +8,7 @@
 #include "objects/object_wallmaster/object_wallmaster.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_HOOKSHOT_PULLS_PLAYER)
 
@@ -759,19 +760,29 @@ void EnFloormas_JumpAtLink(EnFloormas* this, PlayState* play) {
         this->actor.speedXZ = 0.0f;
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FLOORMASTER_SM_LAND);
         EnFloormas_SetupLand(this);
-    } else if ((this->actor.yDistToPlayer < -10.0f) && (this->collider.base.ocFlags1 & OC1_HIT) &&
-               (&player->actor == this->collider.base.oc)) {
-        play->grabPlayer(play, player);
-        EnFloormas_SetupGrabLink(this, player);
+    } else if ((this->actor.yDistToPlayer < -10.0f) && (this->collider.base.ocFlags1 & OC1_HIT)) {
+        Actor* victim = this->collider.base.oc;
+        // Check if victim is a player (Local or Dummy)
+        if (victim->category == ACTORCAT_PLAYER) {
+            play->grabPlayer(play, (Player*)victim);
+            EnFloormas_SetupGrabLink(this, (Player*)victim);
+        }
     }
 }
 
 void EnFloormas_GrabLink(EnFloormas* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
     EnFloormas* parent;
     EnFloormas* child;
     f32 yDelta;
     f32 xzDelta;
+
+    // Identify victim
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* victim = (Player*)targetActor;
 
     if (SkelAnime_Update(&this->skelAnime)) {
         if (this->skelAnime.playSpeed > 0.0f) {
@@ -793,12 +804,12 @@ void EnFloormas_GrabLink(EnFloormas* this, PlayState* play) {
         xzDelta = -30.0f;
     }
 
-    this->actor.world.pos.y = player->actor.world.pos.y + yDelta;
-    this->actor.world.pos.x = Math_SinS(this->actor.shape.rot.y) * (xzDelta * 0.1f) + player->actor.world.pos.x;
-    this->actor.world.pos.z = Math_CosS(this->actor.shape.rot.y) * (xzDelta * 0.1f) + player->actor.world.pos.z;
+    this->actor.world.pos.y = victim->actor.world.pos.y + yDelta;
+    this->actor.world.pos.x = Math_SinS(this->actor.shape.rot.y) * (xzDelta * 0.1f) + victim->actor.world.pos.x;
+    this->actor.world.pos.z = Math_CosS(this->actor.shape.rot.y) * (xzDelta * 0.1f) + victim->actor.world.pos.z;
 
     // let go
-    if (!(player->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY) || (player->invincibilityTimer < 0)) {
+    if (!(victim->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY) || (victim->invincibilityTimer < 0)) {
         parent = (EnFloormas*)this->actor.parent;
         child = (EnFloormas*)this->actor.child;
 
@@ -816,12 +827,12 @@ void EnFloormas_GrabLink(EnFloormas* this, PlayState* play) {
         this->actor.speedXZ = -3.0f;
         EnFloormas_SetupLand(this);
     } else {
-        // Damage link every 20 frames
-        if ((this->actionTarget % 20) == 0) {
+        // Damage victim every 20 frames - ONLY if it's the local player
+        if (victim == localPlayer && (this->actionTarget % 20) == 0) {
             if (!LINK_IS_ADULT) {
-                Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S_KID);
+                Player_PlaySfx(&victim->actor, NA_SE_VO_LI_DAMAGE_S_KID);
             } else {
-                Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S);
+                Player_PlaySfx(&victim->actor, NA_SE_VO_LI_DAMAGE_S);
             }
             play->damagePlayer(play, -8);
         }
@@ -1045,6 +1056,15 @@ void EnFloormas_Update(Actor* thisx, PlayState* play) {
             EnFloormas_SetupLand(this);
         }
         EnFloormas_ColliderCheck(this, play);
+
+        // Anchor: Target closest player
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer != NULL) {
+            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+        }
+
         this->actionFunc(this, play);
 
         if (this->actionFunc != EnFloormas_TakeDamage) {

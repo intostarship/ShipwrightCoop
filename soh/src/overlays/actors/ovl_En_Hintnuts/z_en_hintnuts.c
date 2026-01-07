@@ -8,6 +8,7 @@
 #include "objects/object_hintnuts/object_hintnuts.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE)
 
@@ -487,6 +488,15 @@ void EnHintnuts_Update(Actor* thisx, PlayState* play) {
 
     if (this->actor.params != 0xA) {
         EnHintnuts_ColliderCheck(this, play);
+
+        // Anchor: Target closest player
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer != NULL) {
+            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+        }
+
         this->actionFunc(this, play);
         if (this->actionFunc != EnHintnuts_Freeze && this->actionFunc != EnHintnuts_BeginFreeze) {
             Actor_MoveXZGravity(&this->actor);
