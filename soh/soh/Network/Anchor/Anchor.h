@@ -59,6 +59,32 @@ typedef struct {
     Player* player;
 } AnchorClient;
 
+// Actor state for world snapshot sync
+typedef struct {
+    u32 uniqueId;           // Unique ID based on actorId + params + spawn position
+    s16 actorId;
+    s16 params;
+    Vec3f pos;
+    Vec3s rot;
+    s16 health;
+    u8 isDead;
+    // Animation state
+    f32 animCurFrame;
+    f32 animPlaySpeed;
+    s16 animIndex;
+} ActorState;
+
+// Interpolation data for smooth actor movement
+typedef struct {
+    Vec3f prevPos;
+    Vec3f targetPos;
+    Vec3s prevRot;
+    Vec3s targetRot;
+    f32 interpAlpha;
+    u32 lastUpdateFrame;
+    bool hasData;
+} ActorInterpData;
+
 typedef struct {
     uint32_t ownerClientId;
     u8 pvpMode;           // 0 = off, 1 = on, 2 = on with friendly fire
@@ -107,6 +133,19 @@ class Anchor : public Network {
     void HandlePacket_UpdateDungeonItems(nlohmann::json payload);
     void HandlePacket_UpdateRoomState(nlohmann::json payload);
     void HandlePacket_UpdateTeamState(nlohmann::json payload);
+    void HandlePacket_WorldSnapshot(nlohmann::json payload);
+
+    // World snapshot helpers
+    std::map<u32, ActorInterpData> actorInterpData;
+    std::mutex actorInterpMutex;
+    u8 snapshotSendCounter = 0;
+
+    u32 GetActorUniqueId(Actor* actor);
+    uint32_t GetClosestPlayerToActor(Actor* actor);
+    bool IsActorOwner(Actor* actor);
+    Actor* FindActorByUniqueId(u32 uniqueId);
+    void ApplyActorInterpolation();
+    SkelAnime* GetActorSkelAnime(Actor* actor);
 
   public:
     uint32_t ownClientId;
@@ -135,6 +174,7 @@ class Anchor : public Network {
     inline static const std::string UPDATE_DUNGEON_ITEMS = "UPDATE_DUNGEON_ITEMS";
     inline static const std::string UPDATE_ROOM_STATE = "UPDATE_ROOM_STATE";
     inline static const std::string UPDATE_TEAM_STATE = "UPDATE_TEAM_STATE";
+    inline static const std::string WORLD_SNAPSHOT = "WORLD_SNAPSHOT";
 
     static Anchor* Instance;
     std::map<uint32_t, AnchorClient> clients;
@@ -173,6 +213,7 @@ class Anchor : public Network {
     void SendPacket_UpdateDungeonItems();
     void SendPacket_UpdateRoomState();
     void SendPacket_UpdateTeamState();
+    void SendPacket_WorldSnapshot();
 };
 
 typedef enum {

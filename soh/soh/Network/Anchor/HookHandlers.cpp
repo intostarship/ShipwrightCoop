@@ -60,6 +60,12 @@ void Anchor::RegisterHooks() {
         if (IsSaveLoaded()) {
             RefreshClientActors();
         }
+
+        // Clear interpolation data on scene change
+        {
+            std::lock_guard<std::mutex> lock(actorInterpMutex);
+            actorInterpData.clear();
+        }
     });
 
     COND_HOOK(OnPresentFileSelect, isConnected, [&]() { SendPacket_UpdateClientState(); });
@@ -93,6 +99,12 @@ void Anchor::RegisterHooks() {
         }
 
         SendPacket_PlayerUpdate();
+
+        // World snapshot sync: send states of actors we own (are closest to)
+        SendPacket_WorldSnapshot();
+
+        // Apply interpolation to actors we don't own
+        ApplyActorInterpolation();
     });
 
     COND_HOOK(OnGameFrameUpdate, isConnected, [&]() { ProcessIncomingPacketQueue(); });

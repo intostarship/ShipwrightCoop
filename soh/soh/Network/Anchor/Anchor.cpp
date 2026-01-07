@@ -103,9 +103,13 @@ void Anchor::OnIncomingJson(nlohmann::json payload) {
         }
     }
 
-    // Handle PLAYER_UPDATE packets immediately, no need to queue
+    // Handle PLAYER_UPDATE and WORLD_SNAPSHOT packets immediately, no need to queue
     if (packetType == PLAYER_UPDATE) {
         HandlePacket_PlayerUpdate(payload);
+        return;
+    }
+    if (packetType == WORLD_SNAPSHOT) {
+        HandlePacket_WorldSnapshot(payload);
         return;
     }
 
