@@ -593,6 +593,11 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         s16 params = actorJson["params"].get<s16>();
         Vec3f homePos = actorJson.contains("home") ? actorJson["home"].get<Vec3f>() : Vec3f{0,0,0};
 
+        // Skip per-player actors (each player has their own instance, don't sync)
+        if (perPlayerActors.count(actorId) > 0) {
+            continue;
+        }
+
         receivedNetworkActorIds.insert(networkActorId);
 
         // Step 1: Try to find actor by networkActorId
