@@ -389,35 +389,11 @@ void Anchor::SendPacket_WorldSnapshot() {
         hasReceivedSnapshotThisScene = false;
         ClearNetworkIds();  // Clear actor network IDs on scene change
 
-        // Check if there are other players already in this scene
-        bool othersAlreadyInScene = false;
-        for (auto& [clientId, client] : clients) {
-            if (client.sceneNum == gPlayState->sceneNum && client.online &&
-                client.isSaveLoaded && !client.self) {
-                othersAlreadyInScene = true;
-                break;
-            }
-        }
-
-        // If others are in the scene, destroy all syncable actors
-        // The first snapshot will recreate them with the correct state
-        if (othersAlreadyInScene) {
-            SPDLOG_INFO("[Anchor] Others already in scene, clearing syncable actors for initial sync");
-            for (int cat : syncableCategories) {
-                Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
-                while (actor != NULL) {
-                    Actor* nextActor = actor->next;
-                    // Skip DummyPlayers
-                    if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
-                        actor = nextActor;
-                        continue;
-                    }
-                    // Kill the actor - it will be respawned from snapshot if it exists
-                    Actor_Kill(actor);
-                    actor = nextActor;
-                }
-            }
-        }
+        // Note: We don't destroy actors here because it's too early in the loading process
+        // and can cause crashes. Instead, we:
+        // 1. Block local spawns via IsWaitingForInitialSync()
+        // 2. Let the first snapshot update existing actors or spawn missing ones
+        // 3. The despawn logic in HandlePacket_WorldSnapshot will remove actors not in the snapshot
     }
 
     // Check if there are other players in the same scene
@@ -607,6 +583,8 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
     // Track which networkActorIds we've seen from this sender (for despawn logic)
     std::set<u32> receivedNetworkActorIds;
+    // Track which local actors were matched to snapshot actors (for initial sync despawn)
+    std::set<Actor*> matchedActors;
 
     for (const auto& actorJson : payload["actors"]) {
         // Get networkActorId (or fall back to legacy uid)
@@ -666,6 +644,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
         // Verify actor ID matches
         if (actor->id != actorId) continue;
+
+        // Mark this actor as matched (for despawn logic)
+        matchedActors.insert(actor);
 
         // Check ownership - only apply remote state if we're NOT the owner
         // If we're the owner (closest to this actor), we keep our local state
@@ -802,19 +783,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                 continue;
             }
 
-            // Check if this actor has a networkActorId
-            auto it = actorToNetworkId.find(actor);
-            if (it != actorToNetworkId.end()) {
-                u32 actorNetworkId = it->second;
-                // If this actor's networkActorId is not in the snapshot, the owner killed it
-                if (receivedNetworkActorIds.find(actorNetworkId) == receivedNetworkActorIds.end()) {
-                    SPDLOG_INFO("[Anchor] Despawning actor id={} networkActorId={} (not in owner's snapshot)",
-                                actor->id, actorNetworkId);
-                    // Clean up the mapping
-                    networkIdToActor.erase(actorNetworkId);
+            // Check if this actor was matched to something in the snapshot
+            if (matchedActors.count(actor) == 0) {
+                // Actor wasn't in the snapshot - despawn it
+                SPDLOG_INFO("[Anchor] Despawning actor id={} (not in snapshot)", actor->id);
+                // Clean up network ID mapping if it exists
+                auto it = actorToNetworkId.find(actor);
+                if (it != actorToNetworkId.end()) {
+                    networkIdToActor.erase(it->second);
                     actorToNetworkId.erase(actor);
-                    Actor_Kill(actor);
                 }
+                Actor_Kill(actor);
             }
 
             actor = nextActor;
