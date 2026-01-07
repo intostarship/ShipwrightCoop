@@ -43,17 +43,28 @@ void Anchor::SendPacket_PlayerUpdate() {
     payload["linkAge"] = gSaveContext.linkAge;
     payload["posRot"]["pos"] = player->actor.world.pos;
     payload["posRot"]["rot"] = player->actor.shape.rot;
-    std::vector<int> jointArray;
-    for (size_t i = 0; i < 24; i++) {
-        Vec3s joint = player->skelAnime.jointTable[i];
-        jointArray.push_back(joint.x);
-        jointArray.push_back(joint.y);
-        jointArray.push_back(joint.z);
-    }
+
+    // Serialize all 5 animation tables (24 joints each)
+    // This gives us 100% accurate animation sync including upper body (arms when holding items)
+    auto serializeTable = [](Vec3s* table) -> std::vector<int> {
+        std::vector<int> arr;
+        arr.reserve(24 * 3);
+        for (size_t i = 0; i < 24; i++) {
+            arr.push_back(table[i].x);
+            arr.push_back(table[i].y);
+            arr.push_back(table[i].z);
+        }
+        return arr;
+    };
+
+    payload["jointTable"] = serializeTable(player->skelAnime.jointTable);
+    payload["morphTable"] = serializeTable(player->skelAnime.morphTable);
+    payload["blendTable"] = serializeTable(player->blendTable);
+    payload["upperJointTable"] = serializeTable(player->upperSkelAnime.jointTable);
+    payload["upperMorphTable"] = serializeTable(player->upperSkelAnime.morphTable);
+
     payload["prevTransl"] = player->skelAnime.prevTransl;
     payload["movementFlags"] = player->skelAnime.movementFlags;
-    payload["jointTable"] = jointArray;
-    payload["upperLimbRot"] = player->upperLimbRot;
     payload["currentBoots"] = player->currentBoots;
     payload["currentShield"] = player->currentShield;
     payload["currentTunic"] = player->currentTunic;
@@ -99,15 +110,25 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
         client.entranceIndex = payload["entranceIndex"].get<s32>();
         client.linkAge = payload["linkAge"].get<s32>();
         client.posRot = payload["posRot"].get<PosRot>();
-        std::vector<int> jointArray = payload["jointTable"];
-        for (int i = 0; i < 24; i++) {
-            client.jointTable[i].x = jointArray[i * 3];
-            client.jointTable[i].y = jointArray[i * 3 + 1];
-            client.jointTable[i].z = jointArray[i * 3 + 2];
-        }
+
+        // Deserialize all 5 animation tables
+        auto deserializeTable = [](const nlohmann::json& arr, Vec3s* table) {
+            std::vector<int> data = arr.get<std::vector<int>>();
+            for (int i = 0; i < 24 && i * 3 + 2 < (int)data.size(); i++) {
+                table[i].x = data[i * 3];
+                table[i].y = data[i * 3 + 1];
+                table[i].z = data[i * 3 + 2];
+            }
+        };
+
+        if (payload.contains("jointTable")) deserializeTable(payload["jointTable"], client.jointTable);
+        if (payload.contains("morphTable")) deserializeTable(payload["morphTable"], client.morphTable);
+        if (payload.contains("blendTable")) deserializeTable(payload["blendTable"], client.blendTable);
+        if (payload.contains("upperJointTable")) deserializeTable(payload["upperJointTable"], client.upperJointTable);
+        if (payload.contains("upperMorphTable")) deserializeTable(payload["upperMorphTable"], client.upperMorphTable);
+
         client.movementFlags = payload["movementFlags"].get<u8>();
         client.prevTransl = payload["prevTransl"].get<Vec3s>();
-        client.upperLimbRot = payload["upperLimbRot"].get<Vec3s>();
         client.currentBoots = payload["currentBoots"].get<s8>();
         client.currentShield = payload["currentShield"].get<s8>();
         client.currentTunic = payload["currentTunic"].get<s8>();

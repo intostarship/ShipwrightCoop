@@ -118,10 +118,19 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     }
 
     actor->shape.shadowAlpha = 255;
-    Math_Vec3s_Copy(&player->upperLimbRot, &client.upperLimbRot);
     Math_Vec3s_Copy(&actor->shape.rot, &client.posRot.rot);
     Math_Vec3f_Copy(&actor->world.pos, &client.posRot.pos);
+
+    // Apply all 5 animation tables for 100% accurate animation sync
+    // This includes upper body animations (arms raised when holding items, etc.)
     player->skelAnime.jointTable = client.jointTable;
+    player->skelAnime.morphTable = client.morphTable;
+    for (int i = 0; i < 24; i++) {
+        player->blendTable[i] = client.blendTable[i];
+    }
+    player->upperSkelAnime.jointTable = client.upperJointTable;
+    player->upperSkelAnime.morphTable = client.upperMorphTable;
+
     player->skelAnime.movementFlags = client.movementFlags;
     Math_Vec3s_Copy(&player->skelAnime.prevTransl, &client.prevTransl);
     player->currentBoots = client.currentBoots;

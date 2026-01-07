@@ -36,10 +36,14 @@ typedef struct {
     // Only available in PLAYER_UPDATE packets
     s32 linkAge;
     PosRot posRot;
-    Vec3s jointTable[24];
+    // Animation tables - must match PLAYER_LIMB_BUF_COUNT (24)
+    Vec3s jointTable[24];       // Lower body animation
+    Vec3s morphTable[24];       // Lower body morph targets
+    Vec3s blendTable[24];       // Animation blending
+    Vec3s upperJointTable[24];  // Upper body animation (arms when holding items!)
+    Vec3s upperMorphTable[24];  // Upper body morph targets
     u8 movementFlags;
     Vec3s prevTransl;
-    Vec3s upperLimbRot;
     s8 currentBoots;
     s8 currentShield;
     s8 currentTunic;
