@@ -436,10 +436,8 @@ void Anchor::SendPacket_WorldSnapshot() {
         hasReceivedSnapshotThisScene = true;  // Prevent re-checking priority every frame
     }
 
-    // Rate limit: send at ~15Hz (every 4 frames at 60fps)
-    snapshotSendCounter++;
-    if (snapshotSendCounter < 4) return;
-    snapshotSendCounter = 0;
+    // No rate limiting - sync at same rate as PlayerUpdate (every frame)
+    // This ensures actors move smoothly alongside Link
 
     nlohmann::json payload;
     payload["type"] = WORLD_SNAPSHOT;
@@ -810,8 +808,8 @@ void Anchor::ApplyActorInterpolation() {
 
         // Apply interpolation to all synced actors
 
-        // Advance interpolation (complete in ~4 frames for 15Hz updates)
-        interp.interpAlpha += 0.25f;
+        // Advance interpolation (complete in 1 frame since we sync every frame)
+        interp.interpAlpha += 1.0f;
         if (interp.interpAlpha > 1.0f) interp.interpAlpha = 1.0f;
 
         // Smoothstep for smoother interpolation
