@@ -14,136 +14,13 @@ extern "C" {
 extern PlayState* gPlayState;
 }
 
-// Map of actor IDs to skelAnime EXTRA offsets beyond sizeof(Actor)
-// Header files assume Actor is 0x14C bytes, but actual sizeof(Actor) differs!
-// Real offset = sizeof(Actor) + extra_offset
-//
-// If header says 0x14C -> extra = 0
-// If header says 0x0164 -> extra = 0x0164 - 0x014C = 0x18
-// If header says 0x0170 -> extra = 0x0170 - 0x014C = 0x24
-// etc.
-static const std::map<s16, size_t> actorSkelAnimeExtraOffsets = {
-    // Enemies - Header offset 0x014C -> extra = 0
-    { ACTOR_EN_TITE, 0 },           // Tektite
-    { ACTOR_EN_PEEHAT, 0 },         // Peahat
-    { ACTOR_EN_DEKUNUTS, 0 },       // Deku Scrub
-    { ACTOR_EN_DODONGO, 0 },        // Dodongo
-    { ACTOR_EN_ST, 0 },             // Skulltula
-    { ACTOR_EN_BB, 0 },             // Bubble
-    { ACTOR_EN_POH, 0 },            // Poe
-    { ACTOR_EN_OKUTA, 0 },          // Octorok
-    { ACTOR_EN_WALLMAS, 0 },        // Wallmaster
-    { ACTOR_EN_FLOORMAS, 0 },       // Floormaster
-    { ACTOR_EN_ZF, 0 },             // Lizalfos
-    { ACTOR_EN_VALI, 0 },           // Bari
-    { ACTOR_EN_BILI, 0 },           // Biri
-    { ACTOR_EN_DODOJR, 0 },         // Baby Dodongo
-    { ACTOR_EN_BW, 0 },             // Torch Slug
-    { ACTOR_EN_SW, 0 },             // Skullwalltula
-    { ACTOR_EN_SB, 0 },             // Shell Blade
-    { ACTOR_EN_WEIYER, 0 },         // Stinger
-    { ACTOR_EN_IK, 0 },             // Iron Knuckle
-    { ACTOR_EN_FW, 0 },             // Flare Dancer core
-    { ACTOR_EN_FD, 0 },             // Flare Dancer
-    { ACTOR_EN_DH, 0 },             // Dead Hand
-    { ACTOR_EN_DHA, 0 },            // Dead Hand's Hand
-    { ACTOR_EN_VM, 0 },             // Beamos
-    { ACTOR_EN_SKB, 0 },            // Stalchild
-    { ACTOR_EN_SKJ, 0 },            // Skull Kid
-    { ACTOR_EN_KAREBABA, 0 },       // Withered Deku Baba
-    { ACTOR_EN_ANUBICE, 0 },        // Anubis
-    { ACTOR_EN_HINTNUTS, 0 },       // Hint Deku Scrub
-    { ACTOR_EN_SHOPNUTS, 0 },       // Business Deku Scrub
-    { ACTOR_EN_DNS, 0 },            // Deku Salesman
-    { ACTOR_EN_BIGOKUTA, 0 },       // Big Octo
-    { ACTOR_EN_PO_FIELD, 0 },       // Big Poe
-    { ACTOR_EN_PO_DESERT, 0 },      // Desert Poe
-    { ACTOR_EN_PO_SISTERS, 0 },     // Poe Sisters
-    { ACTOR_EN_PO_RELAY, 0 },       // Poe Guide
-    { ACTOR_EN_SSH, 0 },            // Cursed Spider
-    { ACTOR_EN_GOMA, 0 },           // Gohma Larva
-    { ACTOR_EN_BUBBLE, 0 },         // Shabom
-    { ACTOR_EN_REEBA, 0 },          // Leever
-    { ACTOR_EN_EIYER, 0 },          // Stinger water
-    { ACTOR_EN_NY, 0 },             // Spike
-    { ACTOR_EN_FZ, 0 },             // Freezard
-    { ACTOR_EN_RR, 0 },             // Like-Like
-    { ACTOR_EN_BA, 0 },             // Tentacle
-    { ACTOR_EN_TORCH2, 0 },         // Dark Link
+// Header files assume Actor is 0x14C bytes, but actual sizeof(Actor) differs at runtime!
+// To convert header offset to real offset: sizeof(Actor) + (headerOffset - 0x14C)
+static const size_t HEADER_ACTOR_SIZE = 0x14C;
 
-    // Header offset 0x0164 -> extra = 0x18
-    { ACTOR_EN_AM, 0x18 },          // Armos
-    { ACTOR_EN_BROB, 0x18 },        // Beamos different
-    { ACTOR_EN_JJ, 0x18 },          // Jabu Jabu
-
-    // Header offset 0x0170 -> extra = 0x24
-    { ACTOR_EN_FIREFLY, 0x24 },     // Keese
-
-    // Header offset 0x017C -> extra = 0x30
-    { ACTOR_EN_DEKUBABA, 0x30 },    // Deku Baba
-    { ACTOR_EN_CROW, 0x30 },        // Guay
-
-    // Header offset 0x0188 -> extra = 0x3C
-    { ACTOR_EN_TEST, 0x3C },        // Stalfos
-    { ACTOR_EN_RD, 0x3C },          // ReDead/Gibdo
-    { ACTOR_EN_WF, 0x3C },          // Wolfos
-    { ACTOR_EN_GELDB, 0x3C },       // Gerudo Fighter
-
-    // Header offset 0x018C -> extra = 0x40
-    { ACTOR_EN_MB, 0x40 },          // Moblin
-
-    // Bosses - Header offset 0x014C -> extra = 0
-    { ACTOR_BOSS_GOMA, 0 },
-    { ACTOR_BOSS_DODONGO, 0 },
-    { ACTOR_BOSS_VA, 0 },
-    { ACTOR_BOSS_GANONDROF, 0 },
-    { ACTOR_BOSS_FD, 0 },
-    { ACTOR_BOSS_FD2, 0 },
-    { ACTOR_BOSS_SST, 0 },
-    { ACTOR_BOSS_GANON2, 0 },
-    { ACTOR_BOSS_GANON, 0x04 },     // Header 0x0150 -> extra = 0x04
-    { ACTOR_BOSS_TW, 0x41C },       // Header 0x0568 -> extra = 0x41C
-
-    // NPCs - Type A: skelAnime right after Actor (extra = 0)
-    { ACTOR_EN_SA, 0 },             // Saria
-    { ACTOR_EN_MD, 0 },             // Mido
-    { ACTOR_EN_MA1, 0 },            // Malon child
-    { ACTOR_EN_MA2, 0 },            // Malon adult
-    { ACTOR_EN_MA3, 0 },            // Malon child castle
-    { ACTOR_EN_ZL1, 0 },            // Zelda child
-    { ACTOR_EN_ZL2, 0 },            // Zelda escape
-    { ACTOR_EN_ZL3, 0 },            // Zelda adult
-    { ACTOR_EN_ZL4, 0 },            // Impa and Zelda
-    { ACTOR_EN_RU1, 0 },            // Ruto child
-    { ACTOR_EN_RU2, 0 },            // Ruto adult
-    { ACTOR_EN_NB, 0 },             // Nabooru
-    { ACTOR_EN_TA, 0 },             // Talon
-    { ACTOR_EN_IN, 0 },             // Ingo
-    { ACTOR_EN_KZ, 0 },             // King Zora
-    { ACTOR_EN_GO, 0 },             // Goron
-    { ACTOR_EN_GO2, 0 },            // Goron rolling
-    { ACTOR_EN_ZO, 0 },             // Zora
-    { ACTOR_EN_KO, 0 },             // Kokiri
-    { ACTOR_EN_TK, 0 },             // Dampe
-    { ACTOR_EN_DAIKU, 0 },          // Carpenter
-    { ACTOR_EN_DAIKU_KAKARIKO, 0 }, // Carpenter Kakariko
-    { ACTOR_EN_TORYO, 0 },          // Carpenter Boss
-    { ACTOR_EN_HEISHI1, 0 },        // Castle guard
-    { ACTOR_EN_HEISHI2, 0 },        // Kakariko guard
-    { ACTOR_EN_HEISHI3, 0 },        // Castle guard
-    { ACTOR_EN_HEISHI4, 0 },        // Guard
-    { ACTOR_EN_CS, 0 },             // Graveyard boy
-    { ACTOR_EN_NIW, 0 },            // Cucco
-    { ACTOR_EN_DOG, 0 },            // Dog
-    { ACTOR_EN_FR, 0 },             // Frog
-
-    // NPCs - Type B: skelAnime has 0x4C extra bytes (header 0x198 -> extra = 0x4C)
-    { ACTOR_EN_OWL, 0x4C },         // Kaepora Gaebora
-    { ACTOR_EN_GE1, 0x4C },         // Gerudo white
-    { ACTOR_EN_GE2, 0x4C },         // Gerudo guard
-    { ACTOR_EN_GE3, 0x4C },         // Gerudo purple
-    { ACTOR_EN_HS, 0x4C },          // Grog
-    { ACTOR_EN_HS2, 0x4C },         // Carpenter's son
+// Actors that should NOT be synced (per-player actors)
+static const std::set<s16> perPlayerActors = {
+    ACTOR_EN_ELF,       // Navi - each player has their own fairy
 };
 
 // List of actor categories to sync - everything with position/rotation
@@ -349,17 +226,17 @@ Actor* Anchor::FindActorByUniqueId(u32 uniqueId) {
 }
 
 /**
- * Get the skelAnime pointer for an actor if it's a known type.
- * Uses sizeof(Actor) + extra_offset because header offsets assume wrong Actor size.
+ * Get the skelAnime pointer for an actor using ActorSyncGenerated.inc data.
+ * Converts header offset to real offset: sizeof(Actor) + (headerOffset - 0x14C)
  */
 SkelAnime* Anchor::GetActorSkelAnime(Actor* actor) {
     if (actor == nullptr) return nullptr;
 
-    auto it = actorSkelAnimeExtraOffsets.find(actor->id);
-    if (it == actorSkelAnimeExtraOffsets.end()) return nullptr;
+    ActorSyncInfo* info = GetActorSyncInfo(actor->id);
+    if (info == nullptr || info->skelAnimeOffset == 0) return nullptr;
 
-    // Real offset = sizeof(Actor) + extra offset for this actor type
-    size_t realOffset = sizeof(Actor) + it->second;
+    // Convert header offset to real runtime offset
+    size_t realOffset = sizeof(Actor) + (info->skelAnimeOffset - HEADER_ACTOR_SIZE);
     return reinterpret_cast<SkelAnime*>(reinterpret_cast<uintptr_t>(actor) + realOffset);
 }
 
@@ -503,6 +380,12 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
+            // Skip per-player actors (each player has their own instance)
+            if (perPlayerActors.count(actor->id) > 0) {
+                actor = actor->next;
+                continue;
+            }
+
             // Only send actors in our current room (or room -1 which means "all rooms")
             s8 curRoom = gPlayState->roomCtx.curRoom.num;
             if (actor->room >= 0 && actor->room != curRoom) {
@@ -547,13 +430,11 @@ void Anchor::SendPacket_WorldSnapshot() {
                 // Scale
                 actorJson["scale"] = actor->scale;
 
-                // Animation state if available and we have a known offset
-                if (actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
-                    SkelAnime* skelAnime = GetActorSkelAnime(actor);
-                    if (skelAnime != nullptr && skelAnime->animation != nullptr) {
-                        actorJson["animFrame"] = skelAnime->curFrame;
-                        actorJson["animSpeed"] = skelAnime->playSpeed;
-                    }
+                // Animation state if available (GetActorSkelAnime uses ActorSyncGenerated.inc)
+                SkelAnime* skelAnime = GetActorSkelAnime(actor);
+                if (skelAnime != nullptr && skelAnime->animation != nullptr) {
+                    actorJson["animFrame"] = skelAnime->curFrame;
+                    actorJson["animSpeed"] = skelAnime->playSpeed;
                 }
 
                 // Full AI state serialization (actionFunc, state variables, jointTable, morphTable)
@@ -839,30 +720,28 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
 
         // Store animation interpolation data if available
-        if (actorJson.contains("animFrame") && actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
-            SkelAnime* skelAnime = GetActorSkelAnime(actor);
-            if (skelAnime != nullptr && skelAnime->animation != nullptr) {
-                f32 targetAnimFrame = actorJson["animFrame"].get<f32>();
-                f32 animSpeed = actorJson.contains("animSpeed") ? actorJson["animSpeed"].get<f32>() : 1.0f;
+        SkelAnime* skelAnime = actorJson.contains("animFrame") ? GetActorSkelAnime(actor) : nullptr;
+        if (skelAnime != nullptr && skelAnime->animation != nullptr) {
+            f32 targetAnimFrame = actorJson["animFrame"].get<f32>();
+            f32 animSpeed = actorJson.contains("animSpeed") ? actorJson["animSpeed"].get<f32>() : 1.0f;
 
-                // Sanity check
-                if (targetAnimFrame >= 0.0f && targetAnimFrame < 10000.0f &&
-                    animSpeed >= -10.0f && animSpeed <= 10.0f) {
-                    std::lock_guard<std::mutex> lock(actorInterpMutex);
-                    ActorInterpData& interp = actorInterpData[networkActorId];
+            // Sanity check
+            if (targetAnimFrame >= 0.0f && targetAnimFrame < 10000.0f &&
+                animSpeed >= -10.0f && animSpeed <= 10.0f) {
+                std::lock_guard<std::mutex> lock(actorInterpMutex);
+                ActorInterpData& interp = actorInterpData[networkActorId];
 
-                    if (!interp.hasAnimData) {
-                        // First update - snap to frame
-                        interp.prevAnimFrame = targetAnimFrame;
-                        interp.targetAnimFrame = targetAnimFrame;
-                        interp.animSpeed = animSpeed;
-                        interp.hasAnimData = true;
-                    } else {
-                        // Subsequent updates - set up interpolation
-                        interp.prevAnimFrame = skelAnime->curFrame;
-                        interp.targetAnimFrame = targetAnimFrame;
-                        interp.animSpeed = animSpeed;
-                    }
+                if (!interp.hasAnimData) {
+                    // First update - snap to frame
+                    interp.prevAnimFrame = targetAnimFrame;
+                    interp.targetAnimFrame = targetAnimFrame;
+                    interp.animSpeed = animSpeed;
+                    interp.hasAnimData = true;
+                } else {
+                    // Subsequent updates - set up interpolation
+                    interp.prevAnimFrame = skelAnime->curFrame;
+                    interp.targetAnimFrame = targetAnimFrame;
+                    interp.animSpeed = animSpeed;
                 }
             }
         }
@@ -950,7 +829,7 @@ void Anchor::ApplyActorInterpolation() {
         actor->shape.rot.z = interp.prevRot.z + (s16)((interp.targetRot.z - interp.prevRot.z) * smooth);
 
         // Interpolate animation frame if we have animation data
-        if (interp.hasAnimData && actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
+        if (interp.hasAnimData) {
             SkelAnime* skelAnime = GetActorSkelAnime(actor);
             if (skelAnime != nullptr && skelAnime->animation != nullptr) {
                 // Interpolate frame, accounting for looping animations
