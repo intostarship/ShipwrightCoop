@@ -150,7 +150,8 @@ class Anchor : public Network {
     std::mutex actorInterpMutex;
     u8 snapshotSendCounter = 0;
     s16 lastSnapshotSceneNum = -1;
-    bool hasReceivedSnapshotThisScene = false;  // Wait for first sync before broadcasting
+    s8 lastSnapshotRoomNum = -1;
+    bool hasReceivedSnapshotThisRoom = false;  // Wait for first sync before broadcasting
 
     // Network ID system - unique IDs assigned by first player in scene
     std::map<Actor*, u32> actorToNetworkId;      // Actor pointer -> network ID

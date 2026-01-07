@@ -102,12 +102,14 @@ void Anchor::RegisterHooks() {
 
         // World snapshot sync: send states of actors we own (are closest to)
         SendPacket_WorldSnapshot();
-
-        // Apply interpolation to actors we don't own
-        ApplyActorInterpolation();
     });
 
-    COND_HOOK(OnGameFrameUpdate, isConnected, [&]() { ProcessIncomingPacketQueue(); });
+    COND_HOOK(OnGameFrameUpdate, isConnected, [&]() {
+        // Process incoming packets first (including WORLD_SNAPSHOT)
+        ProcessIncomingPacketQueue();
+        // Then apply interpolation with the new data
+        ApplyActorInterpolation();
+    });
 
     COND_HOOK(OnPlayerSfx, isConnected, [&](u16 sfxId) { SendPacket_PlayerSfx(sfxId); });
     COND_HOOK(OnOcarinaNote, isConnected,

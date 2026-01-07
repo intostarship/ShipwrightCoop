@@ -258,8 +258,8 @@ Actor* Anchor::FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos
                 continue;
             }
 
-            // Check if type and params match
-            if (actor->id == actorId && actor->params == params) {
+            // Check if type matches (ignore params - they may differ due to randomizer)
+            if (actor->id == actorId) {
                 // Check home position distance
                 f32 dx = actor->home.pos.x - homePos.x;
                 f32 dy = actor->home.pos.y - homePos.y;
@@ -381,48 +381,47 @@ SkelAnime* Anchor::GetActorSkelAnime(Actor* actor) {
 void Anchor::SendPacket_WorldSnapshot() {
     if (!IsSaveLoaded() || gPlayState == nullptr) return;
 
-    // Detect scene change - reset sync state
-    if (gPlayState->sceneNum != lastSnapshotSceneNum) {
-        SPDLOG_INFO("[Anchor] Scene changed from {} to {}, resetting snapshot state",
-                    lastSnapshotSceneNum, gPlayState->sceneNum);
+    // Detect scene or room change - reset sync state
+    s8 curRoom = gPlayState->roomCtx.curRoom.num;
+    if (gPlayState->sceneNum != lastSnapshotSceneNum || curRoom != lastSnapshotRoomNum) {
+        SPDLOG_INFO("[Anchor] Scene/room changed from {}/{} to {}/{}, resetting snapshot state",
+                    lastSnapshotSceneNum, lastSnapshotRoomNum, gPlayState->sceneNum, curRoom);
         lastSnapshotSceneNum = gPlayState->sceneNum;
-        hasReceivedSnapshotThisScene = false;
-        ClearNetworkIds();  // Clear actor network IDs on scene change
-
-        // Note: We don't destroy actors here because it's too early in the loading process
-        // and can cause crashes. Instead, we:
-        // 1. Block local spawns via IsWaitingForInitialSync()
-        // 2. Let the first snapshot update existing actors or spawn missing ones
-        // 3. The despawn logic in HandlePacket_WorldSnapshot will remove actors not in the snapshot
+        lastSnapshotRoomNum = curRoom;
+        hasReceivedSnapshotThisRoom = false;
+        ClearNetworkIds();  // Clear actor network IDs on scene/room change
     }
 
-    // Check if there are other players in the same scene
-    bool hasOthersInScene = false;
+    // Check if there are other players in the same scene AND room
+    // We only sync with players in the exact same room - ignore players in other rooms
+    bool hasOthersInRoom = false;
     static int clientsLogCounter = 0;
     bool shouldLogClients = (++clientsLogCounter >= 180);  // Every 3 seconds
     if (shouldLogClients) {
         clientsLogCounter = 0;
-        SPDLOG_INFO("[Anchor] My sceneNum={}, checking {} clients:", gPlayState->sceneNum, clients.size());
+        SPDLOG_INFO("[Anchor] My scene={} room={}, checking {} clients:", gPlayState->sceneNum, curRoom, clients.size());
     }
     for (auto& [clientId, client] : clients) {
         if (shouldLogClients) {
             SPDLOG_INFO("[Anchor]   Client {}: name={}, sceneNum={}, online={}, isSaveLoaded={}, self={}",
                         clientId, client.name, client.sceneNum, client.online, client.isSaveLoaded, client.self);
         }
+        // Note: We can't check client's room here because we don't have it in the client struct
+        // The room check happens when we receive their snapshot
         if (client.sceneNum == gPlayState->sceneNum && client.online &&
             client.isSaveLoaded && !client.self) {
-            hasOthersInScene = true;
+            hasOthersInRoom = true;
         }
     }
-    if (!hasOthersInScene) {
+    if (!hasOthersInRoom) {
         return;
     }
 
     // Wait until we've received at least one snapshot from others before broadcasting
-    // This ensures we don't overwrite existing state when entering a scene
+    // This ensures we don't overwrite existing state when entering a room
     // EXCEPTION: If we have the lowest sessionId among players in this scene, we go first
     // This prevents deadlock when multiple players enter simultaneously
-    if (!hasReceivedSnapshotThisScene) {
+    if (!hasReceivedSnapshotThisRoom) {
         bool hasLowerPriority = false;
         for (auto& [clientId, client] : clients) {
             if (client.sceneNum == gPlayState->sceneNum && client.online &&
@@ -440,7 +439,7 @@ void Anchor::SendPacket_WorldSnapshot() {
         }
         // Otherwise, we have priority - mark as ready and start broadcasting
         SPDLOG_INFO("[Anchor] I have priority (sessionId={}), starting to broadcast", sessionId);
-        hasReceivedSnapshotThisScene = true;  // Prevent re-checking priority every frame
+        hasReceivedSnapshotThisRoom = true;  // Prevent re-checking priority every frame
     }
 
     // No rate limiting - sync at same rate as PlayerUpdate (every frame)
@@ -449,6 +448,7 @@ void Anchor::SendPacket_WorldSnapshot() {
     nlohmann::json payload;
     payload["type"] = WORLD_SNAPSHOT;
     payload["sceneNum"] = gPlayState->sceneNum;
+    payload["roomNum"] = gPlayState->roomCtx.curRoom.num;  // Current room for room-based filtering
     payload["actors"] = nlohmann::json::array();
     payload["quiet"] = true;  // Don't log these frequent packets
 
@@ -465,6 +465,20 @@ void Anchor::SendPacket_WorldSnapshot() {
         };
     }
 
+    // Include global event flags - NPCs like Mido check these to determine their behavior
+    // Convert arrays to JSON arrays for transmission
+    nlohmann::json eventChkInf = nlohmann::json::array();
+    for (int i = 0; i < ARRAY_COUNT(gSaveContext.eventChkInf); i++) {
+        eventChkInf.push_back(gSaveContext.eventChkInf[i]);
+    }
+    payload["eventChkInf"] = eventChkInf;
+
+    nlohmann::json infTable = nlohmann::json::array();
+    for (int i = 0; i < ARRAY_COUNT(gSaveContext.infTable); i++) {
+        infTable.push_back(gSaveContext.infTable[i]);
+    }
+    payload["infTable"] = infTable;
+
     // Send only actors we OWN (we're the closest player to them)
     // Receivers will apply this state because we're the authority
     int enemyCount = 0, bossCount = 0, npcCount = 0, ownedCount = 0;
@@ -477,6 +491,13 @@ void Anchor::SendPacket_WorldSnapshot() {
 
             // Skip DummyPlayers (other network players)
             if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+                actor = actor->next;
+                continue;
+            }
+
+            // Only send actors in our current room (or room -1 which means "all rooms")
+            s8 curRoom = gPlayState->roomCtx.curRoom.num;
+            if (actor->room >= 0 && actor->room != curRoom) {
                 actor = actor->next;
                 continue;
             }
@@ -497,6 +518,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                 actorJson["id"] = actor->id;
                 actorJson["cat"] = actor->category;
                 actorJson["params"] = actor->params;
+                actorJson["room"] = actor->room;
 
                 // Position and rotation
                 actorJson["pos"] = actor->world.pos;
@@ -551,8 +573,18 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     s16 sceneNum = payload["sceneNum"].get<s16>();
     if (sceneNum != gPlayState->sceneNum) return;
 
-    // Mark that we've received a snapshot - we can now start broadcasting
-    hasReceivedSnapshotThisScene = true;
+    // Get sender's room (if provided) - only sync with players in the same room
+    s8 senderRoom = payload.contains("roomNum") ? payload["roomNum"].get<s8>() : -1;
+    s8 myRoom = gPlayState->roomCtx.curRoom.num;
+
+    // If sender is in a different room, ignore their snapshot entirely
+    // This prevents issues with room transitions and actors in other rooms
+    if (senderRoom >= 0 && myRoom >= 0 && senderRoom != myRoom) {
+        return;
+    }
+
+    // Mark that we've received a snapshot from someone in our room - we can now start broadcasting
+    hasReceivedSnapshotThisRoom = true;
 
     uint32_t senderClientId = payload["clientId"].get<uint32_t>();
     SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
@@ -581,10 +613,24 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Track which networkActorIds we've seen from this sender (for despawn logic)
+    // Apply global event flags - these control NPC behavior like Mido
+    // Merge flags (OR them together) so we don't lose local progress
+    if (payload.contains("eventChkInf")) {
+        auto& eventFlags = payload["eventChkInf"];
+        for (size_t i = 0; i < eventFlags.size() && i < ARRAY_COUNT(gSaveContext.eventChkInf); i++) {
+            gSaveContext.eventChkInf[i] |= eventFlags[i].get<u16>();
+        }
+    }
+
+    if (payload.contains("infTable")) {
+        auto& infFlags = payload["infTable"];
+        for (size_t i = 0; i < infFlags.size() && i < ARRAY_COUNT(gSaveContext.infTable); i++) {
+            gSaveContext.infTable[i] |= infFlags[i].get<u16>();
+        }
+    }
+
+    // Track which networkActorIds we've seen from this sender
     std::set<u32> receivedNetworkActorIds;
-    // Track which local actors were matched to snapshot actors (for initial sync despawn)
-    std::set<Actor*> matchedActors;
 
     for (const auto& actorJson : payload["actors"]) {
         // Get networkActorId (or fall back to legacy uid)
@@ -644,9 +690,6 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
         // Verify actor ID matches
         if (actor->id != actorId) continue;
-
-        // Mark this actor as matched (for despawn logic)
-        matchedActors.insert(actor);
 
         // Check ownership - only apply remote state if we're NOT the owner
         // If we're the owner (closest to this actor), we keep our local state
@@ -762,43 +805,18 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Despawn logic: Only despawn actors that:
-    // 1. We don't own (another player is closer)
-    // 2. AND they're not in the received snapshot (meaning the owner killed them)
-    // If we OWN an actor, we never despawn based on remote snapshot
-    for (int cat : syncableCategories) {
-        Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
-        while (actor != NULL) {
-            Actor* nextActor = actor->next;
-
-            // Skip DummyPlayers
-            if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
-                actor = nextActor;
-                continue;
-            }
-
-            // If we own this actor, we keep it - we're the authority
-            if (IsActorOwner(actor)) {
-                actor = nextActor;
-                continue;
-            }
-
-            // Check if this actor was matched to something in the snapshot
-            if (matchedActors.count(actor) == 0) {
-                // Actor wasn't in the snapshot - despawn it
-                SPDLOG_INFO("[Anchor] Despawning actor id={} (not in snapshot)", actor->id);
-                // Clean up network ID mapping if it exists
-                auto it = actorToNetworkId.find(actor);
-                if (it != actorToNetworkId.end()) {
-                    networkIdToActor.erase(it->second);
-                    actorToNetworkId.erase(actor);
-                }
-                Actor_Kill(actor);
-            }
-
-            actor = nextActor;
-        }
-    }
+    // Note: We intentionally do NOT despawn actors that aren't in the snapshot.
+    // The game's normal room loading/unloading handles actor lifecycle.
+    // Forcing despawns causes crashes because:
+    // 1. Setting health=0 doesn't work for many actors (props, switches, BG objects)
+    // 2. Actor_Kill during snapshot processing crashes the draw loop
+    // 3. Room transitions unload actors naturally - we just need to clean up our mappings
+    //
+    // Instead, our approach is:
+    // - Sync position/rotation/health for actors that exist on both sides
+    // - Spawn actors that exist remotely but not locally
+    // - Let the game naturally unload actors when rooms change
+    // - Clean up stale mappings in FindActorByNetworkId when actors become invalid
 }
 
 /**
@@ -892,25 +910,15 @@ void Anchor::ApplyActorInterpolation() {
 }
 
 /**
- * Check if we're waiting for the initial sync in a scene with other players.
- * Used to block local spawns until we receive the first world snapshot.
+ * Check if we're waiting for the initial sync in a room with other players.
+ *
+ * With room-based sync, we can't reliably know if someone is in our room
+ * (we only track scene in client state, not room). So we don't block spawns.
+ *
+ * Instead, the priority system (sessionId) handles who broadcasts first,
+ * and room filtering ensures we only sync with players in our room.
  */
 bool Anchor::IsWaitingForInitialSync() {
-    if (!IsSaveLoaded() || gPlayState == nullptr) return false;
-
-    // Check if there are other players in the same scene
-    bool hasOthersInScene = false;
-    for (auto& [clientId, client] : clients) {
-        if (client.sceneNum == gPlayState->sceneNum && client.online &&
-            client.isSaveLoaded && !client.self) {
-            hasOthersInScene = true;
-            break;
-        }
-    }
-
-    // If no others in scene, we're not waiting
-    if (!hasOthersInScene) return false;
-
-    // If we haven't received a snapshot yet, we're waiting
-    return !hasReceivedSnapshotThisScene;
+    // Don't block spawns - let the priority system and room filtering handle sync
+    return false;
 }

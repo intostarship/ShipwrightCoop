@@ -39,9 +39,10 @@ void Anchor::OnConnected() {
     RegisterHooks();
 
     // Reset snapshot state to trigger initial sync with other players
-    // This ensures we receive the world state from others if they're in our scene
-    hasReceivedSnapshotThisScene = false;
+    // This ensures we receive the world state from others if they're in our room
+    hasReceivedSnapshotThisRoom = false;
     lastSnapshotSceneNum = -1;
+    lastSnapshotRoomNum = -1;
     ClearNetworkIds();
 
     if (IsSaveLoaded()) {
@@ -116,15 +117,13 @@ void Anchor::OnIncomingJson(nlohmann::json payload) {
         }
     }
 
-    // Handle PLAYER_UPDATE and WORLD_SNAPSHOT packets immediately, no need to queue
+    // Handle PLAYER_UPDATE immediately (just updates client state, no actor manipulation)
     if (packetType == PLAYER_UPDATE) {
         HandlePacket_PlayerUpdate(payload);
         return;
     }
-    if (packetType == WORLD_SNAPSHOT) {
-        HandlePacket_WorldSnapshot(payload);
-        return;
-    }
+    // Note: WORLD_SNAPSHOT must be queued to the game thread because it spawns actors
+    // Actor manipulation must happen on the game thread, not the network thread
 
     // Queue all packets to be processed on the game thread
     std::lock_guard<std::mutex> lock(incomingPacketQueueMutex);
@@ -189,6 +188,8 @@ void Anchor::ProcessIncomingPacketQueue() {
             HandlePacket_UpdateRoomState(payload);
         else if (packetType == UPDATE_DUNGEON_ITEMS)
             HandlePacket_UpdateDungeonItems(payload);
+        else if (packetType == WORLD_SNAPSHOT)
+            HandlePacket_WorldSnapshot(payload);
 
         isProcessingIncomingPacket = false;
     }
