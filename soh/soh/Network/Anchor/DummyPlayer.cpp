@@ -98,6 +98,11 @@ void Math_Vec3s_Copy(Vec3s* dest, Vec3s* src) {
 
 // Update the actor with new data from the client
 void DummyPlayer_Update(Actor* actor, PlayState* play) {
+    // Safety checks
+    if (actor == nullptr || play == nullptr || gPlayState == nullptr || Anchor::Instance == nullptr) {
+        return;
+    }
+
     Player* player = (Player*)actor;
 
     uint32_t clientId = Anchor::Instance->GetDummyPlayerClientId(actor);
@@ -233,6 +238,11 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
 }
 
 void DummyPlayer_Draw(Actor* actor, PlayState* play) {
+    // Safety checks
+    if (actor == nullptr || play == nullptr || gPlayState == nullptr || Anchor::Instance == nullptr) {
+        return;
+    }
+
     Player* player = (Player*)actor;
 
     uint32_t clientId = Anchor::Instance->GetDummyPlayerClientId(actor);

@@ -20,7 +20,12 @@ extern PlayState* gPlayState;
  */
 
 void Anchor::SendPacket_PlayerUpdate() {
-    if (!IsSaveLoaded()) {
+    if (!IsSaveLoaded() || gPlayState == nullptr) {
+        return;
+    }
+
+    Player* player = GET_PLAYER(gPlayState);
+    if (player == nullptr) {
         return;
     }
 
@@ -33,8 +38,6 @@ void Anchor::SendPacket_PlayerUpdate() {
     if (currentPlayerCount == 0) {
         return;
     }
-
-    Player* player = GET_PLAYER(gPlayState);
     nlohmann::json payload;
 
     payload["type"] = PLAYER_UPDATE;
@@ -97,10 +100,18 @@ void Anchor::SendPacket_PlayerUpdate() {
 }
 
 void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
+    try {
+        if (!payload.contains("clientId")) return;
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
 
-    if (clients.contains(clientId)) {
+        if (!clients.contains(clientId)) return;
         auto& client = clients[clientId];
+
+        // Check required fields exist before accessing
+        if (!payload.contains("linkAge") || !payload.contains("sceneNum") ||
+            !payload.contains("entranceIndex") || !payload.contains("posRot")) {
+            return;
+        }
 
         if (client.linkAge != payload["linkAge"].get<s32>()) {
             shouldRefreshActors = true;
@@ -149,5 +160,7 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
         } else {
             client.heldActorNetworkId = 0;
         }
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_PlayerUpdate: {}", e.what());
     }
 }

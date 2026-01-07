@@ -586,26 +586,32 @@ void Anchor::SendPacket_WorldSnapshot() {
 void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     if (!IsSaveLoaded() || gPlayState == nullptr) return;
 
-    // Ignore if not in the same scene
-    s16 sceneNum = payload["sceneNum"].get<s16>();
-    if (sceneNum != gPlayState->sceneNum) return;
+    try {
+        // Check required fields exist
+        if (!payload.contains("sceneNum") || !payload.contains("clientId") || !payload.contains("actors")) {
+            return;
+        }
 
-    // Get sender's room (if provided) - only sync with players in the same room
-    s8 senderRoom = payload.contains("roomNum") ? payload["roomNum"].get<s8>() : -1;
-    s8 myRoom = gPlayState->roomCtx.curRoom.num;
+        // Ignore if not in the same scene
+        s16 sceneNum = payload["sceneNum"].get<s16>();
+        if (sceneNum != gPlayState->sceneNum) return;
 
-    // If sender is in a different room, ignore their snapshot entirely
-    // This prevents issues with room transitions and actors in other rooms
-    if (senderRoom >= 0 && myRoom >= 0 && senderRoom != myRoom) {
-        return;
-    }
+        // Get sender's room (if provided) - only sync with players in the same room
+        s8 senderRoom = payload.contains("roomNum") ? payload["roomNum"].get<s8>() : -1;
+        s8 myRoom = gPlayState->roomCtx.curRoom.num;
 
-    // Mark that we've received a snapshot from someone in our room - we can now start broadcasting
-    hasReceivedSnapshotThisRoom = true;
+        // If sender is in a different room, ignore their snapshot entirely
+        // This prevents issues with room transitions and actors in other rooms
+        if (senderRoom >= 0 && myRoom >= 0 && senderRoom != myRoom) {
+            return;
+        }
 
-    uint32_t senderClientId = payload["clientId"].get<uint32_t>();
-    SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
-                senderClientId, payload["actors"].size());
+        // Mark that we've received a snapshot from someone in our room - we can now start broadcasting
+        hasReceivedSnapshotThisRoom = true;
+
+        uint32_t senderClientId = payload["clientId"].get<uint32_t>();
+        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
+                    senderClientId, payload["actors"].size());
 
     // Apply scene flags from the snapshot - this syncs chest/switch/collectible state
     if (payload.contains("sceneFlags")) {
@@ -691,6 +697,11 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     std::set<u32> receivedNetworkActorIds;
 
     for (const auto& actorJson : payload["actors"]) {
+        // Skip actors with missing required fields
+        if (!actorJson.contains("id") || !actorJson.contains("params") || !actorJson.contains("pos")) {
+            continue;
+        }
+
         // Get networkActorId (or fall back to legacy uid)
         u32 networkActorId = actorJson.contains("networkActorId")
             ? actorJson["networkActorId"].get<u32>()
@@ -881,6 +892,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     // - Spawn actors that exist remotely but not locally
     // - Let the game naturally unload actors when rooms change
     // - Clean up stale mappings in FindActorByNetworkId when actors become invalid
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_WorldSnapshot: {}", e.what());
+    }
 }
 
 /**
