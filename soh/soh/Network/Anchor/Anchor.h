@@ -62,12 +62,9 @@ typedef struct {
     u32 heldActorNetworkId;
     Vec3f heldActorPos;  // Position of held actor (calculated by Player_Draw)
 
-    // Interpolation data for smooth movement
-    Vec3f interpPrevPos;
+    // Interpolation data for smooth movement (lerp toward target)
     Vec3f interpTargetPos;
-    Vec3s interpPrevRot;
     Vec3s interpTargetRot;
-    f32 interpAlpha;
     bool interpHasData;
 
     // Ptr to the dummy player

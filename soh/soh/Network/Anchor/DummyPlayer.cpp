@@ -125,28 +125,42 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
 
     actor->shape.shadowAlpha = 255;
 
-    // Apply smooth interpolation for position and rotation
+    // Smooth interpolation using "lerp toward target" approach
+    // This is more robust than discrete prev->target interpolation:
+    // - Naturally handles missed/delayed packets
+    // - No discontinuities when new targets arrive
+    // - Self-correcting
     if (client.interpHasData) {
-        // Advance interpolation alpha (complete in ~3 frames for smoothness)
-        client.interpAlpha += 0.35f;
-        if (client.interpAlpha > 1.0f) client.interpAlpha = 1.0f;
+        // Check for teleport (large distance to target = snap instead of lerp)
+        f32 dx = client.interpTargetPos.x - actor->world.pos.x;
+        f32 dy = client.interpTargetPos.y - actor->world.pos.y;
+        f32 dz = client.interpTargetPos.z - actor->world.pos.z;
+        f32 distSq = dx*dx + dy*dy + dz*dz;
 
-        // Smoothstep for smoother interpolation (ease in/out)
-        f32 t = client.interpAlpha;
-        f32 smooth = t * t * (3.0f - 2.0f * t);
+        const f32 TELEPORT_THRESHOLD_SQ = 400.0f * 400.0f;  // 400 units
 
-        // Interpolate position
-        actor->world.pos.x = client.interpPrevPos.x + (client.interpTargetPos.x - client.interpPrevPos.x) * smooth;
-        actor->world.pos.y = client.interpPrevPos.y + (client.interpTargetPos.y - client.interpPrevPos.y) * smooth;
-        actor->world.pos.z = client.interpPrevPos.z + (client.interpTargetPos.z - client.interpPrevPos.z) * smooth;
+        if (distSq > TELEPORT_THRESHOLD_SQ) {
+            // Teleport detected - snap to target
+            Math_Vec3f_Copy(&actor->world.pos, &client.interpTargetPos);
+            Math_Vec3s_Copy(&actor->shape.rot, &client.interpTargetRot);
+        } else {
+            // Lerp factor: higher = faster catch-up, lower = smoother
+            // 0.5 gives good balance between responsiveness and smoothness
+            const f32 LERP_FACTOR = 0.5f;
 
-        // Interpolate rotation (handle wraparound for s16 angles)
-        s16 rotDiffX = client.interpTargetRot.x - client.interpPrevRot.x;
-        s16 rotDiffY = client.interpTargetRot.y - client.interpPrevRot.y;
-        s16 rotDiffZ = client.interpTargetRot.z - client.interpPrevRot.z;
-        actor->shape.rot.x = client.interpPrevRot.x + (s16)(rotDiffX * smooth);
-        actor->shape.rot.y = client.interpPrevRot.y + (s16)(rotDiffY * smooth);
-        actor->shape.rot.z = client.interpPrevRot.z + (s16)(rotDiffZ * smooth);
+            // Smoothly move current position toward target
+            actor->world.pos.x += dx * LERP_FACTOR;
+            actor->world.pos.y += dy * LERP_FACTOR;
+            actor->world.pos.z += dz * LERP_FACTOR;
+
+            // Smoothly rotate toward target (handle s16 wraparound)
+            s16 rotDiffX = client.interpTargetRot.x - actor->shape.rot.x;
+            s16 rotDiffY = client.interpTargetRot.y - actor->shape.rot.y;
+            s16 rotDiffZ = client.interpTargetRot.z - actor->shape.rot.z;
+            actor->shape.rot.x += (s16)(rotDiffX * LERP_FACTOR);
+            actor->shape.rot.y += (s16)(rotDiffY * LERP_FACTOR);
+            actor->shape.rot.z += (s16)(rotDiffZ * LERP_FACTOR);
+        }
     } else {
         // No interpolation data yet - use direct values
         Math_Vec3s_Copy(&actor->shape.rot, &client.posRot.rot);
