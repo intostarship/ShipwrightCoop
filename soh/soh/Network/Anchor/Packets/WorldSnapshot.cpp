@@ -331,6 +331,22 @@ uint64_t Anchor::GetClosestPlayerToActor(Actor* actor) {
     Player* localPlayer = GET_PLAYER(gPlayState);
     if (localPlayer == nullptr) return sessionId;
 
+    // If actor is held by the local player, local player owns it
+    if (localPlayer->heldActor == actor) {
+        return sessionId;
+    }
+
+    // If actor is held by a DummyPlayer, that player owns it
+    for (auto& [clientId, client] : clients) {
+        if (client.self || !client.online) continue;
+        if (client.heldActorNetworkId != 0) {
+            Actor* heldActor = FindActorByNetworkId(client.heldActorNetworkId);
+            if (heldActor == actor) {
+                return client.sessionId;
+            }
+        }
+    }
+
     // Start with local player distance
     f32 minDist = Actor_WorldDistXZToActor(actor, &localPlayer->actor);
     uint64_t closestSessionId = sessionId;
@@ -846,6 +862,13 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // Player_Draw will handle positioning for held actors
         bool isHeldByOther = actorJson.contains("heldBy");
 
+        // If held by another player, CLEAR interpolation data to prevent flickering
+        // Otherwise the old interpolation target fights with Player_Draw positioning
+        if (isHeldByOther) {
+            std::lock_guard<std::mutex> lock(actorInterpMutex);
+            actorInterpData.erase(networkActorId);
+        }
+
         // Only sync position/rotation/movement for non-held actors
         if (!isHeldByOther) {
             // Get target state
@@ -1053,32 +1076,44 @@ void Anchor::ApplyActorInterpolation() {
         if (actor == nullptr || actor->update == NULL) continue;
 
         // Apply interpolation to all synced actors
+        // Use "lerp toward target" approach for smooth movement
+        // This is more robust than discrete prev->target interpolation
 
-        // Advance interpolation (complete in 1 frame since we sync every frame)
-        interp.interpAlpha += 1.0f;
-        if (interp.interpAlpha > 1.0f) interp.interpAlpha = 1.0f;
+        const f32 LERP_FACTOR = 0.3f;  // Lower = smoother, higher = more responsive
 
-        // Smoothstep for smoother interpolation
-        f32 t = interp.interpAlpha;
-        f32 smooth = t * t * (3.0f - 2.0f * t);
+        // Check for teleport (large distance = snap instead of lerp)
+        f32 dx = interp.targetPos.x - actor->world.pos.x;
+        f32 dy = interp.targetPos.y - actor->world.pos.y;
+        f32 dz = interp.targetPos.z - actor->world.pos.z;
+        f32 distSq = dx*dx + dy*dy + dz*dz;
+        const f32 TELEPORT_THRESHOLD_SQ = 300.0f * 300.0f;
 
-        // Interpolate position
-        actor->world.pos.x = interp.prevPos.x + (interp.targetPos.x - interp.prevPos.x) * smooth;
-        actor->world.pos.y = interp.prevPos.y + (interp.targetPos.y - interp.prevPos.y) * smooth;
-        actor->world.pos.z = interp.prevPos.z + (interp.targetPos.z - interp.prevPos.z) * smooth;
+        if (distSq > TELEPORT_THRESHOLD_SQ) {
+            // Teleport - snap to target
+            actor->world.pos = interp.targetPos;
+            actor->shape.rot = interp.targetRot;
+        } else {
+            // Smoothly lerp toward target position
+            actor->world.pos.x += dx * LERP_FACTOR;
+            actor->world.pos.y += dy * LERP_FACTOR;
+            actor->world.pos.z += dz * LERP_FACTOR;
 
-        // Interpolate rotation (simple lerp, could use slerp for better results)
-        actor->shape.rot.x = interp.prevRot.x + (s16)((interp.targetRot.x - interp.prevRot.x) * smooth);
-        actor->shape.rot.y = interp.prevRot.y + (s16)((interp.targetRot.y - interp.prevRot.y) * smooth);
-        actor->shape.rot.z = interp.prevRot.z + (s16)((interp.targetRot.z - interp.prevRot.z) * smooth);
+            // Smoothly lerp toward target rotation (handles s16 wraparound)
+            s16 rotDiffX = interp.targetRot.x - actor->shape.rot.x;
+            s16 rotDiffY = interp.targetRot.y - actor->shape.rot.y;
+            s16 rotDiffZ = interp.targetRot.z - actor->shape.rot.z;
+            actor->shape.rot.x += (s16)(rotDiffX * LERP_FACTOR);
+            actor->shape.rot.y += (s16)(rotDiffY * LERP_FACTOR);
+            actor->shape.rot.z += (s16)(rotDiffZ * LERP_FACTOR);
+        }
 
         // Interpolate animation frame if we have animation data
         if (interp.hasAnimData) {
             SkelAnime* skelAnime = GetActorSkelAnime(actor);
             if (skelAnime != nullptr && skelAnime->animation != nullptr) {
-                // Interpolate frame, accounting for looping animations
+                // Use lerp-toward-target for animation frames too
                 f32 maxFrame = Animation_GetLastFrame(skelAnime->animation);
-                f32 frameDiff = interp.targetAnimFrame - interp.prevAnimFrame;
+                f32 frameDiff = interp.targetAnimFrame - skelAnime->curFrame;
 
                 // Handle animation looping - if the diff is too large, it wrapped around
                 if (frameDiff > maxFrame / 2.0f) {
@@ -1087,13 +1122,12 @@ void Anchor::ApplyActorInterpolation() {
                     frameDiff += maxFrame;
                 }
 
-                f32 interpFrame = interp.prevAnimFrame + frameDiff * smooth;
+                skelAnime->curFrame += frameDiff * LERP_FACTOR;
 
                 // Wrap the frame within valid range
-                while (interpFrame < 0.0f) interpFrame += maxFrame;
-                while (interpFrame >= maxFrame) interpFrame -= maxFrame;
+                while (skelAnime->curFrame < 0.0f) skelAnime->curFrame += maxFrame;
+                while (skelAnime->curFrame >= maxFrame) skelAnime->curFrame -= maxFrame;
 
-                skelAnime->curFrame = interpFrame;
                 skelAnime->playSpeed = interp.animSpeed;
             }
         }

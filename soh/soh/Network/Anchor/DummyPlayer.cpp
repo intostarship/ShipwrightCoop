@@ -145,8 +145,8 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
             Math_Vec3s_Copy(&actor->shape.rot, &client.interpTargetRot);
         } else {
             // Lerp factor: higher = faster catch-up, lower = smoother
-            // 0.5 gives good balance between responsiveness and smoothness
-            const f32 LERP_FACTOR = 0.5f;
+            // 0.3 gives smoother movement with acceptable lag
+            const f32 LERP_FACTOR = 0.3f;
 
             // Smoothly move current position toward target
             actor->world.pos.x += dx * LERP_FACTOR;
