@@ -130,7 +130,6 @@ void BossVa_ZapperDeath(struct BossVa*, PlayState*);
 void BossVa_ZapperEnraged(struct BossVa*, PlayState*);
 void BossVa_ZapperHold(struct BossVa*, PlayState*);
 void BossVa_ZapperIntro(struct BossVa*, PlayState*);
-void func(struct BossVa*, PlayState*);
 void DoorKiller_Die(struct DoorKiller*, PlayState*);
 void DoorKiller_FallAsRubble(struct DoorKiller*, PlayState*);
 void DoorKiller_FallOver(struct DoorKiller*, PlayState*);
@@ -251,7 +250,6 @@ void EnBox_FallOnSwitchFlag(struct EnBox*, PlayState*);
 void EnBox_Open(struct EnBox*, PlayState*);
 void EnBox_WaitOpen(struct EnBox*, PlayState*);
 void func_809C9700(struct EnBox*, PlayState*);
-void NULL(struct EnBrob*, PlayState*);
 void func_809CB054(struct EnBrob*, PlayState*);
 void func_809CB114(struct EnBrob*, PlayState*);
 void func_809CB218(struct EnBrob*, PlayState*);
@@ -612,7 +610,6 @@ void EnGeldB_SpinDodge(struct EnGeldB*, PlayState*);
 void EnGeldB_Stunned(struct EnGeldB*, PlayState*);
 void EnGeldB_Wait(struct EnGeldB*, PlayState*);
 void EnGirlA_Noop(struct EnGirlA*, PlayState*);
-void func(struct EnGirlA*, PlayState*);
 void EnGm_ProcessChoiceIndex(struct EnGm*, PlayState*);
 void func_80A3DB04(struct EnGm*, PlayState*);
 void func_80A3DBF4(struct EnGm*, PlayState*);
@@ -748,7 +745,6 @@ void func_80A75530(struct EnIk*, PlayState*);
 void func_80A7567C(struct EnIk*, PlayState*);
 void func_80A758B0(struct EnIk*, PlayState*);
 void func_80A75A38(struct EnIk*, PlayState*);
-void NULL(struct EnIn*, PlayState*);
 void func_80A79FB0(struct EnIn*, PlayState*);
 void func_80A7A304(struct EnIn*, PlayState*);
 void func_80A7A4BC(struct EnIn*, PlayState*);
@@ -1471,7 +1467,6 @@ static void* BossVa_ActionFuncs[] = {
     (void*)BossVa_ZapperEnraged,
     (void*)BossVa_ZapperHold,
     (void*)BossVa_ZapperIntro,
-    (void*)func,
     NULL  // Terminator
 };
 
@@ -1648,7 +1643,6 @@ static void* EnBox_ActionFuncs[] = {
 };
 
 static void* EnBrob_ActionFuncs[] = {
-    (void*)NULL,
     (void*)func_809CB054,
     (void*)func_809CB114,
     (void*)func_809CB218,
@@ -2149,7 +2143,6 @@ static void* EnGeldB_ActionFuncs[] = {
 
 static void* EnGirlA_ActionFuncs[] = {
     (void*)EnGirlA_Noop,
-    (void*)func,
     NULL  // Terminator
 };
 
@@ -2337,7 +2330,6 @@ static void* EnIk_ActionFuncs[] = {
 };
 
 static void* EnIn_ActionFuncs[] = {
-    (void*)NULL,
     (void*)func_80A79FB0,
     (void*)func_80A7A304,
     (void*)func_80A7A4BC,
@@ -3193,7 +3185,7 @@ static FieldDescriptor BgDyYoseizo_Fields[] = {
     { "headRot", 0x334, FIELD_TYPE_VEC3S, 1 },
     { "torsoRot", 0x33A, FIELD_TYPE_VEC3S, 1 },
     { "unk_348", 0x348, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossFd2_Fields[] = {
@@ -3211,7 +3203,7 @@ static FieldDescriptor BossFd2_Fields[] = {
     { "deathState", 0x1390, FIELD_TYPE_S16, 1 },
     { "deathCamera", 0x1392, FIELD_TYPE_S16, 1 },
     { "epoch", 0x167C, FIELD_TYPE_U32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossGanon_Fields[] = {
@@ -3298,7 +3290,7 @@ static FieldDescriptor BossGanon_Fields[] = {
     { "organAlpha", 0x718, FIELD_TYPE_S16, 1 },
     { "useOpenHand", 0x71A, FIELD_TYPE_U8, 1 },
     { "windowShatterState", 0x71B, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossGanon2_Fields[] = {
@@ -3378,7 +3370,7 @@ static FieldDescriptor BossGanon2_Fields[] = {
     { "unk_410", 0x410, FIELD_TYPE_VEC3F, 1 },
     { "unk_41C", 0x41C, FIELD_TYPE_F32, 1 },
     { "unk_420", 0x420, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossGanondrof_Fields[] = {
@@ -3412,7 +3404,7 @@ static FieldDescriptor BossGanondrof_Fields[] = {
     { "armRotZ", 0x3D8, FIELD_TYPE_F32, 1 },
     { "rideRotZ", 0x3DC, FIELD_TYPE_F32, 30 },
     { "rideRotY", 0x454, FIELD_TYPE_F32, 30 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossGoma_Fields[] = {
@@ -3463,7 +3455,7 @@ static FieldDescriptor BossGoma_Fields[] = {
     { "subCameraAt", 0x29C, FIELD_TYPE_VEC3F, 1 },
     { "defeatedLimbPositions", 0x2A8, FIELD_TYPE_VEC3F, 100 },
     { "deadLimbsState", 0x758, FIELD_TYPE_U8, 100 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossTw_Fields[] = {
@@ -3540,7 +3532,7 @@ static FieldDescriptor BossTw_Fields[] = {
     { "unused_6A8", 0x6A8, FIELD_TYPE_S8, 4 },
     { "subCamYaw", 0x6AC, FIELD_TYPE_F32, 1 },
     { "subCamYawStep", 0x6B0, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor BossVa_Fields[] = {
@@ -3573,12 +3565,12 @@ static FieldDescriptor BossVa_Fields[] = {
     { "effectPos", 0x1FC, FIELD_TYPE_VEC3F, 10 },
     { "unk_274", 0x274, FIELD_TYPE_VEC3F, 1 },
     { "unk_280", 0x280, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor DoorWarp1_Fields[] = {
     { "rutoWarpState", 0x1EC, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnAm_Fields[] = {
@@ -3592,7 +3584,7 @@ static FieldDescriptor EnAm_Fields[] = {
     { "textureBlend", 0x266, FIELD_TYPE_U8, 1 },
     { "damageEffect", 0x267, FIELD_TYPE_U8, 1 },
     { "shakeOrigin", 0x267, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnAnubice_Fields[] = {
@@ -3616,7 +3608,7 @@ static FieldDescriptor EnAnubice_Fields[] = {
     { "home", 0x298, FIELD_TYPE_VEC3F, 1 },
     { "knockbackRecoveryVelocity", 0x2A4, FIELD_TYPE_VEC3F, 1 },
     { "unk_2C4", 0x2C4, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnAttackNiw_Fields[] = {
@@ -3655,7 +3647,7 @@ static FieldDescriptor EnAttackNiw_Fields[] = {
     { "unk_2DC", 0x2DC, FIELD_TYPE_F32, 1 },
     { "unk_2E0", 0x2E0, FIELD_TYPE_F32, 1 },
     { "unk_2E4", 0x2E4, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBb_Fields[] = {
@@ -3683,7 +3675,7 @@ static FieldDescriptor EnBb_Fields[] = {
     { "blureIdx", 0x2A4, FIELD_TYPE_S32, 1 },
     { "fireIceTimer", 0x2A8, FIELD_TYPE_S16, 1 },
     { "dmgEffect", 0x2AA, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBigokuta_Fields[] = {
@@ -3692,14 +3684,14 @@ static FieldDescriptor EnBigokuta_Fields[] = {
     { "unk_196", 0x196, FIELD_TYPE_S16, 1 },
     { "unk_198", 0x198, FIELD_TYPE_S16, 1 },
     { "unk_19A", 0x19A, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBili_Fields[] = {
     { "tentaclesTexIndex", 0x194, FIELD_TYPE_U8, 1 },
     { "playFlySound", 0x195, FIELD_TYPE_U8, 1 },
     { "timer", 0x196, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBird_Fields[] = {
@@ -3717,7 +3709,7 @@ static FieldDescriptor EnBird_Fields[] = {
     { "unk_1BC", 0x1BC, FIELD_TYPE_F32, 1 },
     { "unk_1C0", 0x1C0, FIELD_TYPE_S16, 1 },
     { "unk_1C2", 0x1C2, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBomBowlMan_Fields[] = {
@@ -3740,7 +3732,7 @@ static FieldDescriptor EnBomBowlMan_Fields[] = {
     { "posCopy", 0x248, FIELD_TYPE_VEC3F, 1 },
     { "frameCount", 0x254, FIELD_TYPE_F32, 1 },
     { "minigamePlayStatus", 0x258, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBox_Fields[] = {
@@ -3751,13 +3743,13 @@ static FieldDescriptor EnBox_Fields[] = {
     { "type", 0x1F9, FIELD_TYPE_U8, 1 },
     { "iceSmokeTimer", 0x1FA, FIELD_TYPE_U8, 1 },
     { "unk_1FB", 0x1FB, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBrob_Fields[] = {
     { "timer", 0x1AC, FIELD_TYPE_S16, 1 },
     { "unk_1AE", 0x1AE, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnButte_Fields[] = {
@@ -3770,7 +3762,7 @@ static FieldDescriptor EnButte_Fields[] = {
     { "unk_25E", 0x25E, FIELD_TYPE_S16, 1 },
     { "unk_260", 0x260, FIELD_TYPE_S16, 1 },
     { "posYTarget", 0x264, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnBw_Fields[] = {
@@ -3797,14 +3789,14 @@ static FieldDescriptor EnBw_Fields[] = {
     { "unk_270", 0x270, FIELD_TYPE_VEC3F, 1 },
     { "unk_27C", 0x27C, FIELD_TYPE_VEC3F, 1 },
     { "unk_288", 0x288, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnCrow_Fields[] = {
     { "timer", 0x1C4, FIELD_TYPE_S16, 1 },
     { "aimRotX", 0x1C6, FIELD_TYPE_S16, 1 },
     { "aimRotY", 0x1C8, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnCs_Fields[] = {
@@ -3823,7 +3815,7 @@ static FieldDescriptor EnCs_Fields[] = {
     { "currentAnimIndex", 0x210, FIELD_TYPE_S32, 1 },
     { "unk_214", 0x214, FIELD_TYPE_S8, 4 },
     { "flag", 0x280, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDaiku_Fields[] = {
@@ -3846,7 +3838,7 @@ static FieldDescriptor EnDaiku_Fields[] = {
     { "startFightSwitchFlag", 0x240, FIELD_TYPE_S32, 1 },
     { "initRot", 0x338, FIELD_TYPE_VEC3S, 1 },
     { "initPos", 0x340, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDaikuKakariko_Fields[] = {
@@ -3862,7 +3854,7 @@ static FieldDescriptor EnDaikuKakariko_Fields[] = {
     { "timer", 0x2F8, FIELD_TYPE_S32, 1 },
     { "neckAngle", 0x2FC, FIELD_TYPE_VEC3S, 1 },
     { "neckAngleTarget", 0x302, FIELD_TYPE_VEC3S, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDekubaba_Fields[] = {
@@ -3871,7 +3863,7 @@ static FieldDescriptor EnDekubaba_Fields[] = {
     { "targetSwayAngle", 0x1C8, FIELD_TYPE_S16, 1 },
     { "stemSectionAngle", 0x1CA, FIELD_TYPE_S16, 3 },
     { "size", 0x230, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDekunuts_Fields[] = {
@@ -3880,7 +3872,7 @@ static FieldDescriptor EnDekunuts_Fields[] = {
     { "animFlagAndTimer", 0x196, FIELD_TYPE_S16, 1 },
     { "runDirection", 0x198, FIELD_TYPE_S16, 1 },
     { "shotsPerRound", 0x19A, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDh_Fields[] = {
@@ -3894,7 +3886,7 @@ static FieldDescriptor EnDh_Fields[] = {
     { "dirtWaveSpread", 0x318, FIELD_TYPE_F32, 1 },
     { "dirtWaveHeight", 0x31C, FIELD_TYPE_F32, 1 },
     { "dirtWaveAlpha", 0x320, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDha_Fields[] = {
@@ -3906,7 +3898,7 @@ static FieldDescriptor EnDha_Fields[] = {
     { "handAngle", 0x1D4, FIELD_TYPE_VEC3S, 1 },
     { "handPos", 0x1DC, FIELD_TYPE_VEC3F, 2 },
     { "armPos", 0x1F4, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDivingGame_Fields[] = {
@@ -3941,7 +3933,7 @@ static FieldDescriptor EnDivingGame_Fields[] = {
     { "allRupeesThrown", 0x31E, FIELD_TYPE_U8, 1 },
     { "unk_31F", 0x31F, FIELD_TYPE_U8, 1 },
     { "unk_320", 0x320, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDns_Fields[] = {
@@ -3951,7 +3943,7 @@ static FieldDescriptor EnDns_Fields[] = {
     { "standOnGround", 0x2BC, FIELD_TYPE_U8, 1 },
     { "dropCollectible", 0x2BD, FIELD_TYPE_U8, 1 },
     { "yInitPos", 0x2C4, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDntJiji_Fields[] = {
@@ -3969,7 +3961,7 @@ static FieldDescriptor EnDntJiji_Fields[] = {
     { "unused", 0x250, FIELD_TYPE_S16, 1 },
     { "attackFlag", 0x252, FIELD_TYPE_S16, 1 },
     { "getItemId", 0x254, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDntNomal_Fields[] = {
@@ -3997,7 +3989,7 @@ static FieldDescriptor EnDntNomal_Fields[] = {
     { "objIndex", 0x279, FIELD_TYPE_S8, 1 },
     { "mouthPos", 0x27C, FIELD_TYPE_VEC3F, 1 },
     { "targetPos", 0x288, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDodojr_Fields[] = {
@@ -4009,7 +4001,7 @@ static FieldDescriptor EnDodojr_Fields[] = {
     { "timer3", 0x202, FIELD_TYPE_S16, 1 },
     { "timer4", 0x204, FIELD_TYPE_S16, 1 },
     { "rootScale", 0x208, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDodongo_Fields[] = {
@@ -4030,7 +4022,7 @@ static FieldDescriptor EnDodongo_Fields[] = {
     { "bombSmokeEnvColor", 0x3C8, FIELD_TYPE_U8, 1 },
     { "damageEffect", 0x3CC, FIELD_TYPE_U8, 1 },
     { "blureIdx", 0x3D0, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDog_Fields[] = {
@@ -4042,7 +4034,7 @@ static FieldDescriptor EnDog_Fields[] = {
     { "pad2", 0x1EE, FIELD_TYPE_S16, 1 },
     { "nextBehavior", 0x1F0, FIELD_TYPE_S16, 1 },
     { "behavior", 0x1F2, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnDu_Fields[] = {
@@ -4059,14 +4051,14 @@ static FieldDescriptor EnDu_Fields[] = {
     { "mouthTexIndex", 0x1F0, FIELD_TYPE_U8, 1 },
     { "noseTexIndex", 0x1F1, FIELD_TYPE_U8, 1 },
     { "blinkTimer", 0x1F2, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnEiyer_Fields[] = {
     { "timer", 0x194, FIELD_TYPE_S16, 1 },
     { "targetYaw", 0x196, FIELD_TYPE_S16, 1 },
     { "basePos", 0x27C, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnFd_Fields[] = {
@@ -4082,7 +4074,7 @@ static FieldDescriptor EnFd_Fields[] = {
     { "runRadius", 0x4C8, FIELD_TYPE_F32, 1 },
     { "fadeAlpha", 0x4CC, FIELD_TYPE_F32, 1 },
     { "corePos", 0x4D0, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnFirefly_Fields[] = {
@@ -4091,7 +4083,7 @@ static FieldDescriptor EnFirefly_Fields[] = {
     { "timer", 0x1BA, FIELD_TYPE_S16, 1 },
     { "targetPitch", 0x1BC, FIELD_TYPE_S16, 1 },
     { "maxAltitude", 0x310, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnFish_Fields[] = {
@@ -4100,7 +4092,7 @@ static FieldDescriptor EnFish_Fields[] = {
     { "slowPhase", 0x24C, FIELD_TYPE_S16, 1 },
     { "fastPhase", 0x24E, FIELD_TYPE_S16, 1 },
     { "unk_250", 0x250, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnFr_Fields[] = {
@@ -4130,7 +4122,7 @@ static FieldDescriptor EnFr_Fields[] = {
     { "xyAngleButterfly", 0x3AA, FIELD_TYPE_S16, 1 },
     { "posButterfly", 0x3AC, FIELD_TYPE_VEC3F, 1 },
     { "posButterflyLight", 0x3B8, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnFw_Fields[] = {
@@ -4147,7 +4139,7 @@ static FieldDescriptor EnFw_Fields[] = {
     { "returnToParentTimer", 0x212, FIELD_TYPE_S16, 1 },
     { "turnAround", 0x214, FIELD_TYPE_S16, 1 },
     { "runRadius", 0x218, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGb_Fields[] = {
@@ -4155,7 +4147,7 @@ static FieldDescriptor EnGb_Fields[] = {
     { "frameTimer", 0x380, FIELD_TYPE_S16, 1 },
     { "actionTimer", 0x382, FIELD_TYPE_S16, 1 },
     { "lightColor", 0x384, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGeldB_Fields[] = {
@@ -4177,7 +4169,7 @@ static FieldDescriptor EnGeldB_Fields[] = {
     { "rightFootPos", 0x4C4, FIELD_TYPE_VEC3F, 1 },
     { "leftFootPos", 0x4D0, FIELD_TYPE_VEC3F, 1 },
     { "headRot", 0x4DC, FIELD_TYPE_VEC3S, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGirlA_Fields[] = {
@@ -4192,7 +4184,7 @@ static FieldDescriptor EnGirlA_Fields[] = {
     { "itemCount", 0x1CA, FIELD_TYPE_S16, 1 },
     { "giDrawId", 0x1CC, FIELD_TYPE_S16, 1 },
     { "randoSlotIndex", 0x1D4, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGm_Fields[] = {
@@ -4201,7 +4193,7 @@ static FieldDescriptor EnGm_Fields[] = {
     { "blinkTimer", 0x2C0, FIELD_TYPE_S16, 1 },
     { "eyeTexIndex", 0x2C2, FIELD_TYPE_U8, 1 },
     { "talkPos", 0x2C4, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGo_Fields[] = {
@@ -4216,7 +4208,7 @@ static FieldDescriptor EnGo_Fields[] = {
     { "unk_21A", 0x21A, FIELD_TYPE_S16, 1 },
     { "unk_21C", 0x21C, FIELD_TYPE_S16, 1 },
     { "unk_21E", 0x21E, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGo2_Fields[] = {
@@ -4246,7 +4238,7 @@ static FieldDescriptor EnGo2_Fields[] = {
     { "unk_598", 0x598, FIELD_TYPE_U8, 1 },
     { "camId", 0x59A, FIELD_TYPE_S16, 1 },
     { "unk_59C", 0x59C, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGoma_Fields[] = {
@@ -4273,7 +4265,7 @@ static FieldDescriptor EnGoma_Fields[] = {
     { "unk_2F4", 0x2F4, FIELD_TYPE_S32, 1 },
     { "stunTimer", 0x2F8, FIELD_TYPE_S16, 1 },
     { "shieldKnockbackVel", 0x2FC, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnGuest_Fields[] = {
@@ -4284,7 +4276,7 @@ static FieldDescriptor EnGuest_Fields[] = {
     { "osAnimeBankIndex", 0x30C, FIELD_TYPE_S8, 1 },
     { "unk_30D", 0x30D, FIELD_TYPE_U8, 1 },
     { "unk_30E", 0x30E, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnHeishi2_Fields[] = {
@@ -4318,7 +4310,7 @@ static FieldDescriptor EnHeishi2_Fields[] = {
     { "cameraId", 0x310, FIELD_TYPE_S16, 1 },
     { "unk_318", 0x318, FIELD_TYPE_U8, 1 },
     { "unk_370", 0x370, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnHeishi3_Fields[] = {
@@ -4333,7 +4325,7 @@ static FieldDescriptor EnHeishi3_Fields[] = {
     { "respawnFlag", 0x276, FIELD_TYPE_U8, 1 },
     { "unk_278", 0x278, FIELD_TYPE_S16, 1 },
     { "unk_27A", 0x27A, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnHeishi4_Fields[] = {
@@ -4349,14 +4341,14 @@ static FieldDescriptor EnHeishi4_Fields[] = {
     { "unk_288", 0x288, FIELD_TYPE_F32, 1 },
     { "unk_2B4", 0x2B4, FIELD_TYPE_U8, 1 },
     { "unk_2B6", 0x2B6, FIELD_TYPE_S8, 7 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnHintnuts_Fields[] = {
     { "animFlagAndTimer", 0x194, FIELD_TYPE_S16, 1 },
     { "unk_196", 0x196, FIELD_TYPE_S16, 1 },
     { "textIdCopy", 0x198, FIELD_TYPE_U16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnHy_Fields[] = {
@@ -4377,7 +4369,7 @@ static FieldDescriptor EnHy_Fields[] = {
     { "unkGetItemId", 0x260, FIELD_TYPE_S32, 1 },
     { "modelOffset", 0x264, FIELD_TYPE_VEC3F, 1 },
     { "unk_330", 0x330, FIELD_TYPE_U16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnIk_Fields[] = {
@@ -4387,7 +4379,7 @@ static FieldDescriptor EnIk_Fields[] = {
     { "npcAction", 0x4D0, FIELD_TYPE_U32, 1 },
     { "unk_4D4", 0x4D4, FIELD_TYPE_S32, 1 },
     { "unk_4D8", 0x4D8, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnIn_Fields[] = {
@@ -4411,7 +4403,7 @@ static FieldDescriptor EnIn_Fields[] = {
     { "unk_300", 0x300, FIELD_TYPE_F32, 1 },
     { "unk_304", 0x304, FIELD_TYPE_F32, 1 },
     { "unk_330", 0x330, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnInsect_Fields[] = {
@@ -4424,7 +4416,7 @@ static FieldDescriptor EnInsect_Fields[] = {
     { "unk_324", 0x324, FIELD_TYPE_F32, 1 },
     { "unk_328", 0x328, FIELD_TYPE_S16, 1 },
     { "unk_32A", 0x32A, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnJj_Fields[] = {
@@ -4435,7 +4427,7 @@ static FieldDescriptor EnJj_Fields[] = {
     { "blinkTimer", 0x30F, FIELD_TYPE_U8, 1 },
     { "extraBlinkCounter", 0x310, FIELD_TYPE_U8, 1 },
     { "extraBlinkTotal", 0x311, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnKakasi2_Fields[] = {
@@ -4444,7 +4436,7 @@ static FieldDescriptor EnKakasi2_Fields[] = {
     { "unk_198", 0x198, FIELD_TYPE_S16, 1 },
     { "maxSpawnDistance", 0x19C, FIELD_TYPE_VEC3F, 1 },
     { "height", 0x1A8, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnKakasi3_Fields[] = {
@@ -4463,7 +4455,7 @@ static FieldDescriptor EnKakasi3_Fields[] = {
     { "rot", 0x1B0, FIELD_TYPE_VEC3S, 1 },
     { "unk_1B8", 0x1B8, FIELD_TYPE_F32, 1 },
     { "camId", 0x208, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnKo_Fields[] = {
@@ -4480,7 +4472,7 @@ static FieldDescriptor EnKo_Fields[] = {
     { "modelAlpha", 0x220, FIELD_TYPE_F32, 1 },
     { "unk_2E4", 0x2E4, FIELD_TYPE_S16, 16 },
     { "unk_304", 0x304, FIELD_TYPE_S16, 16 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnKz_Fields[] = {
@@ -4494,7 +4486,7 @@ static FieldDescriptor EnKz_Fields[] = {
     { "gameplayCamera", 0x214, FIELD_TYPE_S16, 1 },
     { "unk_2A6", 0x2A6, FIELD_TYPE_S16, 12 },
     { "unk_2BE", 0x2BE, FIELD_TYPE_S16, 12 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMa1_Fields[] = {
@@ -4502,7 +4494,7 @@ static FieldDescriptor EnMa1_Fields[] = {
     { "blinkTimer", 0x1E2, FIELD_TYPE_S16, 1 },
     { "eyeIndex", 0x1E4, FIELD_TYPE_S16, 1 },
     { "mouthIndex", 0x1E6, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMa2_Fields[] = {
@@ -4512,7 +4504,7 @@ static FieldDescriptor EnMa2_Fields[] = {
     { "eyeIndex", 0x20E, FIELD_TYPE_S16, 1 },
     { "mouthIndex", 0x210, FIELD_TYPE_S16, 1 },
     { "unk_212", 0x212, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMa3_Fields[] = {
@@ -4522,7 +4514,7 @@ static FieldDescriptor EnMa3_Fields[] = {
     { "eyeIndex", 0x20E, FIELD_TYPE_S16, 1 },
     { "mouthIndex", 0x210, FIELD_TYPE_S16, 1 },
     { "unk_212", 0x212, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMb_Fields[] = {
@@ -4541,7 +4533,7 @@ static FieldDescriptor EnMb_Fields[] = {
     { "direction", 0x35E, FIELD_TYPE_S8, 1 },
     { "maxHomeDist", 0x360, FIELD_TYPE_F32, 1 },
     { "playerDetectionRange", 0x364, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMd_Fields[] = {
@@ -4555,7 +4547,7 @@ static FieldDescriptor EnMd_Fields[] = {
     { "waypoint", 0x212, FIELD_TYPE_S16, 1 },
     { "unk_214", 0x214, FIELD_TYPE_S16, 17 },
     { "unk_236", 0x236, FIELD_TYPE_S16, 17 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMm_Fields[] = {
@@ -4574,7 +4566,7 @@ static FieldDescriptor EnMm_Fields[] = {
     { "unk_254", 0x254, FIELD_TYPE_S32, 1 },
     { "curAnimIndex", 0x258, FIELD_TYPE_S32, 1 },
     { "sitTimer", 0x25C, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMm2_Fields[] = {
@@ -4585,19 +4577,19 @@ static FieldDescriptor EnMm2_Fields[] = {
     { "unk_1F4", 0x1F4, FIELD_TYPE_U16, 1 },
     { "unk_1F6", 0x1F6, FIELD_TYPE_S16, 1 },
     { "previousAnimation", 0x1F8, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMs_Fields[] = {
     { "activeTimer", 0x24C, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnMu_Fields[] = {
     { "defFaceReaction", 0x208, FIELD_TYPE_U16, 1 },
     { "unk_20A", 0x20A, FIELD_TYPE_S16, 16 },
     { "unk_22A", 0x22A, FIELD_TYPE_S16, 17 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnNiw_Fields[] = {
@@ -4647,7 +4639,7 @@ static FieldDescriptor EnNiw_Fields[] = {
     { "unk_300", 0x300, FIELD_TYPE_F32, 1 },
     { "unk_304", 0x304, FIELD_TYPE_F32, 1 },
     { "unk_308", 0x308, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnNiwGirl_Fields[] = {
@@ -4663,7 +4655,7 @@ static FieldDescriptor EnNiwGirl_Fields[] = {
     { "unk_27A", 0x27A, FIELD_TYPE_S16, 1 },
     { "unk_27C", 0x27C, FIELD_TYPE_F32, 1 },
     { "unk_280", 0x280, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnNiwLady_Fields[] = {
@@ -4691,7 +4683,7 @@ static FieldDescriptor EnNiwLady_Fields[] = {
     { "objectAneIndex", 0x280, FIELD_TYPE_S8, 1 },
     { "objectOsAnimeIndex", 0x281, FIELD_TYPE_S8, 1 },
     { "getItemId", 0x284, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnOkuta_Fields[] = {
@@ -4699,7 +4691,7 @@ static FieldDescriptor EnOkuta_Fields[] = {
     { "numShots", 0x196, FIELD_TYPE_S16, 1 },
     { "jumpHeight", 0x360, FIELD_TYPE_F32, 1 },
     { "headScale", 0x364, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnOssan_Fields[] = {
@@ -4737,7 +4729,7 @@ static FieldDescriptor EnOssan_Fields[] = {
     { "stickAnimState", 0x2CD, FIELD_TYPE_U8, 1 },
     { "shopItemSelectedTween", 0x2D0, FIELD_TYPE_F32, 1 },
     { "cameraFaceAngle", 0x2D4, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPeehat_Fields[] = {
@@ -4756,7 +4748,7 @@ static FieldDescriptor EnPeehat_Fields[] = {
     { "seekPlayerTimer", 0x2F8, FIELD_TYPE_S16, 1 },
     { "unk_2FA", 0x2FA, FIELD_TYPE_S16, 1 },
     { "animTimer", 0x2FC, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPoDesert_Fields[] = {
@@ -4767,7 +4759,7 @@ static FieldDescriptor EnPoDesert_Fields[] = {
     { "yDiff", 0x1A0, FIELD_TYPE_F32, 1 },
     { "targetY", 0x1A4, FIELD_TYPE_F32, 1 },
     { "lightColor", 0x220, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPoField_Fields[] = {
@@ -4781,7 +4773,7 @@ static FieldDescriptor EnPoField_Fields[] = {
     { "scaleModifier", 0x21C, FIELD_TYPE_F32, 1 },
     { "flameScale", 0x220, FIELD_TYPE_F32, 1 },
     { "flamePosition", 0x224, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPoRelay_Fields[] = {
@@ -4793,7 +4785,7 @@ static FieldDescriptor EnPoRelay_Fields[] = {
     { "textId", 0x19C, FIELD_TYPE_U16, 1 },
     { "eyeTextureIdx", 0x19E, FIELD_TYPE_U16, 1 },
     { "lightColor", 0x278, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPoSisters_Fields[] = {
@@ -4808,7 +4800,7 @@ static FieldDescriptor EnPoSisters_Fields[] = {
     { "unk_22E", 0x22E, FIELD_TYPE_U8, 1 },
     { "unk_234", 0x234, FIELD_TYPE_VEC3F, 8 },
     { "unk_294", 0x294, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnPoh_Fields[] = {
@@ -4821,7 +4813,7 @@ static FieldDescriptor EnPoh_Fields[] = {
     { "unk_19C", 0x19C, FIELD_TYPE_S16, 1 },
     { "lightColor", 0x29A, FIELD_TYPE_U8, 1 },
     { "envColor", 0x29E, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnRd_Fields[] = {
@@ -4837,7 +4829,7 @@ static FieldDescriptor EnRd_Fields[] = {
     { "unk_31B", 0x31B, FIELD_TYPE_U8, 1 },
     { "unk_31C", 0x31C, FIELD_TYPE_U8, 1 },
     { "unk_31D", 0x31D, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSa_Fields[] = {
@@ -4853,7 +4845,7 @@ static FieldDescriptor EnSa_Fields[] = {
     { "mouthIndex", 0x216, FIELD_TYPE_S16, 1 },
     { "alpha", 0x218, FIELD_TYPE_S16, 1 },
     { "unk_21A", 0x21A, FIELD_TYPE_VEC3S, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSb_Fields[] = {
@@ -4864,17 +4856,17 @@ static FieldDescriptor EnSb_Fields[] = {
     { "attackYaw", 0x200, FIELD_TYPE_S16, 1 },
     { "bouncesLeft", 0x202, FIELD_TYPE_S16, 1 },
     { "hitByWindArrow", 0x204, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnShopnuts_Fields[] = {
     { "animFlagAndTimer", 0x194, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSkb_Fields[] = {
     { "unk_288", 0x288, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSkj_Fields[] = {
@@ -4898,7 +4890,7 @@ static FieldDescriptor EnSkj_Fields[] = {
     { "unk_2EC", 0x2EC, FIELD_TYPE_F32, 1 },
     { "unk_2F0", 0x2F0, FIELD_TYPE_F32, 1 },
     { "posCopy", 0x2F4, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSsh_Fields[] = {
@@ -4922,7 +4914,7 @@ static FieldDescriptor EnSsh_Fields[] = {
     { "hitCount", 0x5CC, FIELD_TYPE_U8, 1 },
     { "blinkState", 0x5CE, FIELD_TYPE_S16, 1 },
     { "blinkTimer", 0x5D0, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSt_Fields[] = {
@@ -4954,7 +4946,7 @@ static FieldDescriptor EnSt_Fields[] = {
     { "colliderScale", 0x408, FIELD_TYPE_F32, 1 },
     { "floorHeightOffset", 0x40C, FIELD_TYPE_F32, 1 },
     { "swayAngle", 0x410, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSw_Fields[] = {
@@ -4987,7 +4979,7 @@ static FieldDescriptor EnSw_Fields[] = {
     { "unk_478", 0x478, FIELD_TYPE_VEC3F, 1 },
     { "unk_484", 0x484, FIELD_TYPE_VEC3F, 1 },
     { "unk_490", 0x490, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSyatekiMan_Fields[] = {
@@ -5002,7 +4994,7 @@ static FieldDescriptor EnSyatekiMan_Fields[] = {
     { "getItemId", 0x218, FIELD_TYPE_S32, 1 },
     { "cameraHold", 0x21C, FIELD_TYPE_U8, 1 },
     { "csCam", 0x228, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnSyatekiNiw_Fields[] = {
@@ -5044,7 +5036,7 @@ static FieldDescriptor EnSyatekiNiw_Fields[] = {
     { "unk_2E8", 0x2E8, FIELD_TYPE_VEC3F, 1 },
     { "unk_2F4", 0x2F4, FIELD_TYPE_F32, 1 },
     { "unk_2F8", 0x2F8, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTa_Fields[] = {
@@ -5060,7 +5052,7 @@ static FieldDescriptor EnTa_Fields[] = {
     { "unk_2DA", 0x2DA, FIELD_TYPE_VEC3S, 1 },
     { "unk_2E0", 0x2E0, FIELD_TYPE_U16, 1 },
     { "unk_2E2", 0x2E2, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTakaraMan_Fields[] = {
@@ -5076,7 +5068,7 @@ static FieldDescriptor EnTakaraMan_Fields[] = {
     { "pos", 0x220, FIELD_TYPE_VEC3F, 1 },
     { "unk_22C", 0x22C, FIELD_TYPE_VEC3S, 1 },
     { "unk_232", 0x232, FIELD_TYPE_VEC3S, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTest_Fields[] = {
@@ -5092,12 +5084,12 @@ static FieldDescriptor EnTest_Fields[] = {
     { "unk_7EC", 0x7EC, FIELD_TYPE_F32, 1 },
     { "meleeWeaponState", 0x808, FIELD_TYPE_S8, 1 },
     { "effectIndex", 0x80C, FIELD_TYPE_S32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTg_Fields[] = {
     { "nextDialogue", 0x208, FIELD_TYPE_U8, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTite_Fields[] = {
@@ -5110,7 +5102,7 @@ static FieldDescriptor EnTite_Fields[] = {
     { "frontRightFootPos", 0x354, FIELD_TYPE_VEC3F, 1 },
     { "backRightFootPos", 0x360, FIELD_TYPE_VEC3F, 1 },
     { "backLeftFootPos", 0x36C, FIELD_TYPE_VEC3F, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnToryo_Fields[] = {
@@ -5118,13 +5110,13 @@ static FieldDescriptor EnToryo_Fields[] = {
     { "unk_1E4", 0x1E4, FIELD_TYPE_S32, 1 },
     { "stateFlags", 0x1E8, FIELD_TYPE_U16, 1 },
     { "unk_1EA", 0x1EA, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnTr_Fields[] = {
     { "eyeIndex", 0x2E0, FIELD_TYPE_S16, 1 },
     { "blinkTimer", 0x2E2, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnVali_Fields[] = {
@@ -5133,7 +5125,7 @@ static FieldDescriptor EnVali_Fields[] = {
     { "timer", 0x196, FIELD_TYPE_S16, 1 },
     { "armScale", 0x2F4, FIELD_TYPE_F32, 1 },
     { "floatHomeHeight", 0x2F8, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnVm_Fields[] = {
@@ -5150,14 +5142,14 @@ static FieldDescriptor EnVm_Fields[] = {
     { "unk_25E", 0x25E, FIELD_TYPE_S16, 1 },
     { "unk_260", 0x260, FIELD_TYPE_S16, 1 },
     { "beamSpeed", 0x264, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnWallmas_Fields[] = {
     { "timer", 0x194, FIELD_TYPE_S16, 1 },
     { "switchFlag", 0x196, FIELD_TYPE_S16, 1 },
     { "yTarget", 0x2C4, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnWeiyer_Fields[] = {
@@ -5165,7 +5157,7 @@ static FieldDescriptor EnWeiyer_Fields[] = {
     { "unk_196", 0x196, FIELD_TYPE_S16, 1 },
     { "unk_27C", 0x27C, FIELD_TYPE_F32, 1 },
     { "unk_280", 0x280, FIELD_TYPE_F32, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnWf_Fields[] = {
@@ -5186,7 +5178,7 @@ static FieldDescriptor EnWf_Fields[] = {
     { "unk_4BC", 0x4BC, FIELD_TYPE_VEC3F, 1 },
     { "unk_4C8", 0x4C8, FIELD_TYPE_VEC3F, 1 },
     { "unk_4D4", 0x4D4, FIELD_TYPE_VEC3S, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnZf_Fields[] = {
@@ -5209,7 +5201,7 @@ static FieldDescriptor EnZf_Fields[] = {
     { "rightFootPos", 0x4E4, FIELD_TYPE_VEC3F, 1 },
     { "leftFootPos", 0x4F0, FIELD_TYPE_VEC3F, 1 },
     { "bodyPartsPos", 0x4FC, FIELD_TYPE_VEC3F, 9 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnZl4_Fields[] = {
@@ -5225,7 +5217,7 @@ static FieldDescriptor EnZl4_Fields[] = {
     { "talkTimer1", 0x212, FIELD_TYPE_S16, 1 },
     { "talkTimer2", 0x214, FIELD_TYPE_S16, 1 },
     { "lastAction", 0x216, FIELD_TYPE_S16, 1 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 static FieldDescriptor EnZo_Fields[] = {
@@ -5239,7 +5231,7 @@ static FieldDescriptor EnZo_Fields[] = {
     { "eyeTexture", 0x654, FIELD_TYPE_S16, 1 },
     { "unk_656", 0x656, FIELD_TYPE_S16, 20 },
     { "unk_67E", 0x67E, FIELD_TYPE_S16, 20 },
-    { NULL, 0, 0, 0 }  // Terminator
+    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator
 };
 
 // Actor sync info
@@ -5264,7 +5256,7 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_BOSS_GANONDROF, 0x578, 0x14C, 0x190, 0, 0, BossGanondrof_ActionFuncs, 9, BossGanondrof_Fields, 30 },
     { ACTOR_BOSS_GOMA, 0xB1C, 0x14C, 0x190, 0, 0, BossGoma_ActionFuncs, 18, BossGoma_Fields, 47 },
     { ACTOR_BOSS_TW, 0x6B4, 0x568, 0x14C, 0, 0, BossTw_ActionFuncs, 26, BossTw_Fields, 73 },
-    { ACTOR_BOSS_VA, 0x3B8, 0x14C, 0x190, 0, 0, BossVa_ActionFuncs, 23, BossVa_Fields, 29 },
+    { ACTOR_BOSS_VA, 0x3B8, 0x14C, 0x190, 0, 0, BossVa_ActionFuncs, 22, BossVa_Fields, 29 },
     { ACTOR_DOOR_KILLER, 0x284, 0x14C, 0x280, 9, 0, DoorKiller_ActionFuncs, 8, NULL, 0 },
     { ACTOR_DOOR_WARP1, 0x1F0, 0x14C, 0x1C0, 0, 0, DoorWarp1_ActionFuncs, 22, DoorWarp1_Fields, 1 },
     { ACTOR_EN_AM, 0x38C, 0x164, 0x254, 14, 14, EnAm_ActionFuncs, 10, EnAm_Fields, 10 },
@@ -5278,7 +5270,7 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_BIRD, 0x1DC, 0x14C, 0x190, 0, 0, EnBird_ActionFuncs, 2, EnBird_Fields, 14 },
     { ACTOR_EN_BOM_BOWL_MAN, 0x264, 0x14C, 0x214, 11, 11, EnBomBowlMan_ActionFuncs, 15, EnBomBowlMan_Fields, 19 },
     { ACTOR_EN_BOX, 0x1FC, 0x164, 0x1B4, 5, 5, EnBox_ActionFuncs, 9, EnBox_Fields, 7 },
-    { ACTOR_EN_BROB, 0x2C0, 0x164, 0x1A8, 10, 10, EnBrob_ActionFuncs, 7, EnBrob_Fields, 2 },
+    { ACTOR_EN_BROB, 0x2C0, 0x164, 0x1A8, 10, 10, EnBrob_ActionFuncs, 6, EnBrob_Fields, 2 },
     { ACTOR_EN_BUTTE, 0x268, 0x1AC, 0x250, 8, 8, EnButte_ActionFuncs, 4, EnButte_Fields, 9 },
     { ACTOR_EN_BW, 0x32C, 0x14C, 0x228, 12, 12, EnBw_ActionFuncs, 9, EnBw_Fields, 23 },
     { ACTOR_EN_COW, 0x280, 0x1E4, 0x27C, 6, 6, EnCow_ActionFuncs, 8, NULL, 0 },
@@ -5313,7 +5305,7 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_GE2, 0x30C, 0x198, 0x308, 22, 22, EnGe2_ActionFuncs, 5, NULL, 0 },
     { ACTOR_EN_GE3, 0x314, 0x198, 0x310, 20, 20, EnGe3_ActionFuncs, 5, NULL, 0 },
     { ACTOR_EN_GELDB, 0x4E4, 0x188, 0x2F4, 24, 24, EnGeldB_ActionFuncs, 17, EnGeldB_Fields, 18 },
-    { ACTOR_EN_GIRLA, 0x1D4, 0x14C, 0x198, 0, 0, EnGirlA_ActionFuncs, 2, EnGirlA_Fields, 11 },
+    { ACTOR_EN_GIRLA, 0x1D4, 0x14C, 0x198, 0, 0, EnGirlA_ActionFuncs, 1, EnGirlA_Fields, 11 },
     { ACTOR_EN_GM, 0x2D0, 0x14C, 0x26C, 18, 18, EnGm_ActionFuncs, 7, EnGm_Fields, 5 },
     { ACTOR_EN_GO, 0x38, 0x14C, 0x190, 18, 18, EnGo_ActionFuncs, 17, EnGo_Fields, 11 },
     { ACTOR_EN_GO2, 0xA, 0x14C, 0x190, 18, 18, EnGo2_ActionFuncs, 13, EnGo2_Fields, 26 },
@@ -5326,7 +5318,7 @@ static ActorSyncInfo actorSyncRegistry[] = {
     { ACTOR_EN_HS2, 0x2B0, 0x198, 0x2AC, 16, 16, EnHs2_ActionFuncs, 1, NULL, 0 },
     { ACTOR_EN_HY, 0x334, 0x14C, 0x190, 16, 16, EnHy_ActionFuncs, 9, EnHy_Fields, 17 },
     { ACTOR_EN_IK, 0x4DC, 0x14C, 0x304, 30, 30, EnIk_ActionFuncs, 11, EnIk_Fields, 6 },
-    { ACTOR_EN_IN, 0x3A8, 0x14C, 0x190, 20, 20, EnIn_ActionFuncs, 15, EnIn_Fields, 20 },
+    { ACTOR_EN_IN, 0x3A8, 0x14C, 0x190, 20, 20, EnIn_ActionFuncs, 14, EnIn_Fields, 20 },
     { ACTOR_EN_INSECT, 0x32C, 0x1AC, 0x310, 24, 24, EnInsect_ActionFuncs, 8, EnInsect_Fields, 9 },
     { ACTOR_EN_JJ, 0x314, 0x164, 0x2FC, 22, 22, EnJj_ActionFuncs, 5, EnJj_Fields, 7 },
     { ACTOR_EN_KAKASI, 0x20C, 0x150, 0x0, 0, 0, EnKakasi_ActionFuncs, 6, NULL, 0 },

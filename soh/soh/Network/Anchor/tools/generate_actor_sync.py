@@ -314,14 +314,17 @@ def parse_source(source_path: Path, actor_info: ActorInfo) -> None:
 
     action_funcs = set()
 
+    # Function names to skip (not real action functions)
+    skip_names = {'actionFunc', 'NULL', 'func', 'Function', 'Callback'}
+
     for match in setup_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name != 'actionFunc':  # Skip the parameter name
+        if func_name not in skip_names:
             action_funcs.add(func_name)
 
     for match in direct_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name != 'actionFunc':
+        if func_name not in skip_names:
             action_funcs.add(func_name)
 
     actor_info.action_funcs = sorted(list(action_funcs))
@@ -443,7 +446,7 @@ def generate_c_code(actors: List[ActorInfo]) -> str:
                 }
                 field_type = type_map.get(field.c_type, 'FIELD_TYPE_U8')
                 lines.append(f'    {{ "{field.name}", 0x{field.offset:X}, {field_type}, {field.array_size} }},')
-            lines.append("    { NULL, 0, 0, 0 }  // Terminator")
+            lines.append("    { NULL, 0, FIELD_TYPE_U8, 0 }  // Terminator")
             lines.append("};")
             lines.append("")
 

@@ -1,6 +1,7 @@
 #include "soh/Network/Anchor/Anchor.h"
 #include "soh/Network/Anchor/AnchorHelpers.h"
 #include "soh/Network/Anchor/JsonConversions.hpp"
+#include "soh/Network/Anchor/ActorSerializer.h"
 #include <nlohmann/json.hpp>
 #include <libultraship/libultraship.h>
 #include <set>
@@ -520,7 +521,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                 actorJson["params"] = actor->params;
                 actorJson["room"] = actor->room;
 
-                // Position and rotation
+                // Position and rotation (always sync these)
                 actorJson["pos"] = actor->world.pos;
                 actorJson["wRot"] = actor->world.rot;   // World rotation
                 actorJson["sRot"] = actor->shape.rot;   // Shape/visual rotation
@@ -545,6 +546,15 @@ void Anchor::SendPacket_WorldSnapshot() {
                     if (skelAnime != nullptr && skelAnime->animation != nullptr) {
                         actorJson["animFrame"] = skelAnime->curFrame;
                         actorJson["animSpeed"] = skelAnime->playSpeed;
+                    }
+                }
+
+                // Full AI state serialization (actionFunc, state variables, jointTable, morphTable)
+                // This gives us 100% sync for actors with serialization info
+                if (IsActorSyncable(actor->id)) {
+                    nlohmann::json aiState = SerializeActorState(actor);
+                    if (!aiState.empty()) {
+                        actorJson["aiState"] = aiState;
                     }
                 }
 
@@ -796,6 +806,12 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                     }
                 }
             }
+        }
+
+        // Apply full AI state if available (actionFunc, state variables, jointTable, morphTable)
+        // This gives us 100% sync for actors with serialization info
+        if (actorJson.contains("aiState") && IsActorSyncable(actor->id)) {
+            DeserializeActorState(actor, actorJson["aiState"]);
         }
 
         // Handle death (health = 0 means actor should die)
