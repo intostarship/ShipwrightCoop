@@ -145,20 +145,6 @@ void Anchor::HandlePacket_UpdateTeamState(nlohmann::json payload) {
         gSaveContext.ship.quest = loadedData.ship.quest;
 
         for (int i = 0; i < 124; i++) {
-            if (i == SCENE_WATER_TEMPLE) {
-                // Keep water temple water level flags
-                u32 mask = (1 << 0x1C) | (1 << 0x1D) | (1 << 0x1E);
-                loadedData.sceneFlags[i].swch =
-                    (loadedData.sceneFlags[i].swch & ~mask) | (gSaveContext.sceneFlags[i].swch & mask);
-            }
-
-            if (i == SCENE_FOREST_TEMPLE) {
-                // Keep forest temple elevator flag
-                u32 mask = (1 << 0x1B);
-                loadedData.sceneFlags[i].swch =
-                    (loadedData.sceneFlags[i].swch & ~mask) | (gSaveContext.sceneFlags[i].swch & mask);
-            }
-
             gSaveContext.sceneFlags[i] = loadedData.sceneFlags[i];
             if (IsSaveLoaded() && gPlayState->sceneNum == i) {
                 gPlayState->actorCtx.flags.chest = loadedData.sceneFlags[i].chest;

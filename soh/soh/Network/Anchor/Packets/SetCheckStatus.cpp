@@ -32,26 +32,38 @@ void Anchor::SendPacket_SetCheckStatus(RandomizerCheck rc) {
 }
 
 void Anchor::HandlePacket_SetCheckStatus(nlohmann::json payload) {
-    if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
-        return;
+    try {
+        if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
+            return;
+        }
+
+        if (!payload.contains("rc") || !payload.contains("status") || !payload.contains("skipped")) {
+            return;
+        }
+
+        auto randoContext = Rando::Context::GetInstance();
+        if (randoContext == nullptr) {
+            return;
+        }
+
+        RandomizerCheck rc = payload["rc"].get<RandomizerCheck>();
+        RandomizerCheckStatus status = payload["status"].get<RandomizerCheckStatus>();
+        bool skipped = payload["skipped"].get<bool>();
+
+        isResultOfHandling = true;
+
+        if (randoContext->GetItemLocation(rc)->GetCheckStatus() != status) {
+            randoContext->GetItemLocation(rc)->SetCheckStatus(status);
+        }
+        if (randoContext->GetItemLocation(rc)->GetIsSkipped() != skipped) {
+            randoContext->GetItemLocation(rc)->SetIsSkipped(skipped);
+        }
+
+        CheckTracker::RecalculateAllAreaTotals();
+        CheckTracker::RecalculateAvailableChecks();
+        isResultOfHandling = false;
+    } catch (const std::exception& e) {
+        isResultOfHandling = false;  // Reset flag on error
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_SetCheckStatus: {}", e.what());
     }
-
-    auto randoContext = Rando::Context::GetInstance();
-
-    RandomizerCheck rc = payload["rc"].get<RandomizerCheck>();
-    RandomizerCheckStatus status = payload["status"].get<RandomizerCheckStatus>();
-    bool skipped = payload["skipped"].get<bool>();
-
-    isResultOfHandling = true;
-
-    if (randoContext->GetItemLocation(rc)->GetCheckStatus() != status) {
-        randoContext->GetItemLocation(rc)->SetCheckStatus(status);
-    }
-    if (randoContext->GetItemLocation(rc)->GetIsSkipped() != skipped) {
-        randoContext->GetItemLocation(rc)->SetIsSkipped(skipped);
-    }
-
-    CheckTracker::RecalculateAllAreaTotals();
-    CheckTracker::RecalculateAvailableChecks();
-    isResultOfHandling = false;
 }

@@ -30,10 +30,18 @@ void Anchor::SendPacket_UpdateBeansCount() {
 }
 
 void Anchor::HandlePacket_UpdateBeansCount(nlohmann::json payload) {
-    if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
-        return;
-    }
+    try {
+        if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
+            return;
+        }
 
-    AMMO(ITEM_BEAN) = payload["amount"].get<s8>();
-    BEANS_BOUGHT = payload["amountBought"].get<s8>();
+        if (!payload.contains("amount") || !payload.contains("amountBought")) {
+            return;
+        }
+
+        AMMO(ITEM_BEAN) = payload["amount"].get<s8>();
+        BEANS_BOUGHT = payload["amountBought"].get<s8>();
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_UpdateBeansCount: {}", e.what());
+    }
 }

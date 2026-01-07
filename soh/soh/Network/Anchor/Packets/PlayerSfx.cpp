@@ -36,12 +36,20 @@ void Anchor::SendPacket_PlayerSfx(u16 sfxId) {
 }
 
 void Anchor::HandlePacket_PlayerSfx(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    u16 sfxId = payload["sfxId"].get<u16>();
+    try {
+        if (!payload.contains("clientId") || !payload.contains("sfxId")) {
+            return;
+        }
 
-    if (!clients.contains(clientId) || !clients[clientId].player) {
-        return;
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        u16 sfxId = payload["sfxId"].get<u16>();
+
+        if (!clients.contains(clientId) || !clients[clientId].player) {
+            return;
+        }
+
+        Player_PlaySfx((Actor*)clients[clientId].player, sfxId);
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_PlayerSfx: {}", e.what());
     }
-
-    Player_PlaySfx((Actor*)clients[clientId].player, sfxId);
 }

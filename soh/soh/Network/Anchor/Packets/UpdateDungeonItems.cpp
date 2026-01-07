@@ -28,11 +28,23 @@ void Anchor::SendPacket_UpdateDungeonItems() {
 }
 
 void Anchor::HandlePacket_UpdateDungeonItems(nlohmann::json payload) {
-    if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
-        return;
-    }
+    try {
+        if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
+            return;
+        }
 
-    u16 mapIndex = payload["mapIndex"].get<u16>();
-    gSaveContext.inventory.dungeonItems[mapIndex] = payload["dungeonItems"].get<u8>();
-    gSaveContext.inventory.dungeonKeys[mapIndex] = payload["dungeonKeys"].get<s8>();
+        if (!payload.contains("mapIndex") || !payload.contains("dungeonItems") || !payload.contains("dungeonKeys")) {
+            return;
+        }
+
+        u16 mapIndex = payload["mapIndex"].get<u16>();
+        if (mapIndex >= ARRAY_COUNT(gSaveContext.inventory.dungeonItems)) {
+            return;  // Bounds check
+        }
+
+        gSaveContext.inventory.dungeonItems[mapIndex] = payload["dungeonItems"].get<u8>();
+        gSaveContext.inventory.dungeonKeys[mapIndex] = payload["dungeonKeys"].get<s8>();
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_UpdateDungeonItems: {}", e.what());
+    }
 }

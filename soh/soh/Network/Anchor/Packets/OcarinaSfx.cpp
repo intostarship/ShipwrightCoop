@@ -39,27 +39,36 @@ void Anchor::SendPacket_OcarinaSfx(uint8_t note, float modulator, int8_t bend) {
 }
 
 void Anchor::HandlePacket_OcarinaSfx(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    uint8_t note = payload["note"].get<uint8_t>();
-    float modulator = payload["modulator"].get<float>();
-    int8_t bend = payload["bend"].get<int8_t>();
+    try {
+        if (!payload.contains("clientId") || !payload.contains("note") ||
+            !payload.contains("modulator") || !payload.contains("bend")) {
+            return;
+        }
 
-    if (!clients.contains(clientId) || !clients[clientId].player) {
-        return;
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        uint8_t note = payload["note"].get<uint8_t>();
+        float modulator = payload["modulator"].get<float>();
+        int8_t bend = payload["bend"].get<int8_t>();
+
+        if (!clients.contains(clientId) || !clients[clientId].player) {
+            return;
+        }
+
+        auto& client = clients[clientId];
+        client.ocarinaModulator = modulator;
+        client.ocarinaBend = bend;
+
+        if ((note != 0xFF) && (client.ocarinaNote != note)) {
+            Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD07, client.ocarinaBend - 1);
+            Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD05, note);
+            Audio_PlaySoundGeneral(NA_SE_OC_OCARINA, &client.player->actor.projectedPos, 4, &client.ocarinaModulator,
+                                   &D_80130F28, &gSfxDefaultReverb);
+        } else if ((client.ocarinaNote != 0xFF) && (note == 0xFF)) {
+            Audio_StopSfxById(NA_SE_OC_OCARINA);
+        }
+
+        client.ocarinaNote = note;
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_OcarinaSfx: {}", e.what());
     }
-
-    auto& client = clients[clientId];
-    client.ocarinaModulator = modulator;
-    client.ocarinaBend = bend;
-
-    if ((note != 0xFF) && (client.ocarinaNote != note)) {
-        Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD07, client.ocarinaBend - 1);
-        Audio_QueueCmdS8(0x6 << 24 | SEQ_PLAYER_SFX << 16 | 0xD05, note);
-        Audio_PlaySoundGeneral(NA_SE_OC_OCARINA, &client.player->actor.projectedPos, 4, &client.ocarinaModulator,
-                               &D_80130F28, &gSfxDefaultReverb);
-    } else if ((client.ocarinaNote != 0xFF) && (note == 0xFF)) {
-        Audio_StopSfxById(NA_SE_OC_OCARINA);
-    }
-
-    client.ocarinaNote = note;
 }

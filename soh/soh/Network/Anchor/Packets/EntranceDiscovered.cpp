@@ -24,10 +24,18 @@ void Anchor::SendPacket_EntranceDiscovered(u16 entranceIndex) {
 }
 
 void Anchor::HandlePacket_EntranceDiscovered(nlohmann::json payload) {
-    if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
-        return;
-    }
+    try {
+        if (!IsSaveLoaded() || !roomState.syncItemsAndFlags) {
+            return;
+        }
 
-    u16 entranceIndex = payload["entranceIndex"].get<u16>();
-    Entrance_SetEntranceDiscovered(entranceIndex, 1);
+        if (!payload.contains("entranceIndex")) {
+            return;
+        }
+
+        u16 entranceIndex = payload["entranceIndex"].get<u16>();
+        Entrance_SetEntranceDiscovered(entranceIndex, 1);
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_EntranceDiscovered: {}", e.what());
+    }
 }

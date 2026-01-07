@@ -58,17 +58,6 @@ void Anchor::HandlePacket_SetFlag(nlohmann::json payload) {
                 Inventory_ReplaceItem(gPlayState, ITEM_LETTER_RUTO, ITEM_BOTTLE);
             }
         } else {
-            // Special case: Ignore water temple water level flags, stored at 0x1C, 0x1D, 0x1E.
-            if (sceneNum == SCENE_WATER_TEMPLE && flagType == FLAG_SCENE_SWITCH &&
-                (flag == 0x1C || flag == 0x1D || flag == 0x1E)) {
-                return;
-            }
-
-            // Special case: Ignore forest temple elevator flag, stored at 0x1B.
-            if (sceneNum == SCENE_FOREST_TEMPLE && flagType == FLAG_SCENE_SWITCH && flag == 0x1B) {
-                return;
-            }
-
             auto effect = new GameInteractionEffect::SetSceneFlag();
             effect->parameters[0] = sceneNum;
             effect->parameters[1] = flagType;

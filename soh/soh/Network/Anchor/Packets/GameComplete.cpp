@@ -26,17 +26,25 @@ void Anchor::SendPacket_GameComplete() {
 }
 
 void Anchor::HandlePacket_GameComplete(nlohmann::json payload) {
-    uint32_t clientId = payload["clientId"].get<uint32_t>();
-    if (!clients.contains(clientId)) {
-        return;
+    try {
+        if (!payload.contains("clientId")) {
+            return;
+        }
+
+        uint32_t clientId = payload["clientId"].get<uint32_t>();
+        if (!clients.contains(clientId)) {
+            return;
+        }
+
+        AnchorClient& anchorClient = clients[clientId];
+        anchorClient.isGameComplete = true;
+        bool isGlobalRoom = (std::string("soh-global") == CVarGetString(CVAR_REMOTE_ANCHOR("RoomId"), ""));
+
+        Notification::Emit({
+            .prefix = isGlobalRoom ? "Someone" : anchorClient.name,
+            .message = RandomElement(gameCompleteMessages),
+        });
+    } catch (const std::exception& e) {
+        SPDLOG_ERROR("[Anchor] Error in HandlePacket_GameComplete: {}", e.what());
     }
-
-    AnchorClient& anchorClient = clients[clientId];
-    anchorClient.isGameComplete = true;
-    bool isGlobalRoom = (std::string("soh-global") == CVarGetString(CVAR_REMOTE_ANCHOR("RoomId"), ""));
-
-    Notification::Emit({
-        .prefix = isGlobalRoom ? "Someone" : anchorClient.name,
-        .message = RandomElement(gameCompleteMessages),
-    });
 }
