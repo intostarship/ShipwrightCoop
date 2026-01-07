@@ -987,13 +987,6 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                 continue;
             }
 
-            // Also check the ownership map (for actors we can't find locally)
-            auto ownerIt = networkIdToOwner.find(oldNetworkId);
-            if (ownerIt != networkIdToOwner.end() && ownerIt->second == sessionId) {
-                // We own this actor - don't despawn it just because someone else stopped sending
-                continue;
-            }
-
             if (actorToCheck != nullptr && actorToCheck->update != nullptr) {
                 // CRITICAL: Only despawn if actor is in the sender's room
                 // If sender is in room 1 but this actor is in room 0, the sender
