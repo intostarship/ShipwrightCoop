@@ -75,6 +75,10 @@ void DummyPlayer_Init(Actor* actor, PlayState* play) {
     play->func_11D54(player, play);
     // #endregion
 
+    // Prevent skelAnime from playing its own animation - we'll set jointTable directly from network
+    player->skelAnime.mode = 0;
+    player->upperSkelAnime.mode = 0;
+
     player->cylinder.base.acFlags = AC_ON | AC_TYPE_PLAYER;
     player->cylinder.base.ocFlags2 = OC2_TYPE_1;
     player->cylinder.info.bumperFlags = BUMP_ON | BUMP_HOOKABLE | BUMP_NO_HITMARK;
@@ -169,13 +173,15 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
 
     // Apply all 5 animation tables for 100% accurate animation sync
     // This includes upper body animations (arms raised when holding items, etc.)
-    player->skelAnime.jointTable = client.jointTable;
-    player->skelAnime.morphTable = client.morphTable;
+    // IMPORTANT: Copy values instead of just pointing, to avoid timing issues
+    // where the game's animation system might overwrite our data
     for (int i = 0; i < 24; i++) {
+        player->skelAnime.jointTable[i] = client.jointTable[i];
+        player->skelAnime.morphTable[i] = client.morphTable[i];
         player->blendTable[i] = client.blendTable[i];
+        player->upperSkelAnime.jointTable[i] = client.upperJointTable[i];
+        player->upperSkelAnime.morphTable[i] = client.upperMorphTable[i];
     }
-    player->upperSkelAnime.jointTable = client.upperJointTable;
-    player->upperSkelAnime.morphTable = client.upperMorphTable;
 
     player->skelAnime.movementFlags = client.movementFlags;
     Math_Vec3s_Copy(&player->skelAnime.prevTransl, &client.prevTransl);
@@ -307,6 +313,16 @@ void DummyPlayer_Draw(Actor* actor, PlayState* play) {
 
     if (client.sceneNum != gPlayState->sceneNum || !client.online || !client.isSaveLoaded) {
         return;
+    }
+
+    // Re-apply animation tables RIGHT BEFORE drawing
+    // This ensures nothing can overwrite them between Update and Draw
+    for (int i = 0; i < 24; i++) {
+        player->skelAnime.jointTable[i] = client.jointTable[i];
+        player->skelAnime.morphTable[i] = client.morphTable[i];
+        player->blendTable[i] = client.blendTable[i];
+        player->upperSkelAnime.jointTable[i] = client.upperJointTable[i];
+        player->upperSkelAnime.morphTable[i] = client.upperMorphTable[i];
     }
 
     // Hack to account for usage of gSaveContext in Player_Draw

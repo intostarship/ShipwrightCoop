@@ -242,12 +242,6 @@ Actor* Anchor::FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
-            // Skip if already has a networkActorId
-            if (actorToNetworkId.find(actor) != actorToNetworkId.end()) {
-                actor = actor->next;
-                continue;
-            }
-
             // Check if type matches (ignore params - they may differ due to randomizer)
             if (actor->id == actorId) {
                 // Check home position distance
@@ -440,6 +434,11 @@ void Anchor::SendPacket_WorldSnapshot() {
         lastSnapshotSceneNum = gPlayState->sceneNum;
         lastSnapshotRoomNum = curRoom;
         receivedSnapshotCount = 0;
+        snapshotSeqCounter = 0;  // Reset our sequence counter
+        // Reset all clients' lastSnapshotSeq so we accept their first packet in new room
+        for (auto& [clientId, client] : clients) {
+            client.lastSnapshotSeq = 0;
+        }
         ClearNetworkIds();  // Clear actor network IDs on scene/room change
     }
 
@@ -496,6 +495,7 @@ void Anchor::SendPacket_WorldSnapshot() {
 
     nlohmann::json payload;
     payload["type"] = WORLD_SNAPSHOT;
+    payload["seq"] = ++snapshotSeqCounter;  // Incrementing sequence for stale packet detection
     payload["sceneNum"] = gPlayState->sceneNum;
     payload["roomNum"] = gPlayState->roomCtx.curRoom.num;  // Current room for room-based filtering
     payload["actors"] = nlohmann::json::array();
@@ -763,8 +763,22 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             SPDLOG_WARN("[Anchor] Received WORLD_SNAPSHOT from client {} but couldn't find sessionId", senderClientId);
             return;
         }
-        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} (session {}) with {} actors (snapshot {}/{})",
-                    senderClientId, senderSessionId, payload["actors"].size(), receivedSnapshotCount, REQUIRED_SNAPSHOTS);
+
+        // Check sequence number to drop stale packets
+        // This prevents lag accumulation - if we're behind, drop old packets to catch up
+        u32 seq = payload.contains("seq") ? payload["seq"].get<u32>() : 0;
+        if (seq > 0 && clients.contains(senderClientId)) {
+            u32 lastSeq = clients[senderClientId].lastSnapshotSeq;
+            if (seq <= lastSeq) {
+                // Old or duplicate packet - skip it to catch up
+                SPDLOG_DEBUG("[Anchor] Dropping stale WORLD_SNAPSHOT seq={} (last={})", seq, lastSeq);
+                return;
+            }
+            clients[senderClientId].lastSnapshotSeq = seq;
+        }
+
+        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} (session {}) with {} actors (seq={}, snapshot {}/{})",
+                    senderClientId, senderSessionId, payload["actors"].size(), seq, receivedSnapshotCount, REQUIRED_SNAPSHOTS);
 
     // Apply scene flags from the snapshot - this syncs chest/switch/collectible state
     if (payload.contains("sceneFlags")) {
@@ -937,20 +951,33 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             }
         }
 
-        // Step 3: If actor doesn't exist locally, skip it
-        // We do NOT spawn missing actors because:
-        // - Different randomizer seeds create different actor sets
-        // - Actor initialization is complex and context-dependent
-        // - Spawning can crash if the actor type isn't meant to exist here
-        // Instead, we only sync state for actors that exist on BOTH sides
+        // Step 3: If actor doesn't exist locally, spawn it (only if room is loaded!)
         bool justSpawned = false;
         if (actor == nullptr) {
-            // Actor doesn't exist locally - skip it, don't try to spawn
-            // This is expected when players have different randomizer configurations
-            continue;
+            // CRITICAL: Only spawn if the actor's room is currently loaded
+            // Spawning in an unloaded room crashes because object banks aren't in memory
+            if (!IsRoomLoaded(actorRoom)) {
+                continue;  // Skip actors in unloaded rooms
+            }
+
+            // Actor doesn't exist locally - spawn it from network data
+            Vec3f pos = actorJson["pos"].get<Vec3f>();
+            Vec3s rot = actorJson.contains("wRot") ? actorJson["wRot"].get<Vec3s>() : Vec3s{0, 0, 0};
+
+            actor = Actor_Spawn(&gPlayState->actorCtx, gPlayState, actorId, pos.x, pos.y, pos.z,
+                                rot.x, rot.y, rot.z, params, false);
+
+            if (actor != nullptr) {
+                justSpawned = true;
+                SetActorNetworkId(actor, networkActorId);
+                SPDLOG_INFO("[Anchor] Spawned actor id={} networkActorId={} from network", actorId, networkActorId);
+            } else {
+                SPDLOG_WARN("[Anchor] Failed to spawn actor id={} networkActorId={}", actorId, networkActorId);
+                continue;
+            }
         }
 
-        // Skip if actor is still null (couldn't find or spawn it)
+        // Skip if actor is still null (couldn't spawn it)
         if (actor == nullptr) {
             continue;
         }

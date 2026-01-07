@@ -67,6 +67,9 @@ typedef struct {
     Vec3s interpTargetRot;
     bool interpHasData;
 
+    // Snapshot sequencing - to drop old packets and catch up
+    u32 lastSnapshotSeq;  // Last received snapshot sequence from this client
+
     // Ptr to the dummy player
     Player* player;
 } AnchorClient;
@@ -159,6 +162,7 @@ class Anchor : public Network {
     s16 lastSnapshotSceneNum = -1;
     s8 lastSnapshotRoomNum = -1;
     int receivedSnapshotCount = 0;  // Wait for N snapshots before broadcasting (prevents overwriting existing state)
+    u32 snapshotSeqCounter = 0;     // Incrementing sequence number for sent snapshots
 
     // Network ID system - unique IDs assigned by first player in scene
     std::map<Actor*, u32> actorToNetworkId;      // Actor pointer -> network ID
