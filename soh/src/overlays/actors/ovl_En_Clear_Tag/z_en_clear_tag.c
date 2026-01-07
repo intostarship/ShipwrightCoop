@@ -4,7 +4,6 @@
 
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -336,14 +335,6 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
     EnClearTag* this = (EnClearTag*)thisx;
     Player* player = GET_PLAYER(play);
 
-    // Anchor: Target closest player
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &player->actor;
-    }
-    Player* targetPlayer = (Player*)targetActor;
-    this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetActor->world.pos);
-
     this->frameCounter++;
 
     if (this->drawMode != CLEAR_TAG_DRAW_MODE_EFFECT) {
@@ -402,14 +393,14 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
 
                         if (this->actor.params == CLEAR_TAG_ARWING) {
                             // Set the Arwing to fly in a circle around the player.
-                            f32 targetCircleX = Math_SinS(targetPlayer->actor.shape.rot.y) * 400.0f;
-                            f32 targetCircleZ = Math_CosS(targetPlayer->actor.shape.rot.y) * 400.0f;
+                            f32 targetCircleX = Math_SinS(player->actor.shape.rot.y) * 400.0f;
+                            f32 targetCircleZ = Math_CosS(player->actor.shape.rot.y) * 400.0f;
 
                             this->targetPosition.x =
-                                Rand_CenteredFloat(700.0f) + (targetPlayer->actor.world.pos.x + targetCircleX);
-                            this->targetPosition.y = Rand_ZeroFloat(200.0f) + targetPlayer->actor.world.pos.y + 150.0f;
+                                Rand_CenteredFloat(700.0f) + (player->actor.world.pos.x + targetCircleX);
+                            this->targetPosition.y = Rand_ZeroFloat(200.0f) + player->actor.world.pos.y + 150.0f;
                             this->targetPosition.z =
-                                Rand_CenteredFloat(700.0f) + (targetPlayer->actor.world.pos.z + targetCircleZ);
+                                Rand_CenteredFloat(700.0f) + (player->actor.world.pos.z + targetCircleZ);
                         } else {
                             // Set the Arwing to fly to a random position.
                             this->targetPosition.x = Rand_CenteredFloat(700.0f);
@@ -426,9 +417,9 @@ void EnClearTag_Update(Actor* thisx, PlayState* play2) {
                 loseTargetLockDistance = 100.0f;
                 if (this->state == CLEAR_TAG_STATE_TARGET_LOCKED) {
                     // Set the Arwing to fly towards the player.
-                    this->targetPosition.x = targetPlayer->actor.world.pos.x;
-                    this->targetPosition.y = targetPlayer->actor.world.pos.y + 40.0f;
-                    this->targetPosition.z = targetPlayer->actor.world.pos.z;
+                    this->targetPosition.x = player->actor.world.pos.x;
+                    this->targetPosition.y = player->actor.world.pos.y + 40.0f;
+                    this->targetPosition.z = player->actor.world.pos.z;
                     rotationScale = 7;
                     xRotationTarget = 0x1000;
                     loseTargetLockDistance = 150.0f;

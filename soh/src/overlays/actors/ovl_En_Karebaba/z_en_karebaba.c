@@ -8,7 +8,6 @@
 #include "objects/object_dekubaba/object_dekubaba.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
 
@@ -257,11 +256,7 @@ void EnKarebaba_Awaken(EnKarebaba* this, PlayState* play) {
 }
 
 void EnKarebaba_Upright(EnKarebaba* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
 
     SkelAnime_Update(&this->skelAnime);
 
@@ -276,7 +271,7 @@ void EnKarebaba_Upright(EnKarebaba* this, PlayState* play) {
     if (this->bodyCollider.base.acFlags & AC_HIT) {
         EnKarebaba_SetupDying(this);
         Enemy_StartFinishingBlow(play, &this->actor);
-    } else if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) > 240.0f) {
+    } else if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) > 240.0f) {
         EnKarebaba_SetupRetract(this);
     } else if (this->actor.params == 0) {
         EnKarebaba_SetupSpin(this);
@@ -420,13 +415,6 @@ void EnKarebaba_Update(Actor* thisx, PlayState* play) {
     s32 pad;
     EnKarebaba* this = (EnKarebaba*)thisx;
     f32 height;
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-    }
 
     this->actionFunc(this, play);
 

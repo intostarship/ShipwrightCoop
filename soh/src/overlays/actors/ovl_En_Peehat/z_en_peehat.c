@@ -4,7 +4,6 @@
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -334,12 +333,7 @@ void EnPeehat_Ground_StateGround(EnPeehat* this, PlayState* play) {
     if (IS_DAY || CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0)) {
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
         if (this->riseDelayTimer == 0) {
-            Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-            if (targetPlayer == NULL) {
-                targetPlayer = &GET_PLAYER(play)->actor;
-            }
-
-            if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < this->xzDistToRise) {
+            if (this->actor.xzDistToPlayer < this->xzDistToRise) {
                 EnPeehat_Ground_SetStateRise(this);
             }
         } else {
@@ -374,12 +368,7 @@ void EnPeehat_Flying_SetStateGround(EnPeehat* this) {
 
 void EnPeehat_Flying_StateGrounded(EnPeehat* this, PlayState* play) {
     if (IS_DAY) {
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer == NULL) {
-            targetPlayer = &GET_PLAYER(play)->actor;
-        }
-
-        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < this->xzDistToRise) {
+        if (this->actor.xzDistToPlayer < this->xzDistToRise) {
             EnPeehat_Flying_SetStateRise(this);
         }
     } else {
@@ -406,16 +395,9 @@ void EnPeehat_Flying_SetStateFly(EnPeehat* this) {
 void EnPeehat_Flying_StateFly(EnPeehat* this, PlayState* play) {
     Audio_PlayActorSound2(&this->actor, NA_SE_EN_PIHAT_FLY - SFX_FLAG);
     SkelAnime_Update(&this->skelAnime);
-    
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-
-    if (!IS_DAY || this->xzDistToRise < distToTarget) {
+    if (!IS_DAY || this->xzDistToRise < this->actor.xzDistToPlayer) {
         EnPeehat_Flying_SetStateLanding(this);
-    } else if (distToTarget < this->xzDistMax) {
+    } else if (this->actor.xzDistToPlayer < this->xzDistMax) {
         if (this->unk_2FA < MAX_LARVA && (play->gameplayFrames & 7) == 0) {
             Actor* larva = Actor_SpawnAsChild(&play->actorCtx, &this->actor, play, ACTOR_EN_PEEHAT,
                                               Rand_CenteredFloat(25.0f) + this->actor.world.pos.x,
@@ -521,11 +503,7 @@ void EnPeehat_Ground_SetStateSeekPlayer(EnPeehat* this) {
 }
 
 void EnPeehat_Ground_StateSeekPlayer(EnPeehat* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
 
     Math_SmoothStepToF(&this->actor.speedXZ, 3.0f, 1.0f, 0.25f, 0.0f);
     Math_SmoothStepToF(&this->actor.world.pos.y, this->actor.floorHeight + 80.0f, 1.0f, 3.0f, 0.0f);
@@ -535,7 +513,7 @@ void EnPeehat_Ground_StateSeekPlayer(EnPeehat* this, PlayState* play) {
     } else {
         this->seekPlayerTimer--;
     }
-    if (IS_DAY && (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->xzDistMax)) {
+    if (IS_DAY && (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->xzDistMax)) {
         Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 1, 1000, 0);
         if (this->unk_2FA != 0) {
             this->actor.shape.rot.y += 0x1C2;
@@ -562,14 +540,8 @@ void EnPeehat_Larva_SetStateSeekPlayer(EnPeehat* this) {
 void EnPeehat_Larva_StateSeekPlayer(EnPeehat* this, PlayState* play) {
     f32 speedXZ = 5.3f;
 
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-
-    if (distToTarget <= 5.3f) {
-        speedXZ = distToTarget + 0.0005f;
+    if (this->actor.xzDistToPlayer <= 5.3f) {
+        speedXZ = this->actor.xzDistToPlayer + 0.0005f;
     }
     if (this->actor.parent != NULL && this->actor.parent->update == NULL) {
         this->actor.parent = NULL;
@@ -692,11 +664,7 @@ void EnPeehat_Ground_SetStateHover(EnPeehat* this) {
 
 void EnPeehat_Ground_StateHover(EnPeehat* this, PlayState* play) {
     f32 cos;
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
 
     // hover but don't gain altitude
     if (this->actor.world.pos.y - this->actor.floorHeight > 75.0f) {
@@ -721,7 +689,7 @@ void EnPeehat_Ground_StateHover(EnPeehat* this, PlayState* play) {
     }
     this->actor.shape.rot.y += 0x15E;
     // if daytime, and the player is close to the initial spawn position
-    if (IS_DAY && Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->xzDistMax) {
+    if (IS_DAY && Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->xzDistMax) {
         this->actor.world.rot.y = this->actor.yawTowardsPlayer;
         EnPeehat_Ground_SetStateSeekPlayer(this);
         this->unk_2FA = play->gameplayFrames & 1;
@@ -743,12 +711,9 @@ void EnPeehat_Ground_SetStateReturnHome(EnPeehat* this) {
 void EnPeehat_Ground_StateReturnHome(EnPeehat* this, PlayState* play) {
     f32 cos;
     s16 yRot;
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player;
 
+    player = GET_PLAYER(play);
     if (this->actor.world.pos.y - this->actor.floorHeight > 75.0f) {
         this->actor.world.pos.y -= 1.0f;
     } else {
@@ -766,7 +731,7 @@ void EnPeehat_Ground_StateReturnHome(EnPeehat* this, PlayState* play) {
         EnPeehat_Ground_SetStateLanding(this);
         this->riseDelayTimer = 60;
     }
-    if (IS_DAY && Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->xzDistMax) {
+    if (IS_DAY && Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->xzDistMax) {
         this->seekPlayerTimer = 400;
         EnPeehat_Ground_SetStateSeekPlayer(this);
         this->unk_2FA = (play->gameplayFrames & 1);

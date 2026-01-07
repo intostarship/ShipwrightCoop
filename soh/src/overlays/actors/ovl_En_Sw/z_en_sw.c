@@ -2,7 +2,6 @@
 #include "objects/object_st/object_st.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -699,23 +698,14 @@ s16 func_80B0DE34(EnSw* this, Vec3f* arg1) {
 }
 
 s32 func_80B0DEA8(EnSw* this, PlayState* play, s32 arg2) {
-    Player* localPlayer = GET_PLAYER(play);
-    
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* player = (Player*)targetActor;
-
+    Player* player = GET_PLAYER(play);
     CollisionPoly* sp58;
     s32 sp54;
     Vec3f sp48;
 
-    // Anchor: If checking remote player, maybe skip ladder check?
-    // Or assume remote player state is synced enough.
     if (!(player->stateFlags1 & PLAYER_STATE1_CLIMBING_LADDER) && arg2) {
         return false;
-    } else if (func_8002DDF4(play) && arg2) { // func_8002DDF4 is usually Player_IsFacingActor
+    } else if (func_8002DDF4(play) && arg2) {
         return false;
     } else if (ABS(func_80B0DE34(this, &player->actor.world.pos) - this->actor.shape.rot.z) >= 0x1FC2) {
         return false;
@@ -912,15 +902,6 @@ void EnSw_Update(Actor* thisx, PlayState* play) {
 
     SkelAnime_Update(&this->skelAnime);
     func_80B0C9F0(this, play);
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-    }
-
     this->actionFunc(this, play);
     func_80B0CBE8(this, play);
 }

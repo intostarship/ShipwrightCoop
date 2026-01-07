@@ -9,7 +9,6 @@
 #include "objects/object_bw/object_bw.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -755,14 +754,6 @@ void EnBw_Update(Actor* thisx, PlayState* play2) {
 
     func_809D0584(this, play);
     if (thisx->colChkInfo.damageEffect != 6) {
-        // Anchor: Target closest player
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer != NULL) {
-            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-        }
-
         this->actionFunc(this, play);
         if (this->unk_23C == 0) {
             this->unk_23A = (this->unk_23A + 4) & 0x7F;

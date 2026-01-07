@@ -10,7 +10,6 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -180,11 +179,7 @@ void EnVm_SetupWait(EnVm* this) {
 }
 
 void EnVm_Wait(EnVm* this, PlayState* play) {
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
     f32 dist;
     s16 headRot;
     s16 pad;
@@ -268,11 +263,7 @@ void EnVm_SetupAttack(EnVm* this) {
 }
 
 void EnVm_Attack(EnVm* this, PlayState* play) {
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
     s16 pitch = Math_Vec3f_Pitch(&this->beamPos1, &player->actor.world.pos);
     f32 dist;
     Vec3f playerPos;
@@ -443,14 +434,6 @@ void EnVm_Update(Actor* thisx, PlayState* play) {
         EffectSsDeadDs_SpawnStationary(play, &this->beamPos3, 20, -1, 255, 20);
         func_80033480(play, &this->beamPos3, 6.0f, 1, 120, 20, 1);
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_BIMOS_LAZER_GND - SFX_FLAG);
-    }
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
     }
 
     this->actionFunc(this, play);

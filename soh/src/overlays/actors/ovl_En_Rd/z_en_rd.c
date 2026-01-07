@@ -2,7 +2,6 @@
 #include "objects/object_rd/object_rd.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -254,22 +253,14 @@ void func_80AE2744(EnRd* this, PlayState* play) {
 
         this->unk_305 = 0;
 
-        // Anchor: Use closest player for wake up check
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer == NULL) {
-            targetPlayer = &GET_PLAYER(play)->actor;
-        }
-        f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
-
-        if (distToTarget <= 150.0f) {
+        if (this->actor.xzDistToPlayer <= 150.0f && func_8002DDE4(play)) {
             // Add a height check to redeads/gibdos freeze when Enemy Randomizer is on.
             // Without the height check, redeads/gibdos can freeze the player from insane distances in
             // vertical rooms (like the first room in Deku Tree), making these rooms nearly unplayable.
             s8 enemyRandoCCActive = CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) ||
                                     (CVarGetInteger(CVAR_REMOTE_CROWD_CONTROL("Enabled"), 0));
             if (!enemyRandoCCActive ||
-                (enemyRandoCCActive && yDistToTarget <= 100.0f && yDistToTarget >= -100.0f)) {
+                (enemyRandoCCActive && this->actor.yDistToPlayer <= 100.0f && this->actor.yDistToPlayer >= -100.0f)) {
                 if ((this->actor.params != 2) && (this->unk_305 == 0)) {
                     func_80AE37BC(this);
                 } else {
@@ -331,15 +322,8 @@ void func_80AE2C1C(EnRd* this, PlayState* play) {
     Vec3f sp44 = D_80AE4918;
     Color_RGBA8 sp40 = D_80AE4924;
     Color_RGBA8 sp3C = D_80AE4928;
-    Player* localPlayer = GET_PLAYER(play);
+    Player* player = GET_PLAYER(play);
     s32 pad;
-
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* player = (Player*)targetActor;
-
     s16 sp32 = this->actor.yawTowardsPlayer - this->actor.shape.rot.y - this->unk_30E - this->unk_310;
 
     this->skelAnime.playSpeed = this->actor.speedXZ;
@@ -361,12 +345,10 @@ void func_80AE2C1C(EnRd* this, PlayState* play) {
             if (this->unk_306 == 0) {
                 if (!(this->unk_312 & PLAYER_STATE2_GRABBED_BY_ENEMY) &&
                     GameInteractor_Should(VB_REDEAD_GIBDO_FREEZE_LINK, true, this)) {
-                    if (player == localPlayer) {
-                        player->actor.freezeTimer = 40;
-                        Player_SetAutoLockOnActor(play, &this->actor);
-                        GET_PLAYER(play)->autoLockOnActor = &this->actor;
-                        func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
-                    }
+                    player->actor.freezeTimer = 40;
+                    Player_SetAutoLockOnActor(play, &this->actor);
+                    GET_PLAYER(play)->autoLockOnActor = &this->actor;
+                    func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
                 }
                 this->unk_306 = 0x3C;
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_REDEAD_AIM);
@@ -510,13 +492,7 @@ void func_80AE33F0(EnRd* this) {
 
 void func_80AE3454(EnRd* this, PlayState* play) {
     s32 pad;
-    Player* localPlayer = GET_PLAYER(play);
-    
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
 
     if (SkelAnime_Update(&this->skelAnime)) {
         this->unk_304++;
@@ -526,9 +502,7 @@ void func_80AE3454(EnRd* this, PlayState* play) {
         case 1:
             Animation_PlayLoop(&this->skelAnime, &gGibdoRedeadGrabAttackAnim);
             this->unk_304++;
-            if (player == localPlayer) {
-                play->damagePlayer(play, -8);
-            }
+            play->damagePlayer(play, -8);
             func_800AA000(this->actor.xzDistToPlayer, 0xFF, 1, 0xC);
             this->unk_319 = 20;
         case 0:
@@ -562,12 +536,10 @@ void func_80AE3454(EnRd* this, PlayState* play) {
             this->unk_319--;
 
             if (this->unk_319 == 0) {
-                if (player == localPlayer) {
-                    play->damagePlayer(play, -8);
-                    Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S + player->ageProperties->unk_92);
-                }
+                play->damagePlayer(play, -8);
                 func_800AA000(this->actor.xzDistToPlayer, 0xF0, 1, 0xC);
                 this->unk_319 = 20;
+                Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S + player->ageProperties->unk_92);
             }
             break;
         case 3:
@@ -599,24 +571,14 @@ void func_80AE3834(EnRd* this, PlayState* play) {
     Vec3f sp34 = D_80AE492C;
     Color_RGBA8 sp30 = D_80AE4938;
     Color_RGBA8 sp2C = D_80AE493C;
-    Player* localPlayer = GET_PLAYER(play);
-    
-    // Anchor: Target closest player
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* player = (Player*)targetActor;
-
+    Player* player = GET_PLAYER(play);
     s16 temp_v0 = this->actor.yawTowardsPlayer - this->actor.shape.rot.y - this->unk_30E - this->unk_310;
 
     if (ABS(temp_v0) < 0x2008) {
         if (!(this->unk_312 & 0x80) && GameInteractor_Should(VB_REDEAD_GIBDO_FREEZE_LINK, true, this)) {
-            if (player == localPlayer) {
-                player->actor.freezeTimer = 60;
-                func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
-                Player_SetAutoLockOnActor(play, &this->actor);
-            }
+            player->actor.freezeTimer = 60;
+            func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
+            Player_SetAutoLockOnActor(play, &this->actor);
         }
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_REDEAD_AIM);
         func_80AE2B90(this, play);
@@ -863,14 +825,6 @@ void EnRd_Update(Actor* thisx, PlayState* play) {
     if (this->unk_31C != 6 && ((this->unk_31B != 11) || (this->unk_31C != 14))) {
         if (this->unk_306 != 0) {
             this->unk_306--;
-        }
-
-        // Anchor: Target closest player
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer != NULL) {
-            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
         }
 
         this->actionFunc(this, play);

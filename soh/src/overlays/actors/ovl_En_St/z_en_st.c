@@ -8,7 +8,6 @@
 #include "objects/object_st/object_st.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -384,7 +383,6 @@ s32 EnSt_CheckHitLink(EnSt* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
     s32 hit;
     s32 i;
-    Actor* victim = NULL;
 
     for (i = 0, hit = 0; i < 3; i++) {
         if (((this->colCylinder[i + 3].base.ocFlags2 & OC2_HIT_PLAYER) != 0) == 0) {
@@ -392,10 +390,9 @@ s32 EnSt_CheckHitLink(EnSt* this, PlayState* play) {
         }
         this->colCylinder[i + 3].base.ocFlags2 &= ~OC2_HIT_PLAYER;
         hit = true;
-        victim = this->colCylinder[i + 3].base.oc;
     }
 
-    if (!hit || victim == NULL) {
+    if (!hit) {
         return false;
     }
 
@@ -404,16 +401,8 @@ s32 EnSt_CheckHitLink(EnSt* this, PlayState* play) {
     }
 
     this->gaveDamageSpinTimer = 30;
-    
-    // Only damage if the victim is the local player
-    if (victim == &player->actor) {
-        play->damagePlayer(play, -8);
-        Audio_PlayActorSound2(&player->actor, NA_SE_PL_BODY_HIT);
-    } else {
-        // Optional: Play sound on dummy?
-        Audio_PlayActorSound2(victim, NA_SE_PL_BODY_HIT);
-    }
-    
+    play->damagePlayer(play, -8);
+    Audio_PlayActorSound2(&player->actor, NA_SE_PL_BODY_HIT);
     func_8002F71C(play, &this->actor, 4.0f, this->actor.yawTowardsPlayer, 6.0f);
     return true;
 }
@@ -700,11 +689,7 @@ void EnSt_Bob(EnSt* this, PlayState* play) {
 }
 
 s32 EnSt_IsCloseToPlayer(EnSt* this, PlayState* play) {
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
     f32 yDist;
 
     if (this->takeDamageSpinTimer != 0) {
@@ -1034,14 +1019,6 @@ void EnSt_Update(Actor* thisx, PlayState* play) {
         SkelAnime_Update(&this->skelAnime);
     } else if (!EnSt_CheckColliders(this, play)) {
         // no collision has been detected.
-
-        // Anchor: Target closest player
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer != NULL) {
-            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-        }
 
         if (this->stunTimer == 0) {
             SkelAnime_Update(&this->skelAnime);

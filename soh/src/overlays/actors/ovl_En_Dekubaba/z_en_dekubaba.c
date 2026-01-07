@@ -4,8 +4,6 @@
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
-#include <stdio.h>
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE)
 
@@ -295,7 +293,6 @@ void EnDekubaba_DisableHitboxes(EnDekubaba* this) {
 }
 
 void EnDekubaba_SetupWait(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupWait");
     s32 i;
     ColliderJntSphElement* element;
 
@@ -323,7 +320,6 @@ void EnDekubaba_SetupWait(EnDekubaba* this) {
 }
 
 void EnDekubaba_SetupGrow(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupGrow");
     s32 i;
 
     Animation_Change(&this->skelAnime, &gDekuBabaFastChompAnim,
@@ -343,7 +339,6 @@ void EnDekubaba_SetupGrow(EnDekubaba* this) {
 }
 
 void EnDekubaba_SetupRetract(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupRetract");
     s32 i;
 
     Animation_Change(&this->skelAnime, &gDekuBabaFastChompAnim, -1.5f, Animation_GetLastFrame(&gDekuBabaFastChompAnim),
@@ -359,28 +354,24 @@ void EnDekubaba_SetupRetract(EnDekubaba* this) {
 }
 
 void EnDekubaba_SetupDecideLunge(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupDecideLunge");
     this->timer = Animation_GetLastFrame(&gDekuBabaFastChompAnim) * 2;
     Animation_MorphToLoop(&this->skelAnime, &gDekuBabaFastChompAnim, -3.0f);
     this->actionFunc = EnDekubaba_DecideLunge;
 }
 
 void EnDekubaba_SetupPrepareLunge(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupPrepareLunge");
     this->timer = 8;
     this->skelAnime.playSpeed = 0.0f;
     this->actionFunc = EnDekubaba_PrepareLunge;
 }
 
 void EnDekubaba_SetupLunge(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupLunge");
     Animation_PlayOnce(&this->skelAnime, &gDekuBabaPauseChompAnim);
     this->timer = 0;
     this->actionFunc = EnDekubaba_Lunge;
 }
 
 void EnDekubaba_SetupPullBack(EnDekubaba* this) {
-    Anchor_LogInfo("[Dekubaba] SetupPullBack");
     Animation_Change(&this->skelAnime, &gDekuBabaPauseChompAnim, 1.0f, 15.0f,
                      Animation_GetLastFrame(&gDekuBabaPauseChompAnim), ANIMMODE_ONCE, -3.0f);
     this->timer = 0;
@@ -490,40 +481,14 @@ void EnDekubaba_Wait(EnDekubaba* this, PlayState* play) {
     this->actor.world.pos.z = this->actor.home.pos.z;
     this->actor.world.pos.y = this->actor.home.pos.y + 14.0f * this->size;
 
-    // Use closest player for wake-up check
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-
-    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-    f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
-
-    // Debug traces for multiplayer
-    f32 xzThreshold = 200.0f * this->size;
-    f32 yThreshold = 30.0f * this->size;
-    char logBuf[256];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] Wait: timer=%d xzDist=%.1f (need<%.1f) yDist=%.1f (need<%.1f) size=%.2f",
-             this->timer, distToTarget, xzThreshold,
-             fabsf(yDistToTarget), yThreshold, this->size);
-    Anchor_LogInfo(logBuf);
-
-    if ((this->timer == 0) && (distToTarget < 200.0f * this->size) &&
-        (fabsf(yDistToTarget) < 30.0f * this->size)) {
-        Anchor_LogInfo("[Dekubaba] TRIGGERED! Growing now");
+    if ((this->timer == 0) && (this->actor.xzDistToPlayer < 200.0f * this->size) &&
+        (fabsf(this->actor.yDistToPlayer) < 30.0f * this->size)) {
         EnDekubaba_SetupGrow(this);
     }
 }
 
 void EnDekubaba_Grow(EnDekubaba* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] Grow: timer=%d", this->timer);
-    Anchor_LogInfo(logBuf);
+    Player* player = GET_PLAYER(play);
     f32 headDistHorizontal;
     f32 headDistVertical;
     f32 headShiftX;
@@ -567,7 +532,7 @@ void EnDekubaba_Grow(EnDekubaba* this, PlayState* play) {
     }
 
     if (this->timer < 10) {
-        Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &targetPlayer->world.pos), 2,
+        Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &player->actor.world.pos), 2,
                        0xE38);
         if (headShiftZ) {} // One way of fake-matching
     }
@@ -582,7 +547,7 @@ void EnDekubaba_Grow(EnDekubaba* this, PlayState* play) {
                              1, HAHEN_OBJECT_DEFAULT, 10, NULL);
 
     if (this->timer == 0) {
-        if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 240.0f * this->size) {
+        if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 240.0f * this->size) {
             EnDekubaba_SetupPrepareLunge(this);
         } else {
             EnDekubaba_SetupRetract(this);
@@ -591,9 +556,6 @@ void EnDekubaba_Grow(EnDekubaba* this, PlayState* play) {
 }
 
 void EnDekubaba_Retract(EnDekubaba* this, PlayState* play) {
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] Retract: timer=%d", this->timer);
-    Anchor_LogInfo(logBuf);
     f32 headDistHorizontal;
     f32 headDistVertical;
     f32 xShift;
@@ -666,14 +628,7 @@ void EnDekubaba_UpdateHeadPosition(EnDekubaba* this) {
 }
 
 void EnDekubaba_DecideLunge(EnDekubaba* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] DecideLunge: timer=%d xzDist=%.1f", this->timer, this->actor.xzDistToPlayer);
-    Anchor_LogInfo(logBuf);
+    Player* player = GET_PLAYER(play);
 
     SkelAnime_Update(&this->skelAnime);
     if (Animation_OnFrame(&this->skelAnime, 0.0f) || Animation_OnFrame(&this->skelAnime, 12.0f)) {
@@ -688,7 +643,7 @@ void EnDekubaba_DecideLunge(EnDekubaba* this, PlayState* play) {
         this->timer--;
     }
 
-    Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &targetPlayer->world.pos), 2,
+    Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &player->actor.world.pos), 2,
                    (this->timer % 5) * 0x222);
 
     if (this->timer < 10) {
@@ -711,17 +666,14 @@ void EnDekubaba_DecideLunge(EnDekubaba* this, PlayState* play) {
 
     EnDekubaba_UpdateHeadPosition(this);
 
-    if (240.0f * this->size < Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos)) {
+    if (240.0f * this->size < Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos)) {
         EnDekubaba_SetupRetract(this);
-    } else if ((this->timer == 0) || (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size)) {
+    } else if ((this->timer == 0) || (this->actor.xzDistToPlayer < 80.0f * this->size)) {
         EnDekubaba_SetupPrepareLunge(this);
     }
 }
 
 void EnDekubaba_Lunge(EnDekubaba* this, PlayState* play) {
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] Lunge: timer=%d", this->timer);
-    Anchor_LogInfo(logBuf);
     static Color_RGBA8 primColor = { 105, 255, 105, 255 };
     static Color_RGBA8 envColor = { 150, 250, 150, 0 };
     s32 allStepsDone;
@@ -781,21 +733,14 @@ void EnDekubaba_Lunge(EnDekubaba* this, PlayState* play) {
 }
 
 void EnDekubaba_PrepareLunge(EnDekubaba* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] PrepareLunge: timer=%d", this->timer);
-    Anchor_LogInfo(logBuf);
+    Player* player = GET_PLAYER(play);
 
     if (this->timer != 0) {
         this->timer--;
     }
 
     Math_SmoothStepToS(&this->actor.shape.rot.x, 0x1800, 2, 0xE38, 0x71C);
-    Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &targetPlayer->world.pos), 2, 0xE38);
+    Math_ApproachS(&this->actor.shape.rot.y, Math_Vec3f_Yaw(&this->actor.home.pos, &player->actor.world.pos), 2, 0xE38);
     Math_ScaledStepToS(&this->stemSectionAngle[0], 0xAAA, 0x444);
     Math_ScaledStepToS(&this->stemSectionAngle[1], -0x4718, 0x888);
     Math_ScaledStepToS(&this->stemSectionAngle[2], -0x6AA4, 0x888);
@@ -808,9 +753,6 @@ void EnDekubaba_PrepareLunge(EnDekubaba* this, PlayState* play) {
 }
 
 void EnDekubaba_PullBack(EnDekubaba* this, PlayState* play) {
-    char logBuf[128];
-    snprintf(logBuf, sizeof(logBuf), "[Dekubaba] PullBack: timer=%d", this->timer);
-    Anchor_LogInfo(logBuf);
     Vec3f dustPos;
     f32 xIncr;
     f32 zIncr;
@@ -874,12 +816,7 @@ void EnDekubaba_PullBack(EnDekubaba* this, PlayState* play) {
         this->timer++;
 
         if (this->timer > 30) {
-            Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-            if (targetPlayer == NULL) {
-                targetPlayer = &GET_PLAYER(play)->actor;
-            }
-
-            if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
+            if (this->actor.xzDistToPlayer < 80.0f * this->size) {
                 EnDekubaba_SetupPrepareLunge(this);
             } else {
                 EnDekubaba_SetupDecideLunge(this);
@@ -947,12 +884,7 @@ void EnDekubaba_Hit(EnDekubaba* this, PlayState* play) {
         } else {
             this->collider.base.acFlags |= AC_ON;
             if (this->timer == 0) {
-                Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-                if (targetPlayer == NULL) {
-                    targetPlayer = &GET_PLAYER(play)->actor;
-                }
-
-                if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
+                if (this->actor.xzDistToPlayer < 80.0f * this->size) {
                     EnDekubaba_SetupPrepareLunge(this);
                 } else {
                     EnDekubaba_SetupRecover(this);
@@ -976,12 +908,7 @@ void EnDekubaba_StunnedVertical(EnDekubaba* this, PlayState* play) {
     if (this->timer == 0) {
         EnDekubaba_DisableHitboxes(this);
 
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer == NULL) {
-            targetPlayer = &GET_PLAYER(play)->actor;
-        }
-
-        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
+        if (this->actor.xzDistToPlayer < 80.0f * this->size) {
             EnDekubaba_SetupPrepareLunge(this);
         } else {
             EnDekubaba_SetupRecover(this);
@@ -1007,13 +934,7 @@ void EnDekubaba_Sway(EnDekubaba* this, PlayState* play) {
 
     if (ABS(angleToVertical) < 0x100) {
         this->collider.base.acFlags |= AC_ON;
-
-        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-        if (targetPlayer == NULL) {
-            targetPlayer = &GET_PLAYER(play)->actor;
-        }
-
-        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
+        if (this->actor.xzDistToPlayer < 80.0f * this->size) {
             EnDekubaba_SetupPrepareLunge(this);
         } else {
             EnDekubaba_SetupRecover(this);

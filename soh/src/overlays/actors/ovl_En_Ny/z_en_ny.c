@@ -2,7 +2,6 @@
 #include "objects/object_ny/object_ny.h"
 #include "soh/frame_interpolation.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE)
 
@@ -387,16 +386,6 @@ void EnNy_Update(Actor* thisx, PlayState* play) {
     func_80ABD3B8(this, temp_f22 + 10.0f, temp_f22 - 10.0f);
     Actor_MoveXZGravity(&this->actor);
     Math_StepToF(&this->unk_1E4, this->unk_1E8, 0.1f);
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.xyzDistToPlayerSq = Math3D_Vec3fDistSq(&this->actor.world.pos, &targetPlayer->world.pos);
-    }
-
     this->actionFunc(this, play);
     this->actor.prevPos.y -= temp_f22;
     this->actor.world.pos.y -= temp_f22;

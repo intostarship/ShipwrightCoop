@@ -8,8 +8,6 @@
 #include "objects/object_mb/object_mb.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 /*
  * This actor can have three behaviors:
@@ -377,11 +375,7 @@ void EnMb_NextWaypoint(EnMb* this, PlayState* play) {
  *       and they all are 100 units wide.
  */
 s32 EnMb_IsPlayerInCorridor(EnMb* this, PlayState* play) {
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
     f32 xFromPlayer;
     f32 zFromPlayer;
     f32 cos;
@@ -678,22 +672,9 @@ void EnMb_SpearPatrolTurnTowardsWaypoint(EnMb* this, PlayState* play) {
         Math_SmoothStepToS(&this->actor.shape.rot.y, this->actor.home.rot.y, 1, 0x3E8, 0);
     }
 
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
-    s16 yawTowardsTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
-    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-
-    if (ABS(yDistToTarget) <= 20.0f && EnMb_IsPlayerInCorridor(this, play)) {
-        relYawFromPlayer = this->actor.shape.rot.y - yawTowardsTarget;
-        if (ABS(relYawFromPlayer) <= 0x4000 || (func_8002DDE4(play) && distToTarget < 160.0f)) {
-            // NOTE: EnMb_FindWaypointTowardsPlayer uses this->actor.yawTowardsPlayer internally.
-            // We should ideally update that function too or update the actor field.
-            // For now, updating actor field locally is safer for that function.
-            this->actor.yawTowardsPlayer = yawTowardsTarget;
-            
+    if (ABS(this->actor.yDistToPlayer) <= 20.0f && EnMb_IsPlayerInCorridor(this, play)) {
+        relYawFromPlayer = this->actor.shape.rot.y - this->actor.yawTowardsPlayer;
+        if (ABS(relYawFromPlayer) <= 0x4000 || (func_8002DDE4(play) && this->actor.xzDistToPlayer < 160.0f)) {
             EnMb_FindWaypointTowardsPlayer(this, play);
             Audio_PlayActorSound2(&this->actor, NA_SE_EN_MORIBLIN_VOICE);
             EnMb_SetupSpearPrepareAndCharge(this);
@@ -773,20 +754,11 @@ void EnMb_SpearPatrolEndCharge(EnMb* this, PlayState* play) {
 
         if (this->timer1 != 0) {
             this->timer3--;
-            
-            Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-            if (targetPlayer == NULL) {
-                targetPlayer = &GET_PLAYER(play)->actor;
-            }
-            f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
-            s16 yawTowardsTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
-            f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-
             if (this->timer3 == 0) {
-                relYawFromPlayer = this->actor.shape.rot.y - yawTowardsTarget;
+                relYawFromPlayer = this->actor.shape.rot.y - this->actor.yawTowardsPlayer;
 
-                if (ABS(yDistToTarget) <= 20.0f && EnMb_IsPlayerInCorridor(this, play) &&
-                    ABS(relYawFromPlayer) <= 0x4000 && distToTarget <= 200.0f) {
+                if (ABS(this->actor.yDistToPlayer) <= 20.0f && EnMb_IsPlayerInCorridor(this, play) &&
+                    ABS(relYawFromPlayer) <= 0x4000 && this->actor.xzDistToPlayer <= 200.0f) {
                     EnMb_SetupSpearPrepareAndCharge(this);
                 } else {
                     lastFrame = Animation_GetLastFrame(&gEnMbSpearPrepareChargeAnim);
@@ -797,7 +769,7 @@ void EnMb_SpearPatrolEndCharge(EnMb* this, PlayState* play) {
                     Audio_PlayActorSound2(&this->actor, NA_SE_EN_MORIBLIN_SPEAR_NORM);
                 }
             } else {
-                if (distToTarget <= 160.0f) {
+                if (this->actor.xzDistToPlayer <= 160.0f) {
                     this->actor.speedXZ = -5.0f;
                 } else {
                     this->actor.speedXZ = 0.0f;
@@ -1178,13 +1150,8 @@ void EnMb_SpearGuardWalk(EnMb* this, PlayState* play) {
     s32 beforeCurFrame;
     s32 pad1;
     s32 pad2;
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    s16 yawTowardsTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
-    s16 relYawTowardsPlayer = yawTowardsTarget - this->actor.shape.rot.y;
+    Player* player = GET_PLAYER(play);
+    s16 relYawTowardsPlayer = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
     s16 yawTowardsHome;
     f32 playSpeedAbs;
 
@@ -1198,10 +1165,10 @@ void EnMb_SpearGuardWalk(EnMb* this, PlayState* play) {
     beforeCurFrame = this->skelAnime.curFrame - playSpeedAbs;
     playSpeedAbs = ABS(this->skelAnime.playSpeed);
     if (this->timer3 == 0 &&
-        Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->playerDetectionRange) {
-        Math_SmoothStepToS(&this->actor.world.rot.y, yawTowardsTarget, 1, 0x2EE, 0);
+        Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->playerDetectionRange) {
+        Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 1, 0x2EE, 0);
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
-        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 500.0f && relYawTowardsPlayer < 0x1388) {
+        if (this->actor.xzDistToPlayer < 500.0f && relYawTowardsPlayer < 0x1388) {
             EnMb_SetupSpearPrepareAndCharge(this);
         }
     } else {
@@ -1258,19 +1225,10 @@ void EnMb_SpearPatrolWalkTowardsWaypoint(EnMb* this, PlayState* play) {
     this->yawToWaypoint = Math_Vec3f_Yaw(&this->actor.world.pos, &this->waypointPos);
     Math_SmoothStepToS(&this->actor.world.rot.y, this->yawToWaypoint, 1, 0x5DC, 0);
 
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
-    f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
-    s16 yawTowardsTarget = Actor_WorldYawTowardActor(&this->actor, targetPlayer);
-    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-
-    yDistToPlayerAbs = (yDistToTarget >= 0.0f) ? yDistToTarget : -yDistToTarget;
+    yDistToPlayerAbs = (this->actor.yDistToPlayer >= 0.0f) ? this->actor.yDistToPlayer : -this->actor.yDistToPlayer;
     if (yDistToPlayerAbs <= 20.0f && EnMb_IsPlayerInCorridor(this, play)) {
-        relYawTowardsPlayer = (this->actor.shape.rot.y - yawTowardsTarget);
-        if (ABS(relYawTowardsPlayer) <= 0x4000 || (func_8002DDE4(play) && distToTarget < 160.0f)) {
-            this->actor.yawTowardsPlayer = yawTowardsTarget;
+        relYawTowardsPlayer = (this->actor.shape.rot.y - this->actor.yawTowardsPlayer);
+        if (ABS(relYawTowardsPlayer) <= 0x4000 || (func_8002DDE4(play) && this->actor.xzDistToPlayer < 160.0f)) {
             EnMb_FindWaypointTowardsPlayer(this, play);
             Audio_PlayActorSound2(&this->actor, NA_SE_EN_MORIBLIN_VOICE);
             EnMb_SetupSpearPrepareAndCharge(this);
@@ -1306,11 +1264,6 @@ void EnMb_SpearPatrolWalkTowardsWaypoint(EnMb* this, PlayState* play) {
 
 void EnMb_ClubWaitPlayerNear(EnMb* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
-    // Use closest player (including DummyPlayers in multiplayer) for distance check
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &player->actor;
-    }
     s32 pad;
     s16 relYawFromPlayer = this->actor.world.rot.y - this->actor.yawTowardsPlayer;
 
@@ -1322,7 +1275,7 @@ void EnMb_ClubWaitPlayerNear(EnMb* this, PlayState* play) {
     }
 
     SkelAnime_Update(&this->skelAnime);
-    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->playerDetectionRange &&
+    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->playerDetectionRange &&
         !(player->stateFlags1 & PLAYER_STATE1_DAMAGED) && ABS(relYawFromPlayer) < 0x3E80) {
         // Add a height check to the Moblin's Club attack when Enemy Randomizer is on.
         // Without the height check, the Moblin will attack (and play the sound effect) a lot even though

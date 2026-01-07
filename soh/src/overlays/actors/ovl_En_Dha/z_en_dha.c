@@ -8,7 +8,6 @@
 #include "overlays/actors/ovl_En_Dh/z_en_dh.h"
 #include "objects/object_dh/object_dh.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -197,17 +196,9 @@ void EnDha_Wait(EnDha* this, PlayState* play) {
     Vec3f zeroVec = { 0.0f, 0.0f, 0.0f }; // unused
     Vec3f armPosMultiplier1 = { 0.0f, 0.0f, 55.0f };
     Vec3f armPosMultiplier2 = { 0.0f, 0.0f, -54.0f };
-    Player* localPlayer = GET_PLAYER(play);
+    Player* player = GET_PLAYER(play);
     s32 pad;
     s32 pad2;
-    
-    // Anchor: Target closest player
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* player = (Player*)targetActor;
-
     Vec3f playerPos = player->actor.world.pos;
     Vec3s angle;
     s16 yaw;
@@ -240,9 +231,7 @@ void EnDha_Wait(EnDha* this, PlayState* play) {
                 this->timer += 0x1194;
                 this->limbAngleY = Math_SinS(this->timer) * 1820.0f;
 
-                // Anchor: If grabbing a dummy/remote player, skip the state check to avoid instant release
-                // because stateFlags2 might be overwritten by network sync.
-                if (player == localPlayer && !(player->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY)) {
+                if (!(player->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY)) {
                     this->unk_1CC = 0;
                     EnDha_SetupTakeDamage(this);
                     return;
@@ -425,14 +414,6 @@ void EnDha_Update(Actor* thisx, PlayState* play) {
     }
 
     EnDha_UpdateHealth(this, play);
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-    }
-
     this->actionFunc(this, play);
     CollisionCheck_SetAC(play, &play->colChkCtx, &this->collider.base);
     CollisionCheck_SetOC(play, &play->colChkCtx, &this->collider.base);

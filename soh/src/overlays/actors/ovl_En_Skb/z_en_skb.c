@@ -3,8 +3,6 @@
 #include "objects/object_skb/object_skb.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -265,11 +263,7 @@ void EnSkb_Advance(EnSkb* this, PlayState* play) {
     s32 thisKeyFrame;
     s32 prevKeyFrame;
     f32 playSpeed;
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
 
     if ((this->unk_283 != 0) && ((play->gameplayFrames & 0xF) == 0)) {
         this->unk_288 = Rand_CenteredFloat(50000.0f);
@@ -298,7 +292,7 @@ void EnSkb_Advance(EnSkb* this, PlayState* play) {
     }
     // Don't despawn stallchildren during daytime or when a stalchildren walks too far away from his "home" when enemy
     // randomizer is enabled.
-    if ((Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) > 800.0f || IS_DAY) &&
+    if ((Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) > 800.0f || IS_DAY) &&
         !CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0)) {
         func_80AFCF48(this);
     } else if (Actor_IsFacingPlayer(&this->actor, 0x11C7) &&
@@ -513,15 +507,6 @@ void EnSkb_Update(Actor* thisx, PlayState* play) {
     func_80AFD968(this, play);
     Actor_MoveXZGravity(&this->actor);
     Actor_UpdateBgCheckInfo(play, &this->actor, 15.0f, 30.0f, 60.0f, 0x1D);
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
-    }
-
     this->actionFunc(this, play);
     this->actor.focus.pos = this->actor.world.pos;
     this->actor.focus.pos.y += (3000.0f * this->actor.scale.y);

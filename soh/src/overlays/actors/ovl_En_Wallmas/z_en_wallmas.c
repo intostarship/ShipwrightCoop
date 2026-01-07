@@ -9,7 +9,6 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -303,12 +302,7 @@ void EnWallmas_SetupStun(EnWallmas* this) {
 }
 
 void EnWallmas_WaitToDrop(EnWallmas* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* player = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
     Vec3f* playerPos = &player->actor.world.pos;
 
     this->actor.world.pos = *playerPos;
@@ -348,23 +342,9 @@ void EnWallmas_WaitToDrop(EnWallmas* this, PlayState* play) {
 void EnWallmas_Drop(EnWallmas* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
-    // Use closest player for grab check
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &player->actor;
-    }
-    
-    f32 xzDist = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetActor->world.pos);
-    f32 yDist = targetActor->world.pos.y - this->actor.world.pos.y;
-
-    // Note: We still check local player state flags (Invincibility) because checking dummy flags is unreliable
-    // or we assume if ANY player is hit, we transition.
-    // Ideally we check the target's invincibility if possible.
-    // For now, we keep the condition strict only on proximity.
-    
     if (!Player_InCsMode(play) && !(player->stateFlags2 & PLAYER_STATE2_MOVING_DYNAPOLY) &&
-        (player->invincibilityTimer >= 0) && (xzDist < 30.0f) &&
-        (yDist < -5.0f) && (-(f32)(player->cylinder.dim.height + 10) < yDist)) {
+        (player->invincibilityTimer >= 0) && (this->actor.xzDistToPlayer < 30.0f) &&
+        (this->actor.yDistToPlayer < -5.0f) && (-(f32)(player->cylinder.dim.height + 10) < this->actor.yDistToPlayer)) {
         EnWallmas_SetupTakePlayer(this, play);
     }
 }
@@ -403,11 +383,7 @@ void EnWallmas_JumpToCeiling(EnWallmas* this, PlayState* play) {
 }
 
 void EnWallmas_ReturnToCeiling(EnWallmas* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
     SkelAnime_Update(&this->skelAnime);
     if (this->skelAnime.curFrame > 20.0f) {
         this->timer += 9;
@@ -425,7 +401,7 @@ void EnWallmas_ReturnToCeiling(EnWallmas* this, PlayState* play) {
         }
 
         if (this->actor.params == WMT_TIMER ||
-            Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 200.0f) {
+            Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 200.0f) {
             EnWallmas_TimerInit(this, play);
         } else {
             EnWallmas_ProximityOrSwitchInit(this);
@@ -477,14 +453,7 @@ void EnWallmas_Die(EnWallmas* this, PlayState* play) {
 }
 
 void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
-    Player* localPlayer = GET_PLAYER(play);
-    
-    // Identify victim
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* victim = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
 
     if (Animation_OnFrame(&this->skelAnime, 1.0f) != 0) {
         if (!LINK_IS_ADULT) {
@@ -496,8 +465,8 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FALL_CATCH);
     }
     if (SkelAnime_Update(&this->skelAnime) != 0) {
-        victim->actor.world.pos.x = this->actor.world.pos.x;
-        victim->actor.world.pos.z = this->actor.world.pos.z;
+        player->actor.world.pos.x = this->actor.world.pos.x;
+        player->actor.world.pos.z = this->actor.world.pos.z;
 
         if (this->timer < 0) {
             this->actor.world.pos.y = this->actor.world.pos.y + 2.0f;
@@ -506,9 +475,9 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
         }
 
         if (!LINK_IS_ADULT) {
-            victim->actor.world.pos.y = this->actor.world.pos.y - 30.0f;
+            player->actor.world.pos.y = this->actor.world.pos.y - 30.0f;
         } else {
-            victim->actor.world.pos.y = this->actor.world.pos.y - 50.0f;
+            player->actor.world.pos.y = this->actor.world.pos.y - 50.0f;
         }
 
         if (this->timer == -0x1E) {
@@ -524,29 +493,22 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
 
         this->timer = this->timer + 2;
     } else {
-        Math_StepToF(&this->actor.world.pos.y, victim->actor.world.pos.y + (!LINK_IS_ADULT ? 30.0f : 50.0f), 5.0f);
+        Math_StepToF(&this->actor.world.pos.y, player->actor.world.pos.y + (!LINK_IS_ADULT ? 30.0f : 50.0f), 5.0f);
     }
 
-    Math_StepToF(&this->actor.world.pos.x, victim->actor.world.pos.x, 3.0f);
-    Math_StepToF(&this->actor.world.pos.z, victim->actor.world.pos.z, 3.0f);
+    Math_StepToF(&this->actor.world.pos.x, player->actor.world.pos.x, 3.0f);
+    Math_StepToF(&this->actor.world.pos.z, player->actor.world.pos.z, 3.0f);
 
     if (this->timer == 0x1E) {
         Sfx_PlaySfxCentered(NA_SE_OC_ABYSS);
-        // CRITICAL: Only respawn if *I* am the victim!
-        if (victim == localPlayer) {
-            Play_TriggerRespawn(play);
-        }
+        Play_TriggerRespawn(play);
     }
 }
 
 void EnWallmas_WaitForProximity(EnWallmas* this, PlayState* play) {
-    // Use closest player (including DummyPlayers in multiplayer)
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer == NULL) {
-        targetPlayer = &GET_PLAYER(play)->actor;
-    }
+    Player* player = GET_PLAYER(play);
     if (this->actor.params == WMT_SHADOWTAG ||
-        Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 200.0f) {
+        Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 200.0f) {
         EnWallmas_TimerInit(this, play);
     }
 }

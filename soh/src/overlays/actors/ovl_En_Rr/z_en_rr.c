@@ -9,7 +9,6 @@
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include <assert.h>
-#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -289,16 +288,9 @@ u8 EnRr_GetMessage(u8 shield, u8 tunic) {
 }
 
 void EnRr_SetupReleasePlayer(EnRr* this, PlayState* play) {
-    Player* localPlayer = GET_PLAYER(play);
+    Player* player = GET_PLAYER(play);
     u8 shield;
     u8 tunic;
-
-    // Identify victim
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &localPlayer->actor;
-    }
-    Player* victim = (Player*)targetActor;
 
     this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
     this->hasPlayer = false;
@@ -308,26 +300,21 @@ void EnRr_SetupReleasePlayer(EnRr* this, PlayState* play) {
     this->wobbleSizeTarget = 2048.0f;
     tunic = 0;
     shield = 0;
-
-    // Only steal if victim is local player
-    if (victim == localPlayer) {
-        if (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_MIRROR) {
-            shield = Inventory_DeleteEquipment(play, EQUIP_TYPE_SHIELD);
-            if (shield != 0) {
-                this->eatenShield = shield;
-                this->retreat = true;
-            }
-        }
-        if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) != EQUIP_VALUE_TUNIC_KOKIRI && !IS_RANDO /* Randomizer Save File */) {
-            tunic = Inventory_DeleteEquipment(play, EQUIP_TYPE_TUNIC);
-            if (tunic != 0) {
-                this->eatenTunic = tunic;
-                this->retreat = true;
-            }
+    if (CUR_EQUIP_VALUE(EQUIP_TYPE_SHIELD) != EQUIP_VALUE_SHIELD_MIRROR) {
+        shield = Inventory_DeleteEquipment(play, EQUIP_TYPE_SHIELD);
+        if (shield != 0) {
+            this->eatenShield = shield;
+            this->retreat = true;
         }
     }
-
-    victim->actor.parent = NULL;
+    if (CUR_EQUIP_VALUE(EQUIP_TYPE_TUNIC) != EQUIP_VALUE_TUNIC_KOKIRI && !IS_RANDO /* Randomizer Save File */) {
+        tunic = Inventory_DeleteEquipment(play, EQUIP_TYPE_TUNIC);
+        if (tunic != 0) {
+            this->eatenTunic = tunic;
+            this->retreat = true;
+        }
+    }
+    player->actor.parent = NULL;
     switch (EnRr_GetMessage(shield, tunic)) {
         case RR_MESSAGE_SHIELD:
             Message_StartTextbox(play, 0x305F, NULL);
@@ -513,27 +500,17 @@ void EnRr_CollisionCheck(EnRr* this, PlayState* play) {
                     return;
             }
         }
-        if ((this->ocTimer == 0) && (this->actor.colorFilterTimer == 0) && 
+        if ((this->ocTimer == 0) && (this->actor.colorFilterTimer == 0) && (player->invincibilityTimer == 0) &&
+            !(player->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY) &&
             ((this->collider1.base.ocFlags1 & OC1_HIT) || (this->collider2.base.ocFlags1 & OC1_HIT))) {
-            
-            Actor* victimActor = NULL;
-            if (this->collider1.base.ocFlags1 & OC1_HIT) victimActor = this->collider1.base.oc;
-            if (victimActor == NULL && (this->collider2.base.ocFlags1 & OC1_HIT)) victimActor = this->collider2.base.oc;
-
             this->collider1.base.ocFlags1 &= ~OC1_HIT;
             this->collider2.base.ocFlags1 &= ~OC1_HIT;
-            
-            if (victimActor != NULL && victimActor->category == ACTORCAT_PLAYER) {
-                Player* victim = (Player*)victimActor;
-                
-                // "catch"
-                osSyncPrintf(VT_FGCOL(GREEN) "キャッチ(%d)！！" VT_RST "\n", this->frameCount);
-                if (victim->invincibilityTimer == 0 && !(victim->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY) &&
-                    GameInteractor_Should(VB_LIKE_LIKE_GRAB_PLAYER, true, this) && play->grabPlayer(play, victim)) {
-                    victim->actor.parent = &this->actor;
-                    this->stopScroll = false;
-                    EnRr_SetupGrabPlayer(this, victim);
-                }
+            // "catch"
+            osSyncPrintf(VT_FGCOL(GREEN) "キャッチ(%d)！！" VT_RST "\n", this->frameCount);
+            if (GameInteractor_Should(VB_LIKE_LIKE_GRAB_PLAYER, true, this) && play->grabPlayer(play, player)) {
+                player->actor.parent = &this->actor;
+                this->stopScroll = false;
+                EnRr_SetupGrabPlayer(this, player);
             }
         }
     }
@@ -645,23 +622,19 @@ void EnRr_Reach(EnRr* this, PlayState* play) {
 }
 
 void EnRr_GrabPlayer(EnRr* this, PlayState* play) {
-    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetActor == NULL) {
-        targetActor = &GET_PLAYER(play)->actor;
-    }
-    Player* victim = (Player*)targetActor;
+    Player* player = GET_PLAYER(play);
 
     func_800AA000(this->actor.xyzDistToPlayerSq, 120, 2, 120);
     if ((this->frameCount % 8) == 0) {
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_LIKE_EAT);
     }
     this->ocTimer = 8;
-    if ((this->grabTimer == 0) || !(victim->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY)) {
+    if ((this->grabTimer == 0) || !(player->stateFlags2 & PLAYER_STATE2_GRABBED_BY_ENEMY)) {
         EnRr_SetupReleasePlayer(this, play);
     } else {
-        Math_ApproachF(&victim->actor.world.pos.x, this->mouthPos.x, 1.0f, 30.0f);
-        Math_ApproachF(&victim->actor.world.pos.y, this->mouthPos.y + this->swallowOffset, 1.0f, 30.0f);
-        Math_ApproachF(&victim->actor.world.pos.z, this->mouthPos.z, 1.0f, 30.0f);
+        Math_ApproachF(&player->actor.world.pos.x, this->mouthPos.x, 1.0f, 30.0f);
+        Math_ApproachF(&player->actor.world.pos.y, this->mouthPos.y + this->swallowOffset, 1.0f, 30.0f);
+        Math_ApproachF(&player->actor.world.pos.z, this->mouthPos.z, 1.0f, 30.0f);
         Math_ApproachF(&this->swallowOffset, -55.0f, 1.0f, 5.0f);
     }
 }
@@ -816,14 +789,6 @@ void EnRr_Update(Actor* thisx, PlayState* play) {
     EnRr_UpdateBodySegments(this, play);
     if (!this->isDead && ((this->actor.colorFilterTimer == 0) || !(this->actor.colorFilterParams & 0x4000))) {
         EnRr_CollisionCheck(this, play);
-    }
-
-    // Anchor: Target closest player
-    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
-    if (targetPlayer != NULL) {
-        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
-        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
-        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
     }
 
     this->actionFunc(this, play);
