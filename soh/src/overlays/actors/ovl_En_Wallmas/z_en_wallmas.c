@@ -9,6 +9,7 @@
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -383,7 +384,11 @@ void EnWallmas_JumpToCeiling(EnWallmas* this, PlayState* play) {
 }
 
 void EnWallmas_ReturnToCeiling(EnWallmas* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
     SkelAnime_Update(&this->skelAnime);
     if (this->skelAnime.curFrame > 20.0f) {
         this->timer += 9;
@@ -401,7 +406,7 @@ void EnWallmas_ReturnToCeiling(EnWallmas* this, PlayState* play) {
         }
 
         if (this->actor.params == WMT_TIMER ||
-            Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 200.0f) {
+            Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 200.0f) {
             EnWallmas_TimerInit(this, play);
         } else {
             EnWallmas_ProximityOrSwitchInit(this);
@@ -506,9 +511,13 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
 }
 
 void EnWallmas_WaitForProximity(EnWallmas* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
     if (this->actor.params == WMT_SHADOWTAG ||
-        Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 200.0f) {
+        Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 200.0f) {
         EnWallmas_TimerInit(this, play);
     }
 }

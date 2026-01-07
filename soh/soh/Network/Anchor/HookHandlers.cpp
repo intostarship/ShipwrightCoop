@@ -1,4 +1,5 @@
 #include "Anchor.h"
+#include "AnchorHelpers.h"
 #include <libultraship/libultraship.h>
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 
@@ -118,6 +119,11 @@ void Anchor::RegisterHooks() {
               [&](uint8_t note, float modulator, int8_t bend) { SendPacket_OcarinaSfx(note, modulator, bend); });
 
     COND_HOOK(OnLoadGame, isConnected, [&](s16 fileNum) { justLoadedSave = true; });
+
+    // NOTE: We intentionally let all actors run their Update() normally.
+    // Proximity-based triggers (like Deku Babas) work because xzDistToPlayer
+    // is calculated using the NEAREST player (local or DummyPlayer) in Actor_UpdateAll.
+    // This means enemies react to ANY nearby player, which is the expected multiplayer behavior.
 
     COND_HOOK(OnSaveFile, isConnected, [&](s16 fileNum, int sectionID) {
         if (sectionID == 0) {

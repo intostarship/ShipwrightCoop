@@ -8,6 +8,7 @@
 #include "objects/object_dekubaba/object_dekubaba.h"
 #include "objects/gameplay_keep/gameplay_keep.h"
 #include "overlays/effects/ovl_Effect_Ss_Hahen/z_eff_ss_hahen.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
 
@@ -256,7 +257,11 @@ void EnKarebaba_Awaken(EnKarebaba* this, PlayState* play) {
 }
 
 void EnKarebaba_Upright(EnKarebaba* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
 
     SkelAnime_Update(&this->skelAnime);
 
@@ -271,7 +276,7 @@ void EnKarebaba_Upright(EnKarebaba* this, PlayState* play) {
     if (this->bodyCollider.base.acFlags & AC_HIT) {
         EnKarebaba_SetupDying(this);
         Enemy_StartFinishingBlow(play, &this->actor);
-    } else if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) > 240.0f) {
+    } else if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) > 240.0f) {
         EnKarebaba_SetupRetract(this);
     } else if (this->actor.params == 0) {
         EnKarebaba_SetupSpin(this);

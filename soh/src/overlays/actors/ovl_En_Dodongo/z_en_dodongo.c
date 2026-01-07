@@ -4,6 +4,7 @@
 #include "objects/object_dodongo/object_dodongo.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -530,7 +531,11 @@ void EnDodongo_SwallowBomb(EnDodongo* this, PlayState* play) {
 void EnDodongo_Walk(EnDodongo* this, PlayState* play) {
     s32 pad;
     f32 playbackSpeed;
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
     s16 yawDiff = (s16)(this->actor.yawTowardsPlayer - this->actor.shape.rot.y);
 
     yawDiff = ABS(yawDiff);
@@ -564,7 +569,7 @@ void EnDodongo_Walk(EnDodongo* this, PlayState* play) {
         }
     }
 
-    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < 400.0f) {
+    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < 400.0f) {
         Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 1, 0x1F4, 0);
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
         if ((this->actor.xzDistToPlayer < 100.0f) && (yawDiff < 0x1388) && (this->actor.yDistToPlayer < 60.0f)) {

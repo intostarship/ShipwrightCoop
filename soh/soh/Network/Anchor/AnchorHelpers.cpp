@@ -1,11 +1,15 @@
 #include "AnchorHelpers.h"
 #include "Anchor.h"
+#include <spdlog/spdlog.h>
 
 extern "C" {
 #include "macros.h"
 #include "functions.h"
 extern PlayState* gPlayState;
 }
+
+// Debug counter to throttle logs
+static int sDebugLogCounter = 0;
 
 extern "C" Actor* Anchor_GetClosestPlayerActor(PlayState* play, Actor* fromActor) {
     // Safety check
@@ -35,11 +39,13 @@ extern "C" Actor* Anchor_GetClosestPlayerActor(PlayState* play, Actor* fromActor
     }
 
     // 2. Check DummyPlayers (in ACTORCAT_NPC)
+    int dummyPlayerCount = 0;
     Actor* actor = play->actorCtx.actorLists[ACTORCAT_NPC].head;
     while (actor != NULL) {
         Actor* nextActor = actor->next;
         // Check if it's a DummyPlayer by checking if update function matches
         if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+            dummyPlayerCount++;
             uint32_t clientId = Anchor::Instance->GetDummyPlayerClientId(actor);
             if (clientId != 0 && Anchor::Instance->clients.contains(clientId)) {
                 AnchorClient& client = Anchor::Instance->clients[clientId];
@@ -48,6 +54,13 @@ extern "C" Actor* Anchor_GetClosestPlayerActor(PlayState* play, Actor* fromActor
                     f32 xzDist = Actor_WorldDistXZToActor(fromActor, actor);
                     f32 yDist = Actor_HeightDiff(fromActor, actor);
                     f32 distSq = SQ(xzDist) + SQ(yDist);
+
+                    // Debug: log when DummyPlayer is closer
+                    if (sDebugLogCounter++ % 300 == 0 && fromActor->category == ACTORCAT_ENEMY) {
+                        SPDLOG_INFO("[Anchor] GetClosestPlayer: enemy {} localDist={:.1f} dummyDist={:.1f} dummyCloser={}",
+                                    fromActor->id, sqrtf(minDistSq), sqrtf(distSq), distSq < minDistSq ? "YES" : "no");
+                    }
+
                     if (distSq < minDistSq) {
                         minDistSq = distSq;
                         closestPlayer = actor;
@@ -56,6 +69,12 @@ extern "C" Actor* Anchor_GetClosestPlayerActor(PlayState* play, Actor* fromActor
             }
         }
         actor = nextActor;
+    }
+
+    // Debug: log periodically
+    if (sDebugLogCounter % 300 == 1 && fromActor->category == ACTORCAT_ENEMY) {
+        SPDLOG_INFO("[Anchor] GetClosestPlayer: enemy {} dummyPlayersFound={} closestIsDummy={}",
+                    fromActor->id, dummyPlayerCount, (closestPlayer != nullptr && closestPlayer != &localPlayer->actor) ? "YES" : "no");
     }
 
     // Fallback to local player if nothing found
@@ -135,4 +154,12 @@ extern "C" bool Anchor_IsWaitingForInitialSync(void) {
         return false;
     }
     return Anchor::Instance->IsWaitingForInitialSync();
+}
+
+extern "C" bool Anchor_ShouldSkipUpdateForNonOwner(s16 category) {
+    // These categories have AI with proximity-based triggers (actionFunc systems)
+    // Non-owners should not run Update() - they receive state from the owner
+    return category == ACTORCAT_ENEMY ||
+           category == ACTORCAT_BOSS ||
+           category == ACTORCAT_NPC;
 }

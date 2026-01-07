@@ -8,6 +8,7 @@
 #include "objects/object_mb/object_mb.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 /*
  * This actor can have three behaviors:
@@ -1150,7 +1151,11 @@ void EnMb_SpearGuardWalk(EnMb* this, PlayState* play) {
     s32 beforeCurFrame;
     s32 pad1;
     s32 pad2;
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
     s16 relYawTowardsPlayer = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
     s16 yawTowardsHome;
     f32 playSpeedAbs;
@@ -1165,7 +1170,7 @@ void EnMb_SpearGuardWalk(EnMb* this, PlayState* play) {
     beforeCurFrame = this->skelAnime.curFrame - playSpeedAbs;
     playSpeedAbs = ABS(this->skelAnime.playSpeed);
     if (this->timer3 == 0 &&
-        Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->playerDetectionRange) {
+        Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->playerDetectionRange) {
         Math_SmoothStepToS(&this->actor.world.rot.y, this->actor.yawTowardsPlayer, 1, 0x2EE, 0);
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
         if (this->actor.xzDistToPlayer < 500.0f && relYawTowardsPlayer < 0x1388) {
@@ -1264,6 +1269,11 @@ void EnMb_SpearPatrolWalkTowardsWaypoint(EnMb* this, PlayState* play) {
 
 void EnMb_ClubWaitPlayerNear(EnMb* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer) for distance check
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &player->actor;
+    }
     s32 pad;
     s16 relYawFromPlayer = this->actor.world.rot.y - this->actor.yawTowardsPlayer;
 
@@ -1275,7 +1285,7 @@ void EnMb_ClubWaitPlayerNear(EnMb* this, PlayState* play) {
     }
 
     SkelAnime_Update(&this->skelAnime);
-    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &player->actor.world.pos) < this->playerDetectionRange &&
+    if (Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos) < this->playerDetectionRange &&
         !(player->stateFlags1 & PLAYER_STATE1_DAMAGED) && ABS(relYawFromPlayer) < 0x3E80) {
         // Add a height check to the Moblin's Club attack when Enemy Randomizer is on.
         // Without the height check, the Moblin will attack (and play the sound effect) a lot even though

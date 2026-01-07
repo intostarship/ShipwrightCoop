@@ -43,6 +43,12 @@ void Anchor_SetNetworkSpawnMode(bool enabled);
  */
 bool Anchor_IsWaitingForInitialSync(void);
 
+/**
+ * Checks if an actor category should have its Update() skipped for non-owners.
+ * Returns true for ENEMY, BOSS, NPC - categories with AI that uses proximity triggers.
+ */
+bool Anchor_ShouldSkipUpdateForNonOwner(s16 category);
+
 #ifdef __cplusplus
 }
 #endif
