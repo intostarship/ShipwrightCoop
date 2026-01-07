@@ -172,7 +172,6 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     }
 
     // Apply all 5 animation tables for 100% accurate animation sync
-    // This includes upper body animations (arms raised when holding items, etc.)
     // IMPORTANT: Copy values instead of just pointing, to avoid timing issues
     // where the game's animation system might overwrite our data
     for (int i = 0; i < 24; i++) {
@@ -181,6 +180,14 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
         player->blendTable[i] = client.blendTable[i];
         player->upperSkelAnime.jointTable[i] = client.upperJointTable[i];
         player->upperSkelAnime.morphTable[i] = client.upperMorphTable[i];
+    }
+
+    // Merge upper body limbs from upperJointTable into skelAnime.jointTable
+    // This replicates what AnimationContext_SetCopyTrue does after Player_Update
+    // Upper body limbs are indices 10-21 (PLAYER_LIMB_UPPER through PLAYER_LIMB_TORSO)
+    // Without this merge, arms won't be raised when holding items (rocks, bombs, etc.)
+    for (int i = 10; i < 22; i++) {
+        player->skelAnime.jointTable[i] = client.upperJointTable[i];
     }
 
     player->skelAnime.movementFlags = client.movementFlags;
@@ -323,6 +330,11 @@ void DummyPlayer_Draw(Actor* actor, PlayState* play) {
         player->blendTable[i] = client.blendTable[i];
         player->upperSkelAnime.jointTable[i] = client.upperJointTable[i];
         player->upperSkelAnime.morphTable[i] = client.upperMorphTable[i];
+    }
+
+    // Merge upper body limbs (indices 10-21) for arms to show correctly
+    for (int i = 10; i < 22; i++) {
+        player->skelAnime.jointTable[i] = client.upperJointTable[i];
     }
 
     // Hack to account for usage of gSaveContext in Player_Draw
