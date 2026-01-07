@@ -172,6 +172,17 @@ class Anchor : public Network {
     std::map<uint64_t, std::set<u32>> ownerToNetworkIds;  // Owner sessionId -> set of network IDs they own
     std::vector<Actor*> actorsPendingKill;       // Actors to kill next frame (deferred for safety)
 
+    // Destroyed actors tracking - broadcast as "do not spawn" so new players don't respawn them
+    struct DestroyedActorInfo {
+        u32 networkActorId;
+        s16 actorId;
+        s16 params;
+        s8 room;
+        Vec3f homePos;
+    };
+    std::map<u32, DestroyedActorInfo> destroyedActors;  // networkActorId -> info (persists until scene change)
+    std::map<u32, DestroyedActorInfo> lastSentActorInfo;  // Info about actors we sent last frame (to detect deaths)
+
     u32 GetActorUniqueId(Actor* actor);           // Legacy hash-based ID (fallback)
     void SetActorNetworkId(Actor* actor, u32 networkActorId);  // Set networkActorId from snapshot
     Actor* FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos);  // Match by type+position

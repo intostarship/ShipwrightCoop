@@ -277,6 +277,8 @@ void Anchor::ClearNetworkIds() {
     networkIdToOwner.clear();
     ownerToNetworkIds.clear();
     actorsPendingKill.clear();
+    destroyedActors.clear();
+    lastSentActorInfo.clear();
     nextNetworkId = 1;
     hasAssignedNetworkIds = false;
 }
@@ -533,6 +535,28 @@ void Anchor::SendPacket_WorldSnapshot() {
     payload["totalDays"] = gSaveContext.totalDays;
     payload["weatherMode"] = gWeatherMode;
 
+    // Kill any actors that respawned but are in our destroyed list
+    // This handles the case where you leave a room and come back - game spawns actors fresh
+    // but we know they should be dead from our destroyedActors tracking
+    if (!destroyedActors.empty()) {
+        for (auto& [networkId, info] : destroyedActors) {
+            if (!IsRoomLoaded(info.room)) continue;
+
+            Actor* actor = FindActorByNetworkId(networkId);
+            if (actor == nullptr) {
+                actor = FindActorByTypeAndPosition(info.actorId, info.params, info.homePos);
+            }
+            if (actor != nullptr && actor->update != nullptr) {
+                SPDLOG_INFO("[Anchor] Killing respawned destroyed actor id={} networkId={}",
+                            actor->id, networkId);
+                Actor_Kill(actor);
+            }
+        }
+    }
+
+    // Track what we're sending this frame to detect deaths
+    std::map<u32, DestroyedActorInfo> currentSentActorInfo;
+
     // Send only actors we OWN (we're the closest player to them)
     // Receivers will apply this state because we're the authority
     int totalSyncable = 0, ownedCount = 0, skippedNotOwned = 0;
@@ -635,8 +659,50 @@ void Anchor::SendPacket_WorldSnapshot() {
                 }
 
                 payload["actors"].push_back(actorJson);
+
+                // Track this actor for death detection next frame
+                currentSentActorInfo[networkActorId] = {
+                    networkActorId,
+                    actor->id,
+                    actor->params,
+                    (s8)actor->room,
+                    actor->home.pos
+                };
             }
             actor = actor->next;
+        }
+    }
+
+    // Detect destroyed actors: were in lastSentActorInfo but not in currentSentActorInfo
+    for (auto& [networkId, info] : lastSentActorInfo) {
+        if (currentSentActorInfo.find(networkId) == currentSentActorInfo.end()) {
+            // This actor was alive last frame but isn't now - it's destroyed
+            // Only add if not already in destroyedActors
+            if (destroyedActors.find(networkId) == destroyedActors.end()) {
+                destroyedActors[networkId] = info;
+                SPDLOG_INFO("[Anchor] Detected destroyed actor: id={} networkId={} room={}",
+                            info.actorId, networkId, info.room);
+            }
+        }
+    }
+
+    // Update lastSentActorInfo for next frame
+    lastSentActorInfo = currentSentActorInfo;
+
+    // Add destroyed actors to payload so other players don't respawn them
+    if (!destroyedActors.empty()) {
+        payload["destroyed"] = nlohmann::json::array();
+        for (auto& [networkId, info] : destroyedActors) {
+            // Only send destroyed actors in loaded rooms
+            if (IsRoomLoaded(info.room)) {
+                nlohmann::json destroyedJson;
+                destroyedJson["networkActorId"] = info.networkActorId;
+                destroyedJson["id"] = info.actorId;
+                destroyedJson["params"] = info.params;
+                destroyedJson["room"] = info.room;
+                destroyedJson["home"] = info.homePos;
+                payload["destroyed"].push_back(destroyedJson);
+            }
         }
     }
 
@@ -766,6 +832,38 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             }
             if (payload.contains("weatherMode")) {
                 gWeatherMode = payload["weatherMode"].get<u8>();
+            }
+        }
+    }
+
+    // Process destroyed actors - kill them locally if they exist
+    if (payload.contains("destroyed")) {
+        for (const auto& destroyedJson : payload["destroyed"]) {
+            if (!destroyedJson.contains("networkActorId")) continue;
+
+            u32 networkActorId = destroyedJson["networkActorId"].get<u32>();
+            s16 actorId = destroyedJson.contains("id") ? destroyedJson["id"].get<s16>() : 0;
+            s16 params = destroyedJson.contains("params") ? destroyedJson["params"].get<s16>() : 0;
+            s8 room = destroyedJson.contains("room") ? destroyedJson["room"].get<s8>() : -1;
+            Vec3f homePos = destroyedJson.contains("home") ? destroyedJson["home"].get<Vec3f>() : Vec3f{0,0,0};
+
+            // Add to our local destroyed list
+            if (destroyedActors.find(networkActorId) == destroyedActors.end()) {
+                destroyedActors[networkActorId] = {networkActorId, actorId, params, room, homePos};
+                SPDLOG_INFO("[Anchor] Received destroyed actor: id={} networkId={} room={}",
+                            actorId, networkActorId, room);
+            }
+
+            // Kill the local actor if it exists
+            Actor* actor = FindActorByNetworkId(networkActorId);
+            if (actor == nullptr) {
+                // Try to find by type + position
+                actor = FindActorByTypeAndPosition(actorId, params, homePos);
+            }
+            if (actor != nullptr && actor->update != nullptr) {
+                SPDLOG_INFO("[Anchor] Killing local actor id={} networkId={} (received destroyed)",
+                            actor->id, networkActorId);
+                Actor_Kill(actor);
             }
         }
     }
@@ -988,59 +1086,15 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     // Update the full set of actors owned by this sender (uses sessionId)
     ownerToNetworkIds[senderSessionId] = receivedNetworkActorIds;
 
-    // Despawn actors that this sender USED to own but no longer sends
-    // This handles cases like: player A throws a rock, rock breaks, player B should see it disappear
-    // IMPORTANT: Only despawn if the actor is in the SAME ROOM as the sender!
-    // If sender changed rooms, they'll stop sending old room actors - that doesn't mean they died
-    for (u32 oldNetworkId : previouslyOwnedByThisSender) {
-        if (receivedNetworkActorIds.count(oldNetworkId) == 0) {
-            // This actor was owned by the sender but is no longer in their snapshot
-            // Find the actor first to check ownership
-            Actor* actorToCheck = FindActorByNetworkId(oldNetworkId);
-
-            // CRITICAL FIX: Check if WE are now the closest player (ownership transferred)
-            // The sender stopped sending because they moved away - we might be the new owner!
-            // This fixes the Saria disappearing bug when players move around
-            if (actorToCheck != nullptr && IsActorOwner(actorToCheck)) {
-                // We're now the closest player to this actor - claim ownership!
-                SPDLOG_INFO("[Anchor] Claiming ownership of actor id={} networkActorId={} (sender moved away, we're closer)",
-                            actorToCheck->id, oldNetworkId);
-                networkIdToOwner[oldNetworkId] = sessionId;
-                ownerToNetworkIds[sessionId].insert(oldNetworkId);
-                continue;
-            }
-
-            if (actorToCheck != nullptr && actorToCheck->update != nullptr) {
-                // CRITICAL: Only despawn if actor is in the sender's room
-                // If sender is in room 1 but this actor is in room 0, the sender
-                // just changed rooms - the actor is still alive in room 0
-                if (senderRoom >= 0 && actorToCheck->room >= 0 && actorToCheck->room != senderRoom) {
-                    // Actor is in a different room than sender - don't despawn
-                    // The sender stopped sending it because they left the room, not because it died
-                    SPDLOG_INFO("[Anchor] NOT despawning actor id={} networkActorId={} (actor room {} != sender room {})",
-                                actorToCheck->id, oldNetworkId, actorToCheck->room, senderRoom);
-                    // Release ownership so someone else can claim it
-                    networkIdToOwner.erase(oldNetworkId);
-                    continue;
-                }
-
-                // Don't kill it immediately during packet processing - defer to next frame
-                // This avoids crashes from killing actors during draw/update loops
-                actorsPendingKill.push_back(actorToCheck);
-                SPDLOG_INFO("[Anchor] Queueing actor id={} networkActorId={} for kill (owner stopped sending)",
-                            actorToCheck->id, oldNetworkId);
-            }
-
-            // Clean up mappings
-            networkIdToOwner.erase(oldNetworkId);
-            if (networkIdToActor.count(oldNetworkId) > 0) {
-                Actor* actor = networkIdToActor[oldNetworkId];
-                actorToNetworkId.erase(actor);
-                networkIdToActor.erase(oldNetworkId);
-            }
-            actorInterpData.erase(oldNetworkId);
-        }
-    }
+    // NOTE: We NO LONGER despawn actors just because someone "stopped sending" them.
+    // This was causing bugs like Saria disappearing when no player is close to her.
+    //
+    // Instead, we ONLY kill actors that are explicitly in the "destroyed" list.
+    // The destroyed list is populated when:
+    // 1. An actor we were sending dies (detected by comparing lastSentActorInfo)
+    // 2. We receive a destroyed list from another player
+    //
+    // This is simpler and more robust: actors stay alive unless explicitly killed.
     } catch (const std::exception& e) {
         SPDLOG_ERROR("[Anchor] Error in HandlePacket_WorldSnapshot: {}", e.what());
     }
