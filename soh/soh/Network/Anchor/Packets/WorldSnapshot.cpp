@@ -795,42 +795,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             }
         }
 
-        // Step 3: If still not found, spawn it
-        // CRITICAL: Only spawn actors in LOADED rooms!
-        // Spawning in an unloaded room crashes because graphics resources aren't available
+        // Step 3: If actor doesn't exist locally, skip it
+        // We do NOT spawn missing actors because:
+        // - Different randomizer seeds create different actor sets
+        // - Actor initialization is complex and context-dependent
+        // - Spawning can crash if the actor type isn't meant to exist here
+        // Instead, we only sync state for actors that exist on BOTH sides
         bool justSpawned = false;
-        bool roomIsLoaded = IsRoomLoaded(actorRoom);
-        if (actor == nullptr && !roomIsLoaded) {
-            // Actor's room is not loaded - skip spawning, it will sync when we enter that room
-            SPDLOG_INFO("[Anchor] Skipping spawn for actor id={} (room {} not loaded)",
-                        actorId, actorRoom);
-        }
-        if (actor == nullptr && roomIsLoaded) {
-            Vec3f pos = actorJson["pos"].get<Vec3f>();
-            Vec3s rot = actorJson.contains("wRot") ? actorJson["wRot"].get<Vec3s>() : actorJson["sRot"].get<Vec3s>();
-
-            // Only spawn if we have category info and it's a syncable category
-            if (category >= 0 && syncableCategories.count(category) > 0) {
-                SPDLOG_INFO("[Anchor] Spawning missing actor id={} networkActorId={} at ({}, {}, {})",
-                            actorId, networkActorId, pos.x, pos.y, pos.z);
-                // Enable network spawn mode to bypass ownership check in Actor_Spawn
-                Anchor_SetNetworkSpawnMode(true);
-                actor = Actor_Spawn(&gPlayState->actorCtx, gPlayState, actorId,
-                                    pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, params, false);
-                Anchor_SetNetworkSpawnMode(false);
-                if (actor == nullptr) {
-                    SPDLOG_WARN("[Anchor] Failed to spawn actor id={}", actorId);
-                    continue;
-                }
-                // Set the correct home position and assign networkActorId
-                actor->home.pos = homePos;
-                if (networkActorId != 0) {
-                    SetActorNetworkId(actor, networkActorId);
-                }
-                justSpawned = true;
-            } else {
-                continue;
-            }
+        if (actor == nullptr) {
+            // Actor doesn't exist locally - skip it, don't try to spawn
+            // This is expected when players have different randomizer configurations
+            continue;
         }
 
         // Skip if actor is still null (couldn't find or spawn it)

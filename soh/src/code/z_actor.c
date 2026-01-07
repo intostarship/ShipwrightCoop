@@ -3394,32 +3394,16 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
 
     ActorDBEntry* dbEntry = ActorDB_Retrieve(actorId);
 
-    // In multiplayer, prevent spawning syncable actors in certain cases:
-    // 1. When waiting for initial sync (entering scene with others) - wait for snapshot
-    // 2. When another player is closer to the spawn position - they will spawn it
-    // Network spawns (from world snapshot) bypass these checks via sIsNetworkSpawn flag
-    if (!sIsNetworkSpawn && Anchor_IsEnabled()) {
-        s16 category = dbEntry->category;
-        // Check if this is a syncable category
-        if (category == ACTORCAT_ENEMY || category == ACTORCAT_BOSS ||
-            category == ACTORCAT_NPC || category == ACTORCAT_PROP ||
-            category == ACTORCAT_SWITCH || category == ACTORCAT_BG ||
-            category == ACTORCAT_DOOR || category == ACTORCAT_CHEST ||
-            category == ACTORCAT_EXPLOSIVE || category == ACTORCAT_ITEMACTION ||
-            category == ACTORCAT_MISC) {
-            // Block ALL syncable spawns while waiting for initial sync
-            if (Anchor_IsWaitingForInitialSync()) {
-                return NULL;
-            }
-            // Check if we own this position
-            Vec3f spawnPos = { posX, posY, posZ };
-            if (!Anchor_IsPositionOwner(&spawnPos)) {
-                // Another player is closer - they will spawn this actor
-                // We'll receive it via world snapshot
-                return NULL;
-            }
-        }
-    }
+    // In multiplayer, each player spawns actors independently.
+    // The sync system reconciles state based on proximity ownership:
+    // - Each player broadcasts ALL actors in their world snapshot
+    // - Receivers apply state from the player closest to each actor
+    // - This ensures deterministic, conflict-free state
+    //
+    // We no longer block spawns based on proximity because:
+    // - It caused players to have no actors when entering scenes with others
+    // - WorldSnapshot no longer spawns missing actors (randomizer compatibility)
+    // - Both players spawning is simpler and more robust
 
     assert(dbEntry->valid);
 
