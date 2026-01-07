@@ -40,7 +40,7 @@ void Anchor::OnConnected() {
 
     // Reset snapshot state to trigger initial sync with other players
     // This ensures we receive the world state from others if they're in our room
-    hasReceivedSnapshotThisRoom = false;
+    receivedSnapshotCount = 0;
     lastSnapshotSceneNum = -1;
     lastSnapshotRoomNum = -1;
     ClearNetworkIds();

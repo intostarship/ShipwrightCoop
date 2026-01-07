@@ -415,7 +415,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                     lastSnapshotSceneNum, lastSnapshotRoomNum, gPlayState->sceneNum, curRoom);
         lastSnapshotSceneNum = gPlayState->sceneNum;
         lastSnapshotRoomNum = curRoom;
-        hasReceivedSnapshotThisRoom = false;
+        receivedSnapshotCount = 0;
         ClearNetworkIds();  // Clear actor network IDs on scene/room change
     }
 
@@ -444,11 +444,12 @@ void Anchor::SendPacket_WorldSnapshot() {
         return;
     }
 
-    // Wait until we've received at least one snapshot from others before broadcasting
-    // This ensures we don't overwrite existing state when entering a room
+    // Wait until we've received at least 4 snapshots from others before broadcasting
+    // This ensures we properly receive the world state before sending our own
     // EXCEPTION: If we have the lowest sessionId among players in this scene, we go first
     // This prevents deadlock when multiple players enter simultaneously
-    if (!hasReceivedSnapshotThisRoom) {
+    const int REQUIRED_SNAPSHOTS = 4;
+    if (receivedSnapshotCount < REQUIRED_SNAPSHOTS) {
         bool hasLowerPriority = false;
         for (auto& [clientId, client] : clients) {
             if (client.sceneNum == gPlayState->sceneNum && client.online &&
@@ -466,7 +467,7 @@ void Anchor::SendPacket_WorldSnapshot() {
         }
         // Otherwise, we have priority - mark as ready and start broadcasting
         SPDLOG_INFO("[Anchor] I have priority (sessionId={}), starting to broadcast", sessionId);
-        hasReceivedSnapshotThisRoom = true;  // Prevent re-checking priority every frame
+        receivedSnapshotCount = REQUIRED_SNAPSHOTS;  // Skip waiting
     }
 
     nlohmann::json payload;
@@ -644,13 +645,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         s8 senderRoom = payload.contains("roomNum") ? payload["roomNum"].get<s8>() : -1;
         s8 myRoom = gPlayState->roomCtx.curRoom.num;
 
-        // Mark that we've received a snapshot from someone in our scene - we can now start broadcasting
-        // (We no longer filter by room here - we filter per-actor instead)
-        hasReceivedSnapshotThisRoom = true;
+        // Count received snapshots - we wait for 4 before broadcasting our own
+        // This ensures we properly receive the world state before sending our own
+        const int REQUIRED_SNAPSHOTS = 4;
+        receivedSnapshotCount++;
+        if (receivedSnapshotCount == REQUIRED_SNAPSHOTS) {
+            SPDLOG_INFO("[Anchor] Received {} snapshots, now ready to broadcast", REQUIRED_SNAPSHOTS);
+        }
 
         uint32_t senderClientId = payload["clientId"].get<uint32_t>();
-        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
-                    senderClientId, payload["actors"].size());
+        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors (snapshot {}/{})",
+                    senderClientId, payload["actors"].size(), receivedSnapshotCount, REQUIRED_SNAPSHOTS);
 
     // Apply scene flags from the snapshot - this syncs chest/switch/collectible state
     if (payload.contains("sceneFlags")) {

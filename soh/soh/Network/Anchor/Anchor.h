@@ -155,7 +155,7 @@ class Anchor : public Network {
     u8 snapshotSendCounter = 0;
     s16 lastSnapshotSceneNum = -1;
     s8 lastSnapshotRoomNum = -1;
-    bool hasReceivedSnapshotThisRoom = false;  // Wait for first sync before broadcasting
+    int receivedSnapshotCount = 0;  // Wait for N snapshots before broadcasting (prevents overwriting existing state)
 
     // Network ID system - unique IDs assigned by first player in scene
     std::map<Actor*, u32> actorToNetworkId;      // Actor pointer -> network ID
