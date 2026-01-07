@@ -3,7 +3,7 @@
 //   python3 soh/soh/Network/Anchor/tools/generate_player_sync.py > soh/soh/Network/Anchor/PlayerActionFuncs.inc
 //
 // 89 Player_Action_* functions
-// 4 Player_UpperAction_* functions
+// 17 Player_UpperAction_* functions
 
 #pragma once
 
@@ -102,10 +102,23 @@ void Player_Action_CsAction(Player*, struct PlayState*);
 void Player_Action_8084F308(Player*, struct PlayState*);
 
 // Forward declarations for Player upper action functions
+s32 Player_UpperAction_CarryActor(Player*, struct PlayState*);
 s32 Player_UpperAction_ChangeHeldItem(Player*, struct PlayState*);
 s32 Player_UpperAction_Sword(Player*, struct PlayState*);
+s32 func_8083485C(Player*, struct PlayState*);
 s32 func_80834B5C(Player*, struct PlayState*);
-s32 Player_UpperAction_CarryActor(Player*, struct PlayState*);
+s32 func_80834BD4(Player*, struct PlayState*);
+s32 func_80834C74(Player*, struct PlayState*);
+s32 func_8083501C(Player*, struct PlayState*);
+s32 func_808351D4(Player*, struct PlayState*);
+s32 func_808353D8(Player*, struct PlayState*);
+s32 func_80835588(Player*, struct PlayState*);
+s32 func_80835800(Player*, struct PlayState*);
+s32 func_80835884(Player*, struct PlayState*);
+s32 func_808358F0(Player*, struct PlayState*);
+s32 func_808359FC(Player*, struct PlayState*);
+s32 func_80835B60(Player*, struct PlayState*);
+s32 func_80835C08(Player*, struct PlayState*);
 
 }  // extern "C"
 
@@ -205,12 +218,25 @@ static const int sPlayerActionFuncCount = 89;
 
 // Player_UpperAction_* function table
 static UpperActionFunc sPlayerUpperActionFuncs[] = {
-    Player_UpperAction_ChangeHeldItem,  // 0
-    Player_UpperAction_Sword,  // 1
-    func_80834B5C,  // 2
-    Player_UpperAction_CarryActor,  // 3
+    Player_UpperAction_CarryActor,  // 0
+    Player_UpperAction_ChangeHeldItem,  // 1
+    Player_UpperAction_Sword,  // 2
+    func_8083485C,  // 3
+    func_80834B5C,  // 4
+    func_80834BD4,  // 5
+    func_80834C74,  // 6
+    func_8083501C,  // 7
+    func_808351D4,  // 8
+    func_808353D8,  // 9
+    func_80835588,  // 10
+    func_80835800,  // 11
+    func_80835884,  // 12
+    func_808358F0,  // 13
+    func_808359FC,  // 14
+    func_80835B60,  // 15
+    func_80835C08,  // 16
 };
-static const int sPlayerUpperActionFuncCount = 4;
+static const int sPlayerUpperActionFuncCount = 17;
 
 // Get index of an action function (-1 if not found)
 static s16 GetPlayerActionFuncIndex(PlayerActionFunc func) {

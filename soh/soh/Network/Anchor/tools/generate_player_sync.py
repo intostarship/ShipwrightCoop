@@ -22,8 +22,6 @@ def find_action_funcs(content: str) -> tuple[list[str], list[str]]:
     # Pattern for function definitions
     # void Player_Action_Idle(Player* this, PlayState* play) {
     action_pattern = re.compile(r'^void (Player_Action_\w+)\s*\(\s*Player\s*\*', re.MULTILINE)
-    # s32 Player_UpperAction_CarryActor(Player* this, PlayState* play) {
-    upper_pattern = re.compile(r'^s32 (Player_UpperAction_\w+|func_80834B5C)\s*\(\s*Player\s*\*', re.MULTILINE)
 
     action_funcs = []
     upper_action_funcs = []
@@ -33,10 +31,37 @@ def find_action_funcs(content: str) -> tuple[list[str], list[str]]:
         if func_name not in action_funcs:
             action_funcs.append(func_name)
 
-    for match in upper_pattern.finditer(content):
+    # Find ALL upper action functions by looking at:
+    # 1. Player_SetUpperActionFunc(this, funcName) calls
+    # 2. sItemActionUpdateFuncs table entries
+    # 3. Function definitions with s32 return type matching the pattern
+
+    # Pattern for Player_SetUpperActionFunc calls
+    set_upper_pattern = re.compile(r'Player_SetUpperActionFunc\s*\(\s*this\s*,\s*(\w+)\s*\)')
+    for match in set_upper_pattern.finditer(content):
         func_name = match.group(1)
-        if func_name not in upper_action_funcs:
+        # Skip table lookups like sItemActionUpdateFuncs[...]
+        if func_name.startswith('s') and '[' not in func_name:
+            continue
+        if func_name not in upper_action_funcs and not func_name.startswith('s'):
             upper_action_funcs.append(func_name)
+
+    # Pattern for sItemActionUpdateFuncs table entries
+    # Find the table start and extract until we see "};""
+    table_start = content.find('sItemActionUpdateFuncs[]')
+    if table_start != -1:
+        table_end = content.find('};', table_start)
+        if table_end != -1:
+            table_content = content[table_start:table_end]
+            # Extract function names (word followed by comma or at end)
+            func_pattern = re.compile(r'\b(func_\w+|Player_UpperAction_\w+)\b')
+            for match in func_pattern.finditer(table_content):
+                func_name = match.group(1)
+                if func_name not in upper_action_funcs:
+                    upper_action_funcs.append(func_name)
+
+    # Sort for consistent output
+    upper_action_funcs.sort()
 
     return action_funcs, upper_action_funcs
 
