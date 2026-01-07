@@ -90,6 +90,11 @@ static s32 sCurCeilingBgId;
 // Used for animating the ice trap on the "Get Item" model.
 f32 iceTrapScale;
 
+// Flag to bypass ownership check during network spawns
+// Set to true when spawning from world snapshot, prevents duplicate local spawns
+static bool sIsNetworkSpawn = false;
+void Anchor_SetNetworkSpawnMode(bool enabled) { sIsNetworkSpawn = enabled; }
+
 // For Link's voice pitch SFX modifier
 static f32 freqMultiplier = 1;
 
@@ -2982,8 +2987,8 @@ s32 Ship_CalcShouldDrawAndUpdate(PlayState* play, Actor* actor, Vec3f* projected
                                  bool* shouldUpdate) {
     f32 clampedProjectedW;
 
-    // In multiplayer, always update and draw syncable actors (enemies, bosses, NPCs, props, etc.)
-    // This ensures the whole world stays active for all players
+    // In multiplayer, syncable actors are always drawn but only updated by their owner
+    // Owner = the player closest to the actor. Non-owners receive state via world snapshot.
     if (Anchor_IsEnabled()) {
         if (actor->category == ACTORCAT_ENEMY || actor->category == ACTORCAT_BOSS ||
             actor->category == ACTORCAT_NPC || actor->category == ACTORCAT_PROP ||
@@ -2991,8 +2996,10 @@ s32 Ship_CalcShouldDrawAndUpdate(PlayState* play, Actor* actor, Vec3f* projected
             actor->category == ACTORCAT_DOOR || actor->category == ACTORCAT_CHEST ||
             actor->category == ACTORCAT_EXPLOSIVE || actor->category == ACTORCAT_ITEMACTION ||
             actor->category == ACTORCAT_MISC) {
-            *shouldUpdate = true;
+            // Always draw - we want to see all actors
             *shouldDraw = true;
+            // Only update if we're the owner (closest player)
+            *shouldUpdate = Anchor_IsActorOwner(actor);
             return true;
         }
     }
@@ -3364,6 +3371,28 @@ Actor* Actor_Spawn(ActorContext* actorCtx, PlayState* play, s16 actorId, f32 pos
     u32 temp;
 
     ActorDBEntry* dbEntry = ActorDB_Retrieve(actorId);
+
+    // In multiplayer, prevent spawning syncable actors if another player is closer
+    // This avoids duplicates when game logic tries to spawn (e.g., rupees from rocks)
+    // Network spawns (from world snapshot) bypass this check via sIsNetworkSpawn flag
+    if (!sIsNetworkSpawn && Anchor_IsEnabled()) {
+        s16 category = dbEntry->category;
+        // Check if this is a syncable category
+        if (category == ACTORCAT_ENEMY || category == ACTORCAT_BOSS ||
+            category == ACTORCAT_NPC || category == ACTORCAT_PROP ||
+            category == ACTORCAT_SWITCH || category == ACTORCAT_BG ||
+            category == ACTORCAT_DOOR || category == ACTORCAT_CHEST ||
+            category == ACTORCAT_EXPLOSIVE || category == ACTORCAT_ITEMACTION ||
+            category == ACTORCAT_MISC) {
+            // Check if we own this position
+            Vec3f spawnPos = { posX, posY, posZ };
+            if (!Anchor_IsPositionOwner(&spawnPos)) {
+                // Another player is closer - they will spawn this actor
+                // We'll receive it via world snapshot
+                return NULL;
+            }
+        }
+    }
 
     assert(dbEntry->valid);
 

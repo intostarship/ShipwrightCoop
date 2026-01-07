@@ -163,16 +163,16 @@ class Anchor : public Network {
     Actor* FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos);  // Match by type+position
     void ClearNetworkIds();                       // Clear all networkActorId mappings (on scene change)
 
-    uint32_t GetClosestPlayerToActor(Actor* actor);
-    bool IsActorOwner(Actor* actor);
     Actor* FindActorByUniqueId(u32 uniqueId);     // Legacy - keep for compatibility
     void ApplyActorInterpolation();
     SkelAnime* GetActorSkelAnime(Actor* actor);
 
   public:
-    // Network ID public methods (needed by DummyPlayer)
+    // Network ID public methods (needed by DummyPlayer and AnchorHelpers)
     u32 GetOrAssignNetworkId(Actor* actor);       // Get existing or assign new networkActorId
     Actor* FindActorByNetworkId(u32 networkActorId);   // Find actor by networkActorId
+    uint32_t GetClosestPlayerToActor(Actor* actor);
+    bool IsActorOwner(Actor* actor);
 
     uint32_t ownClientId;
     inline static const std::string clientVersion = (char*)gBuildVersion;

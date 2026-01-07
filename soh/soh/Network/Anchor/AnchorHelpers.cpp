@@ -68,3 +68,64 @@ extern "C" Actor* Anchor_GetClosestPlayerActor(PlayState* play, Actor* fromActor
 extern "C" bool Anchor_IsEnabled(void) {
     return Anchor::Instance != nullptr && Anchor::Instance->isConnected;
 }
+
+extern "C" bool Anchor_IsActorOwner(Actor* actor) {
+    // If Anchor is not active, we own everything
+    if (Anchor::Instance == nullptr || !Anchor::Instance->isConnected) {
+        return true;
+    }
+
+    // Safety check
+    if (actor == nullptr || gPlayState == nullptr) {
+        return true;
+    }
+
+    // Use the Anchor class method to check ownership
+    return Anchor::Instance->IsActorOwner(actor);
+}
+
+extern "C" bool Anchor_IsPositionOwner(Vec3f* pos) {
+    // If Anchor is not active, we own everything
+    if (Anchor::Instance == nullptr || !Anchor::Instance->isConnected) {
+        return true;
+    }
+
+    // Safety check
+    if (pos == nullptr || gPlayState == nullptr) {
+        return true;
+    }
+
+    Player* localPlayer = GET_PLAYER(gPlayState);
+    if (localPlayer == nullptr) {
+        return true;
+    }
+
+    // Calculate distance from local player to position
+    f32 dx = localPlayer->actor.world.pos.x - pos->x;
+    f32 dz = localPlayer->actor.world.pos.z - pos->z;
+    f32 localDistSq = dx * dx + dz * dz;
+
+    // Check all DummyPlayers (other connected players)
+    Actor* actor = gPlayState->actorCtx.actorLists[ACTORCAT_NPC].head;
+    while (actor != NULL) {
+        if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+            uint32_t clientId = Anchor::Instance->GetDummyPlayerClientId(actor);
+            if (clientId != 0 && Anchor::Instance->clients.contains(clientId)) {
+                AnchorClient& client = Anchor::Instance->clients[clientId];
+                if (client.online && client.isSaveLoaded && client.sceneNum == gPlayState->sceneNum) {
+                    f32 otherDx = actor->world.pos.x - pos->x;
+                    f32 otherDz = actor->world.pos.z - pos->z;
+                    f32 otherDistSq = otherDx * otherDx + otherDz * otherDz;
+                    if (otherDistSq < localDistSq) {
+                        // Another player is closer - they own this position
+                        return false;
+                    }
+                }
+            }
+        }
+        actor = actor->next;
+    }
+
+    // We are the closest - we own this position
+    return true;
+}

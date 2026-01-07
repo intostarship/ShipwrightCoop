@@ -1,4 +1,5 @@
 #include "soh/Network/Anchor/Anchor.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 #include "soh/Network/Anchor/JsonConversions.hpp"
 #include <nlohmann/json.hpp>
 #include <libultraship/libultraship.h>
@@ -459,8 +460,9 @@ void Anchor::SendPacket_WorldSnapshot() {
         };
     }
 
-    // Broadcast ALL actors - receivers will decide which state to apply
-    int enemyCount = 0, bossCount = 0, npcCount = 0;
+    // Send only actors we OWN (we're the closest player to them)
+    // Receivers will apply this state because we're the authority
+    int enemyCount = 0, bossCount = 0, npcCount = 0, ownedCount = 0;
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
@@ -474,6 +476,13 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
+            // Only send actors we OWN (we're the closest player)
+            if (!IsActorOwner(actor)) {
+                actor = actor->next;
+                continue;
+            }
+
+            ownedCount++;
             if (actor->update != NULL) {
                 nlohmann::json actorJson;
 
@@ -519,8 +528,8 @@ void Anchor::SendPacket_WorldSnapshot() {
     }
 
     // Always send snapshot (even if empty) to unblock other players waiting for us
-    SPDLOG_INFO("[Anchor] Sending WORLD_SNAPSHOT with {} actors (enemies={}, bosses={}, npcs={})",
-                payload["actors"].size(), enemyCount, bossCount, npcCount);
+    SPDLOG_INFO("[Anchor] Sending WORLD_SNAPSHOT with {} owned actors (of {} total: enemies={}, bosses={}, npcs={})",
+                ownedCount, enemyCount + bossCount + npcCount, enemyCount, bossCount, npcCount);
     SendJsonToRemote(payload);
 }
 
@@ -606,8 +615,11 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             if (category >= 0 && syncableCategories.count(category) > 0) {
                 SPDLOG_INFO("[Anchor] Spawning missing actor id={} networkActorId={} at ({}, {}, {})",
                             actorId, networkActorId, pos.x, pos.y, pos.z);
+                // Enable network spawn mode to bypass ownership check in Actor_Spawn
+                Anchor_SetNetworkSpawnMode(true);
                 actor = Actor_Spawn(&gPlayState->actorCtx, gPlayState, actorId,
                                     pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, params, false);
+                Anchor_SetNetworkSpawnMode(false);
                 if (actor == nullptr) {
                     SPDLOG_WARN("[Anchor] Failed to spawn actor id={}", actorId);
                     continue;
@@ -626,8 +638,13 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // Verify actor ID matches
         if (actor->id != actorId) continue;
 
-        // No ownership check - we sync EVERYTHING from the sender
-        // The sender with lowest sessionId is the authority for the whole world
+        // Check ownership - only apply remote state if we're NOT the owner
+        // If we're the owner (closest to this actor), we keep our local state
+        if (IsActorOwner(actor) && !justSpawned) {
+            // We're closer to this actor than the sender - we keep our state
+            // (justSpawned actors always get remote state to initialize properly)
+            continue;
+        }
 
         // Get target state
         Vec3f targetPos = actorJson["pos"].get<Vec3f>();
@@ -735,8 +752,10 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Despawn actors that have a networkActorId but are not in the received snapshot
-    // This means the actor was killed on the sender's side
+    // Despawn logic: Only despawn actors that:
+    // 1. We don't own (another player is closer)
+    // 2. AND they're not in the received snapshot (meaning the owner killed them)
+    // If we OWN an actor, we never despawn based on remote snapshot
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
@@ -748,13 +767,19 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                 continue;
             }
 
+            // If we own this actor, we keep it - we're the authority
+            if (IsActorOwner(actor)) {
+                actor = nextActor;
+                continue;
+            }
+
             // Check if this actor has a networkActorId
             auto it = actorToNetworkId.find(actor);
             if (it != actorToNetworkId.end()) {
                 u32 actorNetworkId = it->second;
-                // If this actor's networkActorId is not in the snapshot, despawn it
+                // If this actor's networkActorId is not in the snapshot, the owner killed it
                 if (receivedNetworkActorIds.find(actorNetworkId) == receivedNetworkActorIds.end()) {
-                    SPDLOG_INFO("[Anchor] Despawning actor id={} networkActorId={} (not in snapshot)",
+                    SPDLOG_INFO("[Anchor] Despawning actor id={} networkActorId={} (not in owner's snapshot)",
                                 actor->id, actorNetworkId);
                     // Clean up the mapping
                     networkIdToActor.erase(actorNetworkId);
