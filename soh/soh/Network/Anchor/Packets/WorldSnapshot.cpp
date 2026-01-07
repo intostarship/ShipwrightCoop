@@ -3,6 +3,7 @@
 #include "soh/Network/Anchor/JsonConversions.hpp"
 #include <nlohmann/json.hpp>
 #include <libultraship/libultraship.h>
+#include <set>
 
 extern "C" {
 #include "macros.h"
@@ -800,11 +801,28 @@ void Anchor::ApplyActorInterpolation() {
 
     std::lock_guard<std::mutex> lock(actorInterpMutex);
 
+    // Build a set of actors held by DummyPlayers (skip interpolation for these)
+    std::set<Actor*> heldByDummyPlayer;
+    Actor* npcActor = gPlayState->actorCtx.actorLists[ACTORCAT_NPC].head;
+    while (npcActor != NULL) {
+        if (npcActor->id == ACTOR_EN_OE2 && npcActor->update == DummyPlayer_Update) {
+            Player* dummyPlayer = (Player*)npcActor;
+            if (dummyPlayer->heldActor != nullptr) {
+                heldByDummyPlayer.insert(dummyPlayer->heldActor);
+            }
+        }
+        npcActor = npcActor->next;
+    }
+
     for (auto& [networkActorId, interp] : actorInterpData) {
         if (!interp.hasData) continue;
 
         Actor* actor = FindActorByNetworkId(networkActorId);
         if (actor == nullptr || actor->update == NULL) continue;
+
+        // Skip interpolation for actors held by DummyPlayers
+        // Player_Draw will position them at the holder's hands
+        if (heldByDummyPlayer.count(actor) > 0) continue;
 
         // Apply interpolation to all synced actors
 
