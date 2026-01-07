@@ -388,6 +388,36 @@ void Anchor::SendPacket_WorldSnapshot() {
         lastSnapshotSceneNum = gPlayState->sceneNum;
         hasReceivedSnapshotThisScene = false;
         ClearNetworkIds();  // Clear actor network IDs on scene change
+
+        // Check if there are other players already in this scene
+        bool othersAlreadyInScene = false;
+        for (auto& [clientId, client] : clients) {
+            if (client.sceneNum == gPlayState->sceneNum && client.online &&
+                client.isSaveLoaded && !client.self) {
+                othersAlreadyInScene = true;
+                break;
+            }
+        }
+
+        // If others are in the scene, destroy all syncable actors
+        // The first snapshot will recreate them with the correct state
+        if (othersAlreadyInScene) {
+            SPDLOG_INFO("[Anchor] Others already in scene, clearing syncable actors for initial sync");
+            for (int cat : syncableCategories) {
+                Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
+                while (actor != NULL) {
+                    Actor* nextActor = actor->next;
+                    // Skip DummyPlayers
+                    if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+                        actor = nextActor;
+                        continue;
+                    }
+                    // Kill the actor - it will be respawned from snapshot if it exists
+                    Actor_Kill(actor);
+                    actor = nextActor;
+                }
+            }
+        }
     }
 
     // Check if there are other players in the same scene
@@ -880,4 +910,28 @@ void Anchor::ApplyActorInterpolation() {
             ++it;
         }
     }
+}
+
+/**
+ * Check if we're waiting for the initial sync in a scene with other players.
+ * Used to block local spawns until we receive the first world snapshot.
+ */
+bool Anchor::IsWaitingForInitialSync() {
+    if (!IsSaveLoaded() || gPlayState == nullptr) return false;
+
+    // Check if there are other players in the same scene
+    bool hasOthersInScene = false;
+    for (auto& [clientId, client] : clients) {
+        if (client.sceneNum == gPlayState->sceneNum && client.online &&
+            client.isSaveLoaded && !client.self) {
+            hasOthersInScene = true;
+            break;
+        }
+    }
+
+    // If no others in scene, we're not waiting
+    if (!hasOthersInScene) return false;
+
+    // If we haven't received a snapshot yet, we're waiting
+    return !hasReceivedSnapshotThisScene;
 }

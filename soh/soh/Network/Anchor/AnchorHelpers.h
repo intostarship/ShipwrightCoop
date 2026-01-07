@@ -37,6 +37,12 @@ bool Anchor_IsPositionOwner(Vec3f* pos);
  */
 void Anchor_SetNetworkSpawnMode(bool enabled);
 
+/**
+ * Checks if we're waiting for initial sync in a scene with other players.
+ * Used to block local spawns until we receive the first world snapshot.
+ */
+bool Anchor_IsWaitingForInitialSync(void);
+
 #ifdef __cplusplus
 }
 #endif

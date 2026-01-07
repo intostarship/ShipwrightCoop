@@ -129,3 +129,10 @@ extern "C" bool Anchor_IsPositionOwner(Vec3f* pos) {
     // We are the closest - we own this position
     return true;
 }
+
+extern "C" bool Anchor_IsWaitingForInitialSync(void) {
+    if (Anchor::Instance == nullptr || !Anchor::Instance->isConnected) {
+        return false;
+    }
+    return Anchor::Instance->IsWaitingForInitialSync();
+}

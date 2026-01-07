@@ -173,6 +173,7 @@ class Anchor : public Network {
     Actor* FindActorByNetworkId(u32 networkActorId);   // Find actor by networkActorId
     uint32_t GetClosestPlayerToActor(Actor* actor);
     bool IsActorOwner(Actor* actor);
+    bool IsWaitingForInitialSync();               // Check if waiting for first snapshot in scene with others
 
     uint32_t ownClientId;
     inline static const std::string clientVersion = (char*)gBuildVersion;
