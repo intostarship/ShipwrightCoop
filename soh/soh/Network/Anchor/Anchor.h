@@ -46,59 +46,12 @@ typedef struct {
     u8 movementFlags;
     Vec3s prevTransl;
 
-    // Equipment and appearance
-    s8 currentBoots;
-    s8 currentShield;
-    s8 currentTunic;
-    s8 currentSwordItemId;
-    u8 currentMask;
-    u8 modelGroup;
-    u8 leftHandType;
-    u8 rightHandType;
-    u8 sheathType;
+    // All Player state fields serialized as JSON
+    // This replaces individual fields - use PlayerSerializer to deserialize
+    nlohmann::json playerState;
 
-    // State flags
-    u32 stateFlags1;
-    u32 stateFlags2;
-    u8 stateFlags3;
-
-    // Item state
+    // Equipment button (needs gSaveContext hack)
     u8 buttonItem0;
-    s8 itemAction;
-    s8 heldItemAction;
-    u8 heldItemId;
-
-    // Combat state
-    s8 meleeWeaponAnimation;
-    s8 meleeWeaponState;
-    s8 invincibilityTimer;
-
-    // Movement
-    f32 linearVelocity;
-    s16 yaw;
-
-    // Upper body rotation
-    Vec3s headLimbRot;
-    Vec3s upperLimbRot;
-
-    // Action variables
-    s8 actionVar1;
-    s16 actionVar2;
-
-    // Misc state
-    f32 unk_85C;
-    s16 unk_862;
-    s16 unk_860;
-    f32 unk_854;
-    f32 unk_858;
-
-    // Door state
-    s8 doorType;
-    s8 doorDirection;
-    s16 doorTimer;
-
-    // Body parts positions for IK
-    Vec3f bodyPartsPos[18];  // PLAYER_BODYPART_MAX
 
     // Ocarina
     u8 ocarinaNote;

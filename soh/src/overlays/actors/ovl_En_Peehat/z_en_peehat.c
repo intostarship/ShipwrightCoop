@@ -334,7 +334,12 @@ void EnPeehat_Ground_StateGround(EnPeehat* this, PlayState* play) {
     if (IS_DAY || CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0)) {
         this->actor.flags |= ACTOR_FLAG_ATTENTION_ENABLED;
         if (this->riseDelayTimer == 0) {
-            if (this->actor.xzDistToPlayer < this->xzDistToRise) {
+            Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+            if (targetPlayer == NULL) {
+                targetPlayer = &GET_PLAYER(play)->actor;
+            }
+
+            if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < this->xzDistToRise) {
                 EnPeehat_Ground_SetStateRise(this);
             }
         } else {
@@ -369,7 +374,12 @@ void EnPeehat_Flying_SetStateGround(EnPeehat* this) {
 
 void EnPeehat_Flying_StateGrounded(EnPeehat* this, PlayState* play) {
     if (IS_DAY) {
-        if (this->actor.xzDistToPlayer < this->xzDistToRise) {
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer == NULL) {
+            targetPlayer = &GET_PLAYER(play)->actor;
+        }
+
+        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < this->xzDistToRise) {
             EnPeehat_Flying_SetStateRise(this);
         }
     } else {
@@ -396,9 +406,16 @@ void EnPeehat_Flying_SetStateFly(EnPeehat* this) {
 void EnPeehat_Flying_StateFly(EnPeehat* this, PlayState* play) {
     Audio_PlayActorSound2(&this->actor, NA_SE_EN_PIHAT_FLY - SFX_FLAG);
     SkelAnime_Update(&this->skelAnime);
-    if (!IS_DAY || this->xzDistToRise < this->actor.xzDistToPlayer) {
+    
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+
+    if (!IS_DAY || this->xzDistToRise < distToTarget) {
         EnPeehat_Flying_SetStateLanding(this);
-    } else if (this->actor.xzDistToPlayer < this->xzDistMax) {
+    } else if (distToTarget < this->xzDistMax) {
         if (this->unk_2FA < MAX_LARVA && (play->gameplayFrames & 7) == 0) {
             Actor* larva = Actor_SpawnAsChild(&play->actorCtx, &this->actor, play, ACTOR_EN_PEEHAT,
                                               Rand_CenteredFloat(25.0f) + this->actor.world.pos.x,
@@ -545,8 +562,14 @@ void EnPeehat_Larva_SetStateSeekPlayer(EnPeehat* this) {
 void EnPeehat_Larva_StateSeekPlayer(EnPeehat* this, PlayState* play) {
     f32 speedXZ = 5.3f;
 
-    if (this->actor.xzDistToPlayer <= 5.3f) {
-        speedXZ = this->actor.xzDistToPlayer + 0.0005f;
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+
+    if (distToTarget <= 5.3f) {
+        speedXZ = distToTarget + 0.0005f;
     }
     if (this->actor.parent != NULL && this->actor.parent->update == NULL) {
         this->actor.parent = NULL;

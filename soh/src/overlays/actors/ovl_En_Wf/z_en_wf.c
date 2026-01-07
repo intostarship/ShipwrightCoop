@@ -10,6 +10,7 @@
 #include "objects/object_wf/object_wf.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED)
 
@@ -286,7 +287,12 @@ void EnWf_Destroy(Actor* thisx, PlayState* play) {
 }
 
 s32 EnWf_ChangeAction(PlayState* play, EnWf* this, s16 mustChoose) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
+    
     s32 pad;
     s16 wallYawDiff;
     s16 playerYawDiff;
@@ -501,7 +507,11 @@ void EnWf_RunAtPlayer(EnWf* this, PlayState* play) {
     s32 pad;
     f32 baseRange = 0.0f;
     s16 playerFacingAngleDiff;
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s32 playSpeed;
 
     if (!EnWf_DodgeRanged(play, this)) {
@@ -734,7 +744,11 @@ void EnWf_SetupSlash(EnWf* this) {
 }
 
 void EnWf_Slash(EnWf* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s16 shapeAngleDiff = player->actor.shape.rot.y - this->actor.shape.rot.y;
     s16 yawAngleDiff = this->actor.yawTowardsPlayer - this->actor.shape.rot.y;
     s32 curFrame = this->skelAnime.curFrame;
@@ -1013,7 +1027,11 @@ void EnWf_SetupBlocking(EnWf* this) {
 }
 
 void EnWf_Blocking(EnWf* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s32 pad;
 
     if (this->actionTimer != 0) {
@@ -1094,7 +1112,11 @@ void EnWf_SetupSidestep(EnWf* this, PlayState* play) {
 
 void EnWf_Sidestep(EnWf* this, PlayState* play) {
     s16 angleDiff1;
-    Player* player = GET_PLAYER(play);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     s32 animPrevFrame;
     s32 animFrameSpeedDiff;
     s32 animSpeed;
@@ -1306,6 +1328,14 @@ void EnWf_Update(Actor* thisx, PlayState* play) {
     EnWf* this = (EnWf*)thisx;
 
     EnWf_UpdateDamage(this, play);
+
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+    }
 
     if (this->actor.colChkInfo.damageEffect != ENWF_DMGEFF_ICE_MAGIC) {
         Actor_MoveXZGravity(&this->actor);

@@ -2,6 +2,7 @@
 #include "objects/object_crow/object_crow.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_IGNORE_QUAKE | ACTOR_FLAG_CAN_ATTACH_TO_ARROW)
@@ -283,8 +284,16 @@ void EnCrow_FlyIdle(EnCrow* this, PlayState* play) {
     if (this->timer != 0) {
         this->timer--;
     }
-    if ((this->timer == 0) && (this->actor.xzDistToPlayer < 300.0f) &&
-        !(player->stateFlags1 & PLAYER_STATE1_ON_HORSE) && (this->actor.yDistToWater < -40.0f) &&
+
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &player->actor;
+    }
+    Player* targetPlayer = (Player*)targetActor;
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->actor.world.pos);
+
+    if ((this->timer == 0) && (distToTarget < 300.0f) &&
+        !(targetPlayer->stateFlags1 & PLAYER_STATE1_ON_HORSE) && (this->actor.yDistToWater < -40.0f) &&
         (Player_GetMask(play) != PLAYER_MASK_SKULL) && GameInteractor_Should(VB_GUAY_DO_DIVE_ATTACK, true, this)) {
         EnCrow_SetupDiveAttack(this);
     }
@@ -301,12 +310,22 @@ void EnCrow_DiveAttack(EnCrow* this, PlayState* play) {
         this->timer--;
     }
 
-    facingPlayer = Actor_IsFacingPlayer(&this->actor, 0x2800);
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &player->actor;
+    }
+    Player* targetPlayer = (Player*)targetActor;
+    s16 yawToTarget = Actor_WorldYawTowardActor(&this->actor, targetActor);
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetActor->world.pos);
+
+    // Manual facing check
+    s16 yawDiff = yawToTarget - this->actor.shape.rot.y;
+    facingPlayer = ABS(yawDiff) < 0x2800;
 
     if (facingPlayer) {
-        pos.x = player->actor.world.pos.x;
-        pos.y = player->actor.world.pos.y + 20.0f;
-        pos.z = player->actor.world.pos.z;
+        pos.x = targetActor->world.pos.x;
+        pos.y = targetActor->world.pos.y + 20.0f;
+        pos.z = targetActor->world.pos.z;
         target = Actor_WorldPitchTowardPoint(&this->actor, &pos);
         if (target > 0x3000) {
             target = 0x3000;
@@ -316,12 +335,12 @@ void EnCrow_DiveAttack(EnCrow* this, PlayState* play) {
         Math_ApproachS(&this->actor.shape.rot.x, -0x1000, 2, 0x100);
     }
 
-    if (facingPlayer || (this->actor.xzDistToPlayer > 80.0f)) {
-        Math_ApproachS(&this->actor.shape.rot.y, this->actor.yawTowardsPlayer, 4, 0xC00);
+    if (facingPlayer || (distToTarget > 80.0f)) {
+        Math_ApproachS(&this->actor.shape.rot.y, yawToTarget, 4, 0xC00);
     }
 
     if ((this->timer == 0) || (Player_GetMask(play) == PLAYER_MASK_SKULL) || (this->collider.base.atFlags & AT_HIT) ||
-        (this->actor.bgCheckFlags & 9) || (player->stateFlags1 & PLAYER_STATE1_ON_HORSE) ||
+        (this->actor.bgCheckFlags & 9) || (targetPlayer->stateFlags1 & PLAYER_STATE1_ON_HORSE) ||
         (this->actor.yDistToWater > -40.0f) || GameInteractor_Should(VB_GUAY_FORCE_FLY_AWAY, false, this)) {
         if (this->collider.base.atFlags & AT_HIT) {
             this->collider.base.atFlags &= ~AT_HIT;

@@ -303,7 +303,12 @@ void EnWallmas_SetupStun(EnWallmas* this) {
 }
 
 void EnWallmas_WaitToDrop(EnWallmas* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    // Use closest player (including DummyPlayers in multiplayer)
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &GET_PLAYER(play)->actor;
+    }
+    Player* player = (Player*)targetActor;
     Vec3f* playerPos = &player->actor.world.pos;
 
     this->actor.world.pos = *playerPos;
@@ -343,9 +348,23 @@ void EnWallmas_WaitToDrop(EnWallmas* this, PlayState* play) {
 void EnWallmas_Drop(EnWallmas* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
+    // Use closest player for grab check
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &player->actor;
+    }
+    
+    f32 xzDist = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetActor->world.pos);
+    f32 yDist = targetActor->world.pos.y - this->actor.world.pos.y;
+
+    // Note: We still check local player state flags (Invincibility) because checking dummy flags is unreliable
+    // or we assume if ANY player is hit, we transition.
+    // Ideally we check the target's invincibility if possible.
+    // For now, we keep the condition strict only on proximity.
+    
     if (!Player_InCsMode(play) && !(player->stateFlags2 & PLAYER_STATE2_MOVING_DYNAPOLY) &&
-        (player->invincibilityTimer >= 0) && (this->actor.xzDistToPlayer < 30.0f) &&
-        (this->actor.yDistToPlayer < -5.0f) && (-(f32)(player->cylinder.dim.height + 10) < this->actor.yDistToPlayer)) {
+        (player->invincibilityTimer >= 0) && (xzDist < 30.0f) &&
+        (yDist < -5.0f) && (-(f32)(player->cylinder.dim.height + 10) < yDist)) {
         EnWallmas_SetupTakePlayer(this, play);
     }
 }
@@ -458,7 +477,14 @@ void EnWallmas_Die(EnWallmas* this, PlayState* play) {
 }
 
 void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
+    
+    // Identify victim
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* victim = (Player*)targetActor;
 
     if (Animation_OnFrame(&this->skelAnime, 1.0f) != 0) {
         if (!LINK_IS_ADULT) {
@@ -470,8 +496,8 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_FALL_CATCH);
     }
     if (SkelAnime_Update(&this->skelAnime) != 0) {
-        player->actor.world.pos.x = this->actor.world.pos.x;
-        player->actor.world.pos.z = this->actor.world.pos.z;
+        victim->actor.world.pos.x = this->actor.world.pos.x;
+        victim->actor.world.pos.z = this->actor.world.pos.z;
 
         if (this->timer < 0) {
             this->actor.world.pos.y = this->actor.world.pos.y + 2.0f;
@@ -480,9 +506,9 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
         }
 
         if (!LINK_IS_ADULT) {
-            player->actor.world.pos.y = this->actor.world.pos.y - 30.0f;
+            victim->actor.world.pos.y = this->actor.world.pos.y - 30.0f;
         } else {
-            player->actor.world.pos.y = this->actor.world.pos.y - 50.0f;
+            victim->actor.world.pos.y = this->actor.world.pos.y - 50.0f;
         }
 
         if (this->timer == -0x1E) {
@@ -498,15 +524,18 @@ void EnWallmas_TakePlayer(EnWallmas* this, PlayState* play) {
 
         this->timer = this->timer + 2;
     } else {
-        Math_StepToF(&this->actor.world.pos.y, player->actor.world.pos.y + (!LINK_IS_ADULT ? 30.0f : 50.0f), 5.0f);
+        Math_StepToF(&this->actor.world.pos.y, victim->actor.world.pos.y + (!LINK_IS_ADULT ? 30.0f : 50.0f), 5.0f);
     }
 
-    Math_StepToF(&this->actor.world.pos.x, player->actor.world.pos.x, 3.0f);
-    Math_StepToF(&this->actor.world.pos.z, player->actor.world.pos.z, 3.0f);
+    Math_StepToF(&this->actor.world.pos.x, victim->actor.world.pos.x, 3.0f);
+    Math_StepToF(&this->actor.world.pos.z, victim->actor.world.pos.z, 3.0f);
 
     if (this->timer == 0x1E) {
         Sfx_PlaySfxCentered(NA_SE_OC_ABYSS);
-        Play_TriggerRespawn(play);
+        // CRITICAL: Only respawn if *I* am the victim!
+        if (victim == localPlayer) {
+            Play_TriggerRespawn(play);
+        }
     }
 }
 

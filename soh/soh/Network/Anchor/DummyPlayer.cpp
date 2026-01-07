@@ -1,4 +1,5 @@
 #include "Anchor.h"
+#include "PlayerSerializer.h"
 #include "soh/Enhancements/nametag.h"
 #include "soh/frame_interpolation.h"
 
@@ -139,58 +140,26 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     player->skelAnime.movementFlags = client.movementFlags;
     Math_Vec3s_Copy(&player->skelAnime.prevTransl, &client.prevTransl);
 
-    // Equipment and appearance
-    player->currentBoots = client.currentBoots;
-    player->currentShield = client.currentShield;
-    player->currentTunic = client.currentTunic;
-    player->currentSwordItemId = client.currentSwordItemId;
-    player->currentMask = client.currentMask;
-    player->leftHandType = client.leftHandType;
-    player->rightHandType = client.rightHandType;
-    player->sheathType = client.sheathType;
+    // Save old modelGroup BEFORE deserializing (so we can detect changes)
+    u8 oldModelGroup = player->modelGroup;
 
-    // State flags
-    player->stateFlags1 = client.stateFlags1;
-    player->stateFlags2 = client.stateFlags2;
-    player->stateFlags3 = client.stateFlags3;
+    // Apply ALL Player state fields from serialized JSON
+    // This automatically handles ~100 fields: equipment, state flags, combat, movement, body parts, etc.
+    if (!client.playerState.empty()) {
+        DeserializePlayerState(player, client.playerState);
+    }
 
-    // Item state
-    player->itemAction = client.itemAction;
-    player->heldItemAction = client.heldItemAction;
-    player->heldItemId = client.heldItemId;
-
-    // Combat state
-    player->meleeWeaponAnimation = client.meleeWeaponAnimation;
-    player->meleeWeaponState = client.meleeWeaponState;
-    player->invincibilityTimer = client.invincibilityTimer;
-
-    // Movement
-    player->linearVelocity = client.linearVelocity;
-    player->yaw = client.yaw;
-
-    // Upper body rotation
-    Math_Vec3s_Copy(&player->headLimbRot, &client.headLimbRot);
-    Math_Vec3s_Copy(&player->upperLimbRot, &client.upperLimbRot);
-
-    // Action variables
-    player->av1.actionVar1 = client.actionVar1;
-    player->av2.actionVar2 = client.actionVar2;
-
-    // Misc state
-    player->unk_85C = client.unk_85C;
-    player->unk_862 = client.unk_862;
-    player->unk_860 = client.unk_860;
-    player->unk_854 = client.unk_854;
-    player->unk_858 = client.unk_858;
-
-    // Door state
-    player->doorType = client.doorType;
-    player->doorDirection = client.doorDirection;
-    player->doorTimer = client.doorTimer;
-
-    // Body parts positions
-    for (int i = 0; i < 18; i++) {
-        Math_Vec3f_Copy(&player->bodyPartsPos[i], &client.bodyPartsPos[i]);
+    // Check if modelGroup changed - need to call Player_SetModelGroup with gSaveContext hack
+    // This updates the visual model (sword, shield, etc.)
+    if (player->modelGroup != oldModelGroup) {
+        // Hack to account for usage of gSaveContext
+        s32 originalAge = gSaveContext.linkAge;
+        gSaveContext.linkAge = client.linkAge;
+        u8 originalButtonItem0 = gSaveContext.equips.buttonItems[0];
+        gSaveContext.equips.buttonItems[0] = client.buttonItem0;
+        Player_SetModelGroup(player, player->modelGroup);
+        gSaveContext.linkAge = originalAge;
+        gSaveContext.equips.buttonItems[0] = originalButtonItem0;
     }
 
     // Apply animation movement (Copied from Player_ApplyAnimMovementScaledByAge)
@@ -213,17 +182,6 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
         }
 
         player->actor.world.pos.y += diff.y * player->actor.scale.y;
-    }
-
-    if (player->modelGroup != client.modelGroup) {
-        // Hack to account for usage of gSaveContext
-        s32 originalAge = gSaveContext.linkAge;
-        gSaveContext.linkAge = client.linkAge;
-        u8 originalButtonItem0 = gSaveContext.equips.buttonItems[0];
-        gSaveContext.equips.buttonItems[0] = client.buttonItem0;
-        Player_SetModelGroup(player, client.modelGroup);
-        gSaveContext.linkAge = originalAge;
-        gSaveContext.equips.buttonItems[0] = originalButtonItem0;
     }
 
     // Update held actor (for rocks, bombs, etc.)

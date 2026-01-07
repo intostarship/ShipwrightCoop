@@ -490,17 +490,26 @@ void EnDekubaba_Wait(EnDekubaba* this, PlayState* play) {
     this->actor.world.pos.z = this->actor.home.pos.z;
     this->actor.world.pos.y = this->actor.home.pos.y + 14.0f * this->size;
 
+    // Use closest player for wake-up check
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer == NULL) {
+        targetPlayer = &GET_PLAYER(play)->actor;
+    }
+
+    f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+    f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
+
     // Debug traces for multiplayer
     f32 xzThreshold = 200.0f * this->size;
     f32 yThreshold = 30.0f * this->size;
     char logBuf[256];
     snprintf(logBuf, sizeof(logBuf), "[Dekubaba] Wait: timer=%d xzDist=%.1f (need<%.1f) yDist=%.1f (need<%.1f) size=%.2f",
-             this->timer, this->actor.xzDistToPlayer, xzThreshold,
-             fabsf(this->actor.yDistToPlayer), yThreshold, this->size);
+             this->timer, distToTarget, xzThreshold,
+             fabsf(yDistToTarget), yThreshold, this->size);
     Anchor_LogInfo(logBuf);
 
-    if ((this->timer == 0) && (this->actor.xzDistToPlayer < 200.0f * this->size) &&
-        (fabsf(this->actor.yDistToPlayer) < 30.0f * this->size)) {
+    if ((this->timer == 0) && (distToTarget < 200.0f * this->size) &&
+        (fabsf(yDistToTarget) < 30.0f * this->size)) {
         Anchor_LogInfo("[Dekubaba] TRIGGERED! Growing now");
         EnDekubaba_SetupGrow(this);
     }
@@ -704,7 +713,7 @@ void EnDekubaba_DecideLunge(EnDekubaba* this, PlayState* play) {
 
     if (240.0f * this->size < Math_Vec3f_DistXZ(&this->actor.home.pos, &targetPlayer->world.pos)) {
         EnDekubaba_SetupRetract(this);
-    } else if ((this->timer == 0) || (this->actor.xzDistToPlayer < 80.0f * this->size)) {
+    } else if ((this->timer == 0) || (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size)) {
         EnDekubaba_SetupPrepareLunge(this);
     }
 }
@@ -865,7 +874,12 @@ void EnDekubaba_PullBack(EnDekubaba* this, PlayState* play) {
         this->timer++;
 
         if (this->timer > 30) {
-            if (this->actor.xzDistToPlayer < 80.0f * this->size) {
+            Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+            if (targetPlayer == NULL) {
+                targetPlayer = &GET_PLAYER(play)->actor;
+            }
+
+            if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
                 EnDekubaba_SetupPrepareLunge(this);
             } else {
                 EnDekubaba_SetupDecideLunge(this);
@@ -933,7 +947,12 @@ void EnDekubaba_Hit(EnDekubaba* this, PlayState* play) {
         } else {
             this->collider.base.acFlags |= AC_ON;
             if (this->timer == 0) {
-                if (this->actor.xzDistToPlayer < 80.0f * this->size) {
+                Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+                if (targetPlayer == NULL) {
+                    targetPlayer = &GET_PLAYER(play)->actor;
+                }
+
+                if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
                     EnDekubaba_SetupPrepareLunge(this);
                 } else {
                     EnDekubaba_SetupRecover(this);
@@ -957,7 +976,12 @@ void EnDekubaba_StunnedVertical(EnDekubaba* this, PlayState* play) {
     if (this->timer == 0) {
         EnDekubaba_DisableHitboxes(this);
 
-        if (this->actor.xzDistToPlayer < 80.0f * this->size) {
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer == NULL) {
+            targetPlayer = &GET_PLAYER(play)->actor;
+        }
+
+        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
             EnDekubaba_SetupPrepareLunge(this);
         } else {
             EnDekubaba_SetupRecover(this);
@@ -983,7 +1007,13 @@ void EnDekubaba_Sway(EnDekubaba* this, PlayState* play) {
 
     if (ABS(angleToVertical) < 0x100) {
         this->collider.base.acFlags |= AC_ON;
-        if (this->actor.xzDistToPlayer < 80.0f * this->size) {
+
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer == NULL) {
+            targetPlayer = &GET_PLAYER(play)->actor;
+        }
+
+        if (Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos) < 80.0f * this->size) {
             EnDekubaba_SetupPrepareLunge(this);
         } else {
             EnDekubaba_SetupRecover(this);
