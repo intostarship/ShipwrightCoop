@@ -512,14 +512,10 @@ void Anchor::SendPacket_WorldSnapshot() {
 
     // Send only actors we OWN (we're the closest player to them)
     // Receivers will apply this state because we're the authority
-    int enemyCount = 0, bossCount = 0, npcCount = 0, ownedCount = 0;
+    int totalSyncable = 0, ownedCount = 0, skippedNotOwned = 0;
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
-            if (cat == ACTORCAT_ENEMY) enemyCount++;
-            if (cat == ACTORCAT_BOSS) bossCount++;
-            if (cat == ACTORCAT_NPC) npcCount++;
-
             // Skip DummyPlayers (other network players)
             if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
                 actor = actor->next;
@@ -548,9 +544,13 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
+            // Count AFTER filtering out non-syncable actors
+            totalSyncable++;
+
             // SIMPLE OWNERSHIP: only send actors we're closest to
             // With deterministic IDs, we don't need complex tracking - just proximity
             if (!IsActorOwner(actor)) {
+                skippedNotOwned++;
                 actor = actor->next;
                 continue;
             }
@@ -616,8 +616,8 @@ void Anchor::SendPacket_WorldSnapshot() {
     }
 
     // Always send snapshot (even if empty) to unblock other players waiting for us
-    SPDLOG_INFO("[Anchor] Sending WORLD_SNAPSHOT with {} owned actors (of {} total: enemies={}, bosses={}, npcs={})",
-                ownedCount, enemyCount + bossCount + npcCount, enemyCount, bossCount, npcCount);
+    SPDLOG_INFO("[Anchor] Sending WORLD_SNAPSHOT: owned={}/{} syncable (other player owns {})",
+                ownedCount, totalSyncable, skippedNotOwned);
     SendJsonToRemote(payload);
 }
 
