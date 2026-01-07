@@ -36,6 +36,7 @@ typedef struct {
     // Only available in PLAYER_UPDATE packets
     s32 linkAge;
     PosRot posRot;
+
     // Animation tables - must match PLAYER_LIMB_BUF_COUNT (24)
     Vec3s jointTable[24];       // Lower body animation
     Vec3s morphTable[24];       // Lower body morph targets
@@ -44,19 +45,62 @@ typedef struct {
     Vec3s upperMorphTable[24];  // Upper body morph targets
     u8 movementFlags;
     Vec3s prevTransl;
+
+    // Equipment and appearance
     s8 currentBoots;
     s8 currentShield;
     s8 currentTunic;
+    s8 currentSwordItemId;
+    u8 currentMask;
+    u8 modelGroup;
+    u8 leftHandType;
+    u8 rightHandType;
+    u8 sheathType;
+
+    // State flags
     u32 stateFlags1;
     u32 stateFlags2;
+    u8 stateFlags3;
+
+    // Item state
     u8 buttonItem0;
     s8 itemAction;
     s8 heldItemAction;
-    u8 modelGroup;
+    u8 heldItemId;
+
+    // Combat state
+    s8 meleeWeaponAnimation;
+    s8 meleeWeaponState;
     s8 invincibilityTimer;
+
+    // Movement
+    f32 linearVelocity;
+    s16 yaw;
+
+    // Upper body rotation
+    Vec3s headLimbRot;
+    Vec3s upperLimbRot;
+
+    // Action variables
+    s8 actionVar1;
+    s16 actionVar2;
+
+    // Misc state
     f32 unk_85C;
     s16 unk_862;
-    s8 actionVar1;
+    s16 unk_860;
+    f32 unk_854;
+    f32 unk_858;
+
+    // Door state
+    s8 doorType;
+    s8 doorDirection;
+    s16 doorTimer;
+
+    // Body parts positions for IK
+    Vec3f bodyPartsPos[18];  // PLAYER_BODYPART_MAX
+
+    // Ocarina
     u8 ocarinaNote;
     f32 ocarinaModulator;
     s8 ocarinaBend;

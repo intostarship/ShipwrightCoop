@@ -138,17 +138,60 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
 
     player->skelAnime.movementFlags = client.movementFlags;
     Math_Vec3s_Copy(&player->skelAnime.prevTransl, &client.prevTransl);
+
+    // Equipment and appearance
     player->currentBoots = client.currentBoots;
     player->currentShield = client.currentShield;
     player->currentTunic = client.currentTunic;
+    player->currentSwordItemId = client.currentSwordItemId;
+    player->currentMask = client.currentMask;
+    player->leftHandType = client.leftHandType;
+    player->rightHandType = client.rightHandType;
+    player->sheathType = client.sheathType;
+
+    // State flags
     player->stateFlags1 = client.stateFlags1;
     player->stateFlags2 = client.stateFlags2;
+    player->stateFlags3 = client.stateFlags3;
+
+    // Item state
     player->itemAction = client.itemAction;
     player->heldItemAction = client.heldItemAction;
+    player->heldItemId = client.heldItemId;
+
+    // Combat state
+    player->meleeWeaponAnimation = client.meleeWeaponAnimation;
+    player->meleeWeaponState = client.meleeWeaponState;
     player->invincibilityTimer = client.invincibilityTimer;
-    player->unk_862 = client.unk_862;
-    player->unk_85C = client.unk_85C;
+
+    // Movement
+    player->linearVelocity = client.linearVelocity;
+    player->yaw = client.yaw;
+
+    // Upper body rotation
+    Math_Vec3s_Copy(&player->headLimbRot, &client.headLimbRot);
+    Math_Vec3s_Copy(&player->upperLimbRot, &client.upperLimbRot);
+
+    // Action variables
     player->av1.actionVar1 = client.actionVar1;
+    player->av2.actionVar2 = client.actionVar2;
+
+    // Misc state
+    player->unk_85C = client.unk_85C;
+    player->unk_862 = client.unk_862;
+    player->unk_860 = client.unk_860;
+    player->unk_854 = client.unk_854;
+    player->unk_858 = client.unk_858;
+
+    // Door state
+    player->doorType = client.doorType;
+    player->doorDirection = client.doorDirection;
+    player->doorTimer = client.doorTimer;
+
+    // Body parts positions
+    for (int i = 0; i < 18; i++) {
+        Math_Vec3f_Copy(&player->bodyPartsPos[i], &client.bodyPartsPos[i]);
+    }
 
     // Apply animation movement (Copied from Player_ApplyAnimMovementScaledByAge)
     Vec3f diff;

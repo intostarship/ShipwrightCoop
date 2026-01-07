@@ -49,6 +49,12 @@ bool Anchor_IsWaitingForInitialSync(void);
  */
 bool Anchor_ShouldSkipUpdateForNonOwner(s16 category);
 
+/**
+ * Log a message using spdlog from C code.
+ * This allows C files to use the same logging system as C++ code.
+ */
+void Anchor_LogInfo(const char* message);
+
 #ifdef __cplusplus
 }
 #endif

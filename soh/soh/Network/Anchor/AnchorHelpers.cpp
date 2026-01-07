@@ -163,3 +163,7 @@ extern "C" bool Anchor_ShouldSkipUpdateForNonOwner(s16 category) {
            category == ACTORCAT_BOSS ||
            category == ACTORCAT_NPC;
 }
+
+extern "C" void Anchor_LogInfo(const char* message) {
+    SPDLOG_INFO("{}", message);
+}
