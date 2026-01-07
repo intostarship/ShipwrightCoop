@@ -67,6 +67,14 @@ void Anchor::SendPacket_PlayerUpdate() {
     payload["unk_862"] = player->unk_862;
     payload["unk_85C"] = player->unk_85C;
     payload["actionVar1"] = player->av1.actionVar1;
+
+    // Held actor (for rocks, bombs, etc.)
+    u32 heldActorNetworkId = 0;
+    if (player->heldActor != nullptr) {
+        heldActorNetworkId = Anchor::Instance->GetOrAssignNetworkId(player->heldActor);
+    }
+    payload["heldActorNetworkId"] = heldActorNetworkId;
+
     payload["quiet"] = true;
 
     for (auto& [clientId, client] : clients) {
@@ -113,5 +121,12 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
         client.unk_862 = payload["unk_862"].get<s16>();
         client.unk_85C = payload["unk_85C"].get<f32>();
         client.actionVar1 = payload["actionVar1"].get<s8>();
+
+        // Held actor
+        if (payload.contains("heldActorNetworkId")) {
+            client.heldActorNetworkId = payload["heldActorNetworkId"].get<u32>();
+        } else {
+            client.heldActorNetworkId = 0;
+        }
     }
 }

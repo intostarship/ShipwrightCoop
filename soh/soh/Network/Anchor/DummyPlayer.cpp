@@ -169,6 +169,14 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
         gSaveContext.equips.buttonItems[0] = originalButtonItem0;
     }
 
+    // Update held actor (for rocks, bombs, etc.)
+    if (client.heldActorNetworkId != 0) {
+        Actor* heldActor = Anchor::Instance->FindActorByNetworkId(client.heldActorNetworkId);
+        player->heldActor = heldActor;
+    } else {
+        player->heldActor = nullptr;
+    }
+
     if (Anchor::Instance->roomState.pvpMode == 0 ||
         (Anchor::Instance->roomState.pvpMode == 1 &&
          client.teamId == CVarGetString(CVAR_REMOTE_ANCHOR("TeamId"), "default"))) {

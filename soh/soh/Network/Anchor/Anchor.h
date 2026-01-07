@@ -57,6 +57,9 @@ typedef struct {
     f32 ocarinaModulator;
     s8 ocarinaBend;
 
+    // Held actor (for rocks, bombs, etc.)
+    u32 heldActorNetworkId;
+
     // Ptr to the dummy player
     Player* player;
 } AnchorClient;
@@ -149,14 +152,28 @@ class Anchor : public Network {
     s16 lastSnapshotSceneNum = -1;
     bool hasReceivedSnapshotThisScene = false;  // Wait for first sync before broadcasting
 
-    u32 GetActorUniqueId(Actor* actor);
+    // Network ID system - unique IDs assigned by first player in scene
+    std::map<Actor*, u32> actorToNetworkId;      // Actor pointer -> network ID
+    std::map<u32, Actor*> networkIdToActor;      // Network ID -> Actor pointer
+    u32 nextNetworkId = 1;                        // Counter for next available ID
+    bool hasAssignedNetworkIds = false;           // Have we assigned IDs as the first player?
+
+    u32 GetActorUniqueId(Actor* actor);           // Legacy hash-based ID (fallback)
+    void SetActorNetworkId(Actor* actor, u32 networkActorId);  // Set networkActorId from snapshot
+    Actor* FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos);  // Match by type+position
+    void ClearNetworkIds();                       // Clear all networkActorId mappings (on scene change)
+
     uint32_t GetClosestPlayerToActor(Actor* actor);
     bool IsActorOwner(Actor* actor);
-    Actor* FindActorByUniqueId(u32 uniqueId);
+    Actor* FindActorByUniqueId(u32 uniqueId);     // Legacy - keep for compatibility
     void ApplyActorInterpolation();
     SkelAnime* GetActorSkelAnime(Actor* actor);
 
   public:
+    // Network ID public methods (needed by DummyPlayer)
+    u32 GetOrAssignNetworkId(Actor* actor);       // Get existing or assign new networkActorId
+    Actor* FindActorByNetworkId(u32 networkActorId);   // Find actor by networkActorId
+
     uint32_t ownClientId;
     inline static const std::string clientVersion = (char*)gBuildVersion;
 

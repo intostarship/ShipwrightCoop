@@ -2982,6 +2982,21 @@ s32 Ship_CalcShouldDrawAndUpdate(PlayState* play, Actor* actor, Vec3f* projected
                                  bool* shouldUpdate) {
     f32 clampedProjectedW;
 
+    // In multiplayer, always update and draw syncable actors (enemies, bosses, NPCs, props, etc.)
+    // This ensures the whole world stays active for all players
+    if (Anchor_IsEnabled()) {
+        if (actor->category == ACTORCAT_ENEMY || actor->category == ACTORCAT_BOSS ||
+            actor->category == ACTORCAT_NPC || actor->category == ACTORCAT_PROP ||
+            actor->category == ACTORCAT_SWITCH || actor->category == ACTORCAT_BG ||
+            actor->category == ACTORCAT_DOOR || actor->category == ACTORCAT_CHEST ||
+            actor->category == ACTORCAT_EXPLOSIVE || actor->category == ACTORCAT_ITEMACTION ||
+            actor->category == ACTORCAT_MISC) {
+            *shouldUpdate = true;
+            *shouldDraw = true;
+            return true;
+        }
+    }
+
     // Check if the actor passes its original/vanilla culling requirements
     if (func_800314D4(play, actor, projectedPos, projectedW)) {
         *shouldUpdate = true;

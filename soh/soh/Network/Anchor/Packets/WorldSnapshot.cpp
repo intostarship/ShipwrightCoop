@@ -161,7 +161,7 @@ static const std::set<s16> syncableCategories = {
 
 /**
  * Generate a unique ID for an actor based on its initial spawn position and params.
- * This allows matching actors across clients without network-assigned IDs.
+ * This is a LEGACY fallback - prefer network IDs for reliable matching.
  */
 u32 Anchor::GetActorUniqueId(Actor* actor) {
     if (actor == nullptr) return 0;
@@ -174,6 +174,116 @@ u32 Anchor::GetActorUniqueId(Actor* actor) {
     hash ^= (u32)(actor->home.pos.z * 10.0f);
 
     return hash;
+}
+
+/**
+ * Get or assign a networkActorId for an actor.
+ * If we already have an ID for this actor (from a received snapshot), return it.
+ * Otherwise, assign a new one (we're the first/owner).
+ */
+u32 Anchor::GetOrAssignNetworkId(Actor* actor) {
+    if (actor == nullptr) return 0;
+
+    // Check if this actor already has a networkActorId
+    auto it = actorToNetworkId.find(actor);
+    if (it != actorToNetworkId.end()) {
+        return it->second;
+    }
+
+    // Assign a new networkActorId (we're the authority)
+    u32 newId = nextNetworkId++;
+    actorToNetworkId[actor] = newId;
+    networkIdToActor[newId] = actor;
+
+    return newId;
+}
+
+/**
+ * Set the networkActorId for an actor (received from another player's snapshot).
+ */
+void Anchor::SetActorNetworkId(Actor* actor, u32 networkActorId) {
+    if (actor == nullptr || networkActorId == 0) return;
+
+    // Remove old mapping if exists
+    auto it = actorToNetworkId.find(actor);
+    if (it != actorToNetworkId.end()) {
+        networkIdToActor.erase(it->second);
+    }
+
+    actorToNetworkId[actor] = networkActorId;
+    networkIdToActor[networkActorId] = actor;
+
+    // Keep nextNetworkId ahead of any received ID
+    if (networkActorId >= nextNetworkId) {
+        nextNetworkId = networkActorId + 1;
+    }
+}
+
+/**
+ * Find an actor by its networkActorId.
+ */
+Actor* Anchor::FindActorByNetworkId(u32 networkActorId) {
+    auto it = networkIdToActor.find(networkActorId);
+    if (it != networkIdToActor.end()) {
+        Actor* actor = it->second;
+        // Verify actor is still valid (not killed)
+        if (actor != nullptr && actor->update != nullptr) {
+            return actor;
+        }
+        // Actor was killed, clean up mapping
+        actorToNetworkId.erase(actor);
+        networkIdToActor.erase(networkActorId);
+    }
+    return nullptr;
+}
+
+/**
+ * Try to match a received actor to a local actor by type and position.
+ * Used when we don't have a networkActorId mapping yet.
+ */
+Actor* Anchor::FindActorByTypeAndPosition(s16 actorId, s16 params, Vec3f homePos) {
+    if (gPlayState == nullptr) return nullptr;
+
+    f32 bestDist = 100.0f;  // Max distance to consider a match
+    Actor* bestMatch = nullptr;
+
+    for (int cat : syncableCategories) {
+        Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
+        while (actor != NULL) {
+            // Skip if already has a networkActorId
+            if (actorToNetworkId.find(actor) != actorToNetworkId.end()) {
+                actor = actor->next;
+                continue;
+            }
+
+            // Check if type and params match
+            if (actor->id == actorId && actor->params == params) {
+                // Check home position distance
+                f32 dx = actor->home.pos.x - homePos.x;
+                f32 dy = actor->home.pos.y - homePos.y;
+                f32 dz = actor->home.pos.z - homePos.z;
+                f32 dist = sqrtf(dx*dx + dy*dy + dz*dz);
+
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestMatch = actor;
+                }
+            }
+            actor = actor->next;
+        }
+    }
+
+    return bestMatch;
+}
+
+/**
+ * Clear all networkActorId mappings (called on scene change).
+ */
+void Anchor::ClearNetworkIds() {
+    actorToNetworkId.clear();
+    networkIdToActor.clear();
+    nextNetworkId = 1;
+    hasAssignedNetworkIds = false;
 }
 
 /**
@@ -275,6 +385,7 @@ void Anchor::SendPacket_WorldSnapshot() {
                     lastSnapshotSceneNum, gPlayState->sceneNum);
         lastSnapshotSceneNum = gPlayState->sceneNum;
         hasReceivedSnapshotThisScene = false;
+        ClearNetworkIds();  // Clear actor network IDs on scene change
     }
 
     // Check if there are other players in the same scene
@@ -366,8 +477,9 @@ void Anchor::SendPacket_WorldSnapshot() {
             if (actor->update != NULL) {
                 nlohmann::json actorJson;
 
-                u32 uniqueId = GetActorUniqueId(actor);
-                actorJson["uid"] = uniqueId;
+                // Get or assign a networkActorId for this actor
+                u32 networkActorId = GetOrAssignNetworkId(actor);
+                actorJson["networkActorId"] = networkActorId;
                 actorJson["id"] = actor->id;
                 actorJson["cat"] = actor->category;
                 actorJson["params"] = actor->params;
@@ -455,46 +567,67 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Track which actors we've seen from this sender (for despawn logic)
-    std::set<u32> receivedActorUids;
+    // Track which networkActorIds we've seen from this sender (for despawn logic)
+    std::set<u32> receivedNetworkActorIds;
 
     for (const auto& actorJson : payload["actors"]) {
-        u32 uniqueId = actorJson["uid"].get<u32>();
+        // Get networkActorId (or fall back to legacy uid)
+        u32 networkActorId = actorJson.contains("networkActorId")
+            ? actorJson["networkActorId"].get<u32>()
+            : actorJson.contains("uid") ? actorJson["uid"].get<u32>() : 0;
+
         s16 actorId = actorJson["id"].get<s16>();
         s16 category = actorJson.contains("cat") ? actorJson["cat"].get<s16>() : -1;
         s16 params = actorJson["params"].get<s16>();
+        Vec3f homePos = actorJson.contains("home") ? actorJson["home"].get<Vec3f>() : Vec3f{0,0,0};
 
-        receivedActorUids.insert(uniqueId);
+        receivedNetworkActorIds.insert(networkActorId);
 
-        // Find the actor locally
-        Actor* actor = FindActorByUniqueId(uniqueId);
+        // Step 1: Try to find actor by networkActorId
+        Actor* actor = FindActorByNetworkId(networkActorId);
 
-        // If actor doesn't exist locally, spawn it
+        // Step 2: If not found, try to match by type + position (for initial sync)
+        if (actor == nullptr && networkActorId != 0) {
+            actor = FindActorByTypeAndPosition(actorId, params, homePos);
+            if (actor != nullptr) {
+                // Found a match! Assign the networkActorId from the snapshot
+                SetActorNetworkId(actor, networkActorId);
+                SPDLOG_INFO("[Anchor] Matched actor id={} to networkActorId={}", actorId, networkActorId);
+            }
+        }
+
+        // Step 3: If still not found, spawn it
+        bool justSpawned = false;
         if (actor == nullptr) {
             Vec3f pos = actorJson["pos"].get<Vec3f>();
             Vec3s rot = actorJson.contains("wRot") ? actorJson["wRot"].get<Vec3s>() : actorJson["sRot"].get<Vec3s>();
 
             // Only spawn if we have category info and it's a syncable category
             if (category >= 0 && syncableCategories.count(category) > 0) {
-                SPDLOG_INFO("[Anchor] Spawning missing actor id={} params={} at ({}, {}, {})",
-                            actorId, params, pos.x, pos.y, pos.z);
+                SPDLOG_INFO("[Anchor] Spawning missing actor id={} networkActorId={} at ({}, {}, {})",
+                            actorId, networkActorId, pos.x, pos.y, pos.z);
                 actor = Actor_Spawn(&gPlayState->actorCtx, gPlayState, actorId,
                                     pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, params, false);
                 if (actor == nullptr) {
                     SPDLOG_WARN("[Anchor] Failed to spawn actor id={}", actorId);
                     continue;
                 }
+                // Set the correct home position and assign networkActorId
+                actor->home.pos = homePos;
+                if (networkActorId != 0) {
+                    SetActorNetworkId(actor, networkActorId);
+                }
+                justSpawned = true;
             } else {
                 continue;
             }
         }
 
-        // Verify actor ID matches (could have collision in uniqueId hash)
+        // Verify actor ID matches
         if (actor->id != actorId) continue;
 
-        // Verify sender is actually the owner (closest player to this actor)
-        // This prevents conflicts if multiple clients think they own the same actor
-        if (GetClosestPlayerToActor(actor) != senderClientId) continue;
+        // No ownership check - we sync EVERYTHING from the sender
+        // The sender with lowest sessionId is the authority for the whole world
 
         // Get target state
         Vec3f targetPos = actorJson["pos"].get<Vec3f>();
@@ -503,7 +636,7 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // Store interpolation data
         {
             std::lock_guard<std::mutex> lock(actorInterpMutex);
-            ActorInterpData& interp = actorInterpData[uniqueId];
+            ActorInterpData& interp = actorInterpData[networkActorId];
 
             if (!interp.hasData) {
                 // First update - snap to position
@@ -577,7 +710,7 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                 if (targetAnimFrame >= 0.0f && targetAnimFrame < 10000.0f &&
                     animSpeed >= -10.0f && animSpeed <= 10.0f) {
                     std::lock_guard<std::mutex> lock(actorInterpMutex);
-                    ActorInterpData& interp = actorInterpData[uniqueId];
+                    ActorInterpData& interp = actorInterpData[networkActorId];
 
                     if (!interp.hasAnimData) {
                         // First update - snap to frame
@@ -602,8 +735,8 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
     }
 
-    // Despawn actors that exist locally but aren't in the owner's snapshot
-    // Only despawn if the sender is the owner (closest player)
+    // Despawn actors that have a networkActorId but are not in the received snapshot
+    // This means the actor was killed on the sender's side
     for (int cat : syncableCategories) {
         Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
         while (actor != NULL) {
@@ -615,13 +748,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
                 continue;
             }
 
-            u32 uid = GetActorUniqueId(actor);
-
-            // If this sender is the owner of this actor, and the actor wasn't in their snapshot, despawn it
-            if (GetClosestPlayerToActor(actor) == senderClientId) {
-                if (receivedActorUids.find(uid) == receivedActorUids.end()) {
-                    SPDLOG_INFO("[Anchor] Despawning actor id={} uid={} (not in owner's snapshot)",
-                                actor->id, uid);
+            // Check if this actor has a networkActorId
+            auto it = actorToNetworkId.find(actor);
+            if (it != actorToNetworkId.end()) {
+                u32 actorNetworkId = it->second;
+                // If this actor's networkActorId is not in the snapshot, despawn it
+                if (receivedNetworkActorIds.find(actorNetworkId) == receivedNetworkActorIds.end()) {
+                    SPDLOG_INFO("[Anchor] Despawning actor id={} networkActorId={} (not in snapshot)",
+                                actor->id, actorNetworkId);
+                    // Clean up the mapping
+                    networkIdToActor.erase(actorNetworkId);
+                    actorToNetworkId.erase(actor);
                     Actor_Kill(actor);
                 }
             }
@@ -632,7 +769,7 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 }
 
 /**
- * Apply smooth interpolation to actors we don't own.
+ * Apply smooth interpolation to actors.
  * Called every frame to smoothly move actors to their target positions.
  */
 void Anchor::ApplyActorInterpolation() {
@@ -640,14 +777,13 @@ void Anchor::ApplyActorInterpolation() {
 
     std::lock_guard<std::mutex> lock(actorInterpMutex);
 
-    for (auto& [uniqueId, interp] : actorInterpData) {
+    for (auto& [networkActorId, interp] : actorInterpData) {
         if (!interp.hasData) continue;
 
-        Actor* actor = FindActorByUniqueId(uniqueId);
+        Actor* actor = FindActorByNetworkId(networkActorId);
         if (actor == nullptr || actor->update == NULL) continue;
 
-        // Don't interpolate actors we own
-        if (IsActorOwner(actor)) continue;
+        // Apply interpolation to all synced actors
 
         // Advance interpolation (complete in ~4 frames for 15Hz updates)
         interp.interpAlpha += 0.25f;
