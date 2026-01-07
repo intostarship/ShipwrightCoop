@@ -2,6 +2,7 @@
 #include "objects/object_rd/object_rd.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -322,8 +323,15 @@ void func_80AE2C1C(EnRd* this, PlayState* play) {
     Vec3f sp44 = D_80AE4918;
     Color_RGBA8 sp40 = D_80AE4924;
     Color_RGBA8 sp3C = D_80AE4928;
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
     s32 pad;
+
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* player = (Player*)targetActor;
+
     s16 sp32 = this->actor.yawTowardsPlayer - this->actor.shape.rot.y - this->unk_30E - this->unk_310;
 
     this->skelAnime.playSpeed = this->actor.speedXZ;
@@ -345,10 +353,12 @@ void func_80AE2C1C(EnRd* this, PlayState* play) {
             if (this->unk_306 == 0) {
                 if (!(this->unk_312 & PLAYER_STATE2_GRABBED_BY_ENEMY) &&
                     GameInteractor_Should(VB_REDEAD_GIBDO_FREEZE_LINK, true, this)) {
-                    player->actor.freezeTimer = 40;
-                    Player_SetAutoLockOnActor(play, &this->actor);
-                    GET_PLAYER(play)->autoLockOnActor = &this->actor;
-                    func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
+                    if (player == localPlayer) {
+                        player->actor.freezeTimer = 40;
+                        Player_SetAutoLockOnActor(play, &this->actor);
+                        GET_PLAYER(play)->autoLockOnActor = &this->actor;
+                        func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
+                    }
                 }
                 this->unk_306 = 0x3C;
                 Audio_PlayActorSound2(&this->actor, NA_SE_EN_REDEAD_AIM);
@@ -825,6 +835,14 @@ void EnRd_Update(Actor* thisx, PlayState* play) {
     if (this->unk_31C != 6 && ((this->unk_31B != 11) || (this->unk_31C != 14))) {
         if (this->unk_306 != 0) {
             this->unk_306--;
+        }
+
+        // Anchor: Target closest player
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer != NULL) {
+            this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+            this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+            this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
         }
 
         this->actionFunc(this, play);

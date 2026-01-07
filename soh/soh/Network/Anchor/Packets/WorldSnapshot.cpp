@@ -1007,16 +1007,17 @@ void Anchor::ApplyActorInterpolation() {
     std::lock_guard<std::mutex> lock(actorInterpMutex);
 
     // Build a set of actors held by DummyPlayers (skip interpolation for these)
+    // Use client.heldActorNetworkId directly because DummyPlayer_Update hasn't run yet
+    // (OnGameFrameUpdate runs before Actor_Update)
     std::set<Actor*> heldByDummyPlayer;
-    Actor* npcActor = gPlayState->actorCtx.actorLists[ACTORCAT_NPC].head;
-    while (npcActor != NULL) {
-        if (npcActor->id == ACTOR_EN_OE2 && npcActor->update == DummyPlayer_Update) {
-            Player* dummyPlayer = (Player*)npcActor;
-            if (dummyPlayer->heldActor != nullptr) {
-                heldByDummyPlayer.insert(dummyPlayer->heldActor);
+    for (auto& [clientId, client] : clients) {
+        if (client.self || !client.online) continue;
+        if (client.heldActorNetworkId != 0) {
+            Actor* heldActor = FindActorByNetworkId(client.heldActorNetworkId);
+            if (heldActor != nullptr) {
+                heldByDummyPlayer.insert(heldActor);
             }
         }
-        npcActor = npcActor->next;
     }
 
     for (auto& [networkActorId, interp] : actorInterpData) {

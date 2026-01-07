@@ -185,10 +185,19 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     }
 
     // Update held actor (for rocks, bombs, etc.)
+    // Must set BOTH player->heldActor AND heldActor->parent for position sync to work
     if (client.heldActorNetworkId != 0) {
         Actor* heldActor = Anchor::Instance->FindActorByNetworkId(client.heldActorNetworkId);
-        player->heldActor = heldActor;
+        if (heldActor != nullptr) {
+            player->heldActor = heldActor;
+            player->actor.child = heldActor;
+            heldActor->parent = &player->actor;  // Critical: links rock to DummyPlayer
+        }
     } else {
+        if (player->heldActor != nullptr) {
+            player->heldActor->parent = nullptr;
+            player->actor.child = nullptr;
+        }
         player->heldActor = nullptr;
     }
 
