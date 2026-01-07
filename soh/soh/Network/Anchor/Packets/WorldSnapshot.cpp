@@ -861,33 +861,36 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     }
 
     // Process destroyed actors - kill them locally if they exist
+    // IMPORTANT: Only kill on FIRST receipt to avoid multiple death effects (explosions, etc.)
     if (payload.contains("destroyed")) {
         for (const auto& destroyedJson : payload["destroyed"]) {
             if (!destroyedJson.contains("networkActorId")) continue;
 
             u32 networkActorId = destroyedJson["networkActorId"].get<u32>();
-            s16 actorId = destroyedJson.contains("id") ? destroyedJson["id"].get<s16>() : 0;
-            s16 params = destroyedJson.contains("params") ? destroyedJson["params"].get<s16>() : 0;
-            s8 room = destroyedJson.contains("room") ? destroyedJson["room"].get<s8>() : -1;
-            Vec3f homePos = destroyedJson.contains("home") ? destroyedJson["home"].get<Vec3f>() : Vec3f{0,0,0};
 
-            // Add to our local destroyed list
+            // Only process if we haven't already received this destroyed actor
+            // This prevents calling Actor_Kill multiple times which causes multiple explosion effects
             if (destroyedActors.find(networkActorId) == destroyedActors.end()) {
+                s16 actorId = destroyedJson.contains("id") ? destroyedJson["id"].get<s16>() : 0;
+                s16 params = destroyedJson.contains("params") ? destroyedJson["params"].get<s16>() : 0;
+                s8 room = destroyedJson.contains("room") ? destroyedJson["room"].get<s8>() : -1;
+                Vec3f homePos = destroyedJson.contains("home") ? destroyedJson["home"].get<Vec3f>() : Vec3f{0,0,0};
+
                 destroyedActors[networkActorId] = {networkActorId, actorId, params, room, homePos};
                 SPDLOG_INFO("[Anchor] Received destroyed actor: id={} networkId={} room={}",
                             actorId, networkActorId, room);
-            }
 
-            // Kill the local actor if it exists
-            Actor* actor = FindActorByNetworkId(networkActorId);
-            if (actor == nullptr) {
-                // Try to find by type + position
-                actor = FindActorByTypeAndPosition(actorId, params, homePos);
-            }
-            if (actor != nullptr && actor->update != nullptr) {
-                SPDLOG_INFO("[Anchor] Killing local actor id={} networkId={} (received destroyed)",
-                            actor->id, networkActorId);
-                Actor_Kill(actor);
+                // Kill the local actor if it exists (only on first receipt!)
+                Actor* actor = FindActorByNetworkId(networkActorId);
+                if (actor == nullptr) {
+                    // Try to find by type + position
+                    actor = FindActorByTypeAndPosition(actorId, params, homePos);
+                }
+                if (actor != nullptr && actor->update != nullptr) {
+                    SPDLOG_INFO("[Anchor] Killing local actor id={} networkActorId={} (received destroyed)",
+                                actor->id, networkActorId);
+                    Actor_Kill(actor);
+                }
             }
         }
     }
