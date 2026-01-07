@@ -82,9 +82,13 @@ typedef struct {
     Vec3f targetPos;
     Vec3s prevRot;
     Vec3s targetRot;
+    f32 prevAnimFrame;
+    f32 targetAnimFrame;
+    f32 animSpeed;
     f32 interpAlpha;
     u32 lastUpdateFrame;
     bool hasData;
+    bool hasAnimData;
 } ActorInterpData;
 
 typedef struct {

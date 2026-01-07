@@ -335,6 +335,19 @@ void Anchor::SendPacket_WorldSnapshot() {
     payload["actors"] = nlohmann::json::array();
     payload["quiet"] = true;  // Don't log these frequent packets
 
+    // Include scene flags - actors read these to determine their state
+    // This is the most generic way to sync actor state (chests, switches, etc.)
+    s16 sceneNum = gPlayState->sceneNum;
+    if (sceneNum >= 0 && sceneNum < SCENE_ID_MAX) {
+        payload["sceneFlags"] = {
+            {"swch", gSaveContext.sceneFlags[sceneNum].swch},
+            {"chest", gSaveContext.sceneFlags[sceneNum].chest},
+            {"clear", gSaveContext.sceneFlags[sceneNum].clear},
+            {"collect", gSaveContext.sceneFlags[sceneNum].collect},
+            {"rooms", gSaveContext.sceneFlags[sceneNum].rooms}
+        };
+    }
+
     // Broadcast ALL actors - receivers will decide which state to apply
     int enemyCount = 0, bossCount = 0, npcCount = 0;
     for (int cat : syncableCategories) {
@@ -356,11 +369,27 @@ void Anchor::SendPacket_WorldSnapshot() {
                 u32 uniqueId = GetActorUniqueId(actor);
                 actorJson["uid"] = uniqueId;
                 actorJson["id"] = actor->id;
+                actorJson["cat"] = actor->category;
                 actorJson["params"] = actor->params;
+
+                // Position and rotation
                 actorJson["pos"] = actor->world.pos;
-                actorJson["rot"] = actor->shape.rot;
+                actorJson["wRot"] = actor->world.rot;   // World rotation
+                actorJson["sRot"] = actor->shape.rot;   // Shape/visual rotation
+                actorJson["home"] = actor->home.pos;    // Home position for identification
+
+                // Movement
+                actorJson["vel"] = actor->velocity;
+                actorJson["spd"] = actor->speedXZ;
+                actorJson["grav"] = actor->gravity;
+
+                // State
                 actorJson["hp"] = actor->colChkInfo.health;
-                actorJson["dead"] = 0;
+                actorJson["flags"] = actor->flags;
+                actorJson["freeze"] = actor->freezeTimer;
+
+                // Scale
+                actorJson["scale"] = actor->scale;
 
                 // Animation state if available and we have a known offset
                 if (actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
@@ -386,6 +415,8 @@ void Anchor::SendPacket_WorldSnapshot() {
 /**
  * Handle incoming world snapshot from another player.
  * Apply states to actors they own (are closest to).
+ * Spawn actors that exist in remote snapshot but not locally.
+ * Despawn actors that we don't own and aren't in any owner's snapshot.
  */
 void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     if (!IsSaveLoaded() || gPlayState == nullptr) return;
@@ -401,13 +432,65 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors",
                 senderClientId, payload["actors"].size());
 
+    // Apply scene flags from the snapshot - this syncs chest/switch/collectible state
+    if (payload.contains("sceneFlags")) {
+        auto& flags = payload["sceneFlags"];
+        if (sceneNum >= 0 && sceneNum < SCENE_ID_MAX) {
+            // Merge flags (OR them together) so we don't lose local progress
+            if (flags.contains("swch")) {
+                gSaveContext.sceneFlags[sceneNum].swch |= flags["swch"].get<u32>();
+            }
+            if (flags.contains("chest")) {
+                gSaveContext.sceneFlags[sceneNum].chest |= flags["chest"].get<u32>();
+            }
+            if (flags.contains("clear")) {
+                gSaveContext.sceneFlags[sceneNum].clear |= flags["clear"].get<u32>();
+            }
+            if (flags.contains("collect")) {
+                gSaveContext.sceneFlags[sceneNum].collect |= flags["collect"].get<u32>();
+            }
+            if (flags.contains("rooms")) {
+                gSaveContext.sceneFlags[sceneNum].rooms |= flags["rooms"].get<u32>();
+            }
+        }
+    }
+
+    // Track which actors we've seen from this sender (for despawn logic)
+    std::set<u32> receivedActorUids;
+
     for (const auto& actorJson : payload["actors"]) {
         u32 uniqueId = actorJson["uid"].get<u32>();
         s16 actorId = actorJson["id"].get<s16>();
+        s16 category = actorJson.contains("cat") ? actorJson["cat"].get<s16>() : -1;
+        s16 params = actorJson["params"].get<s16>();
+
+        receivedActorUids.insert(uniqueId);
 
         // Find the actor locally
         Actor* actor = FindActorByUniqueId(uniqueId);
-        if (actor == nullptr || actor->id != actorId) continue;
+
+        // If actor doesn't exist locally, spawn it
+        if (actor == nullptr) {
+            Vec3f pos = actorJson["pos"].get<Vec3f>();
+            Vec3s rot = actorJson.contains("wRot") ? actorJson["wRot"].get<Vec3s>() : actorJson["sRot"].get<Vec3s>();
+
+            // Only spawn if we have category info and it's a syncable category
+            if (category >= 0 && syncableCategories.count(category) > 0) {
+                SPDLOG_INFO("[Anchor] Spawning missing actor id={} params={} at ({}, {}, {})",
+                            actorId, params, pos.x, pos.y, pos.z);
+                actor = Actor_Spawn(&gPlayState->actorCtx, gPlayState, actorId,
+                                    pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, params, false);
+                if (actor == nullptr) {
+                    SPDLOG_WARN("[Anchor] Failed to spawn actor id={}", actorId);
+                    continue;
+                }
+            } else {
+                continue;
+            }
+        }
+
+        // Verify actor ID matches (could have collision in uniqueId hash)
+        if (actor->id != actorId) continue;
 
         // Verify sender is actually the owner (closest player to this actor)
         // This prevents conflicts if multiple clients think they own the same actor
@@ -415,8 +498,7 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
         // Get target state
         Vec3f targetPos = actorJson["pos"].get<Vec3f>();
-        Vec3s targetRot = actorJson["rot"].get<Vec3s>();
-        s16 health = actorJson["hp"].get<s16>();
+        Vec3s targetRot = actorJson.contains("sRot") ? actorJson["sRot"].get<Vec3s>() : actorJson["wRot"].get<Vec3s>();
 
         // Store interpolation data
         {
@@ -441,32 +523,110 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             interp.lastUpdateFrame = gPlayState->state.frames;
         }
 
-        // Apply health immediately
-        actor->colChkInfo.health = health;
+        // Apply health
+        if (actorJson.contains("hp")) {
+            actor->colChkInfo.health = actorJson["hp"].get<s16>();
+        }
 
-        // Apply animation if available and we have a known offset for this actor type
+        // Apply velocity
+        if (actorJson.contains("vel")) {
+            actor->velocity = actorJson["vel"].get<Vec3f>();
+        }
+
+        // Apply speed
+        if (actorJson.contains("spd")) {
+            actor->speedXZ = actorJson["spd"].get<f32>();
+        }
+
+        // Apply gravity
+        if (actorJson.contains("grav")) {
+            actor->gravity = actorJson["grav"].get<f32>();
+        }
+
+        // Apply world rotation
+        if (actorJson.contains("wRot")) {
+            actor->world.rot = actorJson["wRot"].get<Vec3s>();
+        }
+
+        // Apply flags (but preserve some local-only flags)
+        if (actorJson.contains("flags")) {
+            u32 remoteFlags = actorJson["flags"].get<u32>();
+            // Preserve ACTOR_FLAG_SFX_FOR_PLAYER_BODY_HIT as it's set locally
+            actor->flags = (remoteFlags & ~ACTOR_FLAG_SFX_FOR_PLAYER_BODY_HIT) |
+                           (actor->flags & ACTOR_FLAG_SFX_FOR_PLAYER_BODY_HIT);
+        }
+
+        // Apply freeze timer
+        if (actorJson.contains("freeze")) {
+            actor->freezeTimer = actorJson["freeze"].get<u16>();
+        }
+
+        // Apply scale
+        if (actorJson.contains("scale")) {
+            actor->scale = actorJson["scale"].get<Vec3f>();
+        }
+
+        // Store animation interpolation data if available
         if (actorJson.contains("animFrame") && actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
             SkelAnime* skelAnime = GetActorSkelAnime(actor);
             if (skelAnime != nullptr && skelAnime->animation != nullptr) {
-                f32 animFrame = actorJson["animFrame"].get<f32>();
-                // Sanity check - animFrame should be reasonable (0 to 10000)
-                if (animFrame >= 0.0f && animFrame < 10000.0f) {
-                    skelAnime->curFrame = animFrame;
-                    if (actorJson.contains("animSpeed")) {
-                        f32 animSpeed = actorJson["animSpeed"].get<f32>();
-                        if (animSpeed >= -10.0f && animSpeed <= 10.0f) {
-                            skelAnime->playSpeed = animSpeed;
-                        }
+                f32 targetAnimFrame = actorJson["animFrame"].get<f32>();
+                f32 animSpeed = actorJson.contains("animSpeed") ? actorJson["animSpeed"].get<f32>() : 1.0f;
+
+                // Sanity check
+                if (targetAnimFrame >= 0.0f && targetAnimFrame < 10000.0f &&
+                    animSpeed >= -10.0f && animSpeed <= 10.0f) {
+                    std::lock_guard<std::mutex> lock(actorInterpMutex);
+                    ActorInterpData& interp = actorInterpData[uniqueId];
+
+                    if (!interp.hasAnimData) {
+                        // First update - snap to frame
+                        interp.prevAnimFrame = targetAnimFrame;
+                        interp.targetAnimFrame = targetAnimFrame;
+                        interp.animSpeed = animSpeed;
+                        interp.hasAnimData = true;
+                    } else {
+                        // Subsequent updates - set up interpolation
+                        interp.prevAnimFrame = skelAnime->curFrame;
+                        interp.targetAnimFrame = targetAnimFrame;
+                        interp.animSpeed = animSpeed;
                     }
                 }
             }
         }
 
-        // Handle death
-        if (actorJson.contains("dead") && actorJson["dead"].get<u8>() == 1) {
-            if (actor->update != NULL) {
-                Actor_Kill(actor);
+        // Handle death (health = 0 means actor should die)
+        if (actor->colChkInfo.health <= 0 && actor->update != NULL) {
+            // Let the actor die naturally by setting health to 0
+            // The actor's own update logic should handle death
+        }
+    }
+
+    // Despawn actors that exist locally but aren't in the owner's snapshot
+    // Only despawn if the sender is the owner (closest player)
+    for (int cat : syncableCategories) {
+        Actor* actor = gPlayState->actorCtx.actorLists[cat].head;
+        while (actor != NULL) {
+            Actor* nextActor = actor->next;
+
+            // Skip DummyPlayers
+            if (actor->id == ACTOR_EN_OE2 && actor->update == DummyPlayer_Update) {
+                actor = nextActor;
+                continue;
             }
+
+            u32 uid = GetActorUniqueId(actor);
+
+            // If this sender is the owner of this actor, and the actor wasn't in their snapshot, despawn it
+            if (GetClosestPlayerToActor(actor) == senderClientId) {
+                if (receivedActorUids.find(uid) == receivedActorUids.end()) {
+                    SPDLOG_INFO("[Anchor] Despawning actor id={} uid={} (not in owner's snapshot)",
+                                actor->id, uid);
+                    Actor_Kill(actor);
+                }
+            }
+
+            actor = nextActor;
         }
     }
 }
@@ -506,6 +666,32 @@ void Anchor::ApplyActorInterpolation() {
         actor->shape.rot.x = interp.prevRot.x + (s16)((interp.targetRot.x - interp.prevRot.x) * smooth);
         actor->shape.rot.y = interp.prevRot.y + (s16)((interp.targetRot.y - interp.prevRot.y) * smooth);
         actor->shape.rot.z = interp.prevRot.z + (s16)((interp.targetRot.z - interp.prevRot.z) * smooth);
+
+        // Interpolate animation frame if we have animation data
+        if (interp.hasAnimData && actorSkelAnimeExtraOffsets.count(actor->id) > 0) {
+            SkelAnime* skelAnime = GetActorSkelAnime(actor);
+            if (skelAnime != nullptr && skelAnime->animation != nullptr) {
+                // Interpolate frame, accounting for looping animations
+                f32 maxFrame = Animation_GetLastFrame(skelAnime->animation);
+                f32 frameDiff = interp.targetAnimFrame - interp.prevAnimFrame;
+
+                // Handle animation looping - if the diff is too large, it wrapped around
+                if (frameDiff > maxFrame / 2.0f) {
+                    frameDiff -= maxFrame;
+                } else if (frameDiff < -maxFrame / 2.0f) {
+                    frameDiff += maxFrame;
+                }
+
+                f32 interpFrame = interp.prevAnimFrame + frameDiff * smooth;
+
+                // Wrap the frame within valid range
+                while (interpFrame < 0.0f) interpFrame += maxFrame;
+                while (interpFrame >= maxFrame) interpFrame -= maxFrame;
+
+                skelAnime->curFrame = interpFrame;
+                skelAnime->playSpeed = interp.animSpeed;
+            }
+        }
     }
 
     // Clean up old interpolation data (actors that no longer exist)
