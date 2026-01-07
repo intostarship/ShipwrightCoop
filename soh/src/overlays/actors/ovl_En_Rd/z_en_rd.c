@@ -254,14 +254,22 @@ void func_80AE2744(EnRd* this, PlayState* play) {
 
         this->unk_305 = 0;
 
-        if (this->actor.xzDistToPlayer <= 150.0f && func_8002DDE4(play)) {
+        // Anchor: Use closest player for wake up check
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+        if (targetPlayer == NULL) {
+            targetPlayer = &GET_PLAYER(play)->actor;
+        }
+        f32 distToTarget = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        f32 yDistToTarget = targetPlayer->world.pos.y - this->actor.world.pos.y;
+
+        if (distToTarget <= 150.0f) {
             // Add a height check to redeads/gibdos freeze when Enemy Randomizer is on.
             // Without the height check, redeads/gibdos can freeze the player from insane distances in
             // vertical rooms (like the first room in Deku Tree), making these rooms nearly unplayable.
             s8 enemyRandoCCActive = CVarGetInteger(CVAR_ENHANCEMENT("RandomizedEnemies"), 0) ||
                                     (CVarGetInteger(CVAR_REMOTE_CROWD_CONTROL("Enabled"), 0));
             if (!enemyRandoCCActive ||
-                (enemyRandoCCActive && this->actor.yDistToPlayer <= 100.0f && this->actor.yDistToPlayer >= -100.0f)) {
+                (enemyRandoCCActive && yDistToTarget <= 100.0f && yDistToTarget >= -100.0f)) {
                 if ((this->actor.params != 2) && (this->unk_305 == 0)) {
                     func_80AE37BC(this);
                 } else {
@@ -502,7 +510,13 @@ void func_80AE33F0(EnRd* this) {
 
 void func_80AE3454(EnRd* this, PlayState* play) {
     s32 pad;
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
+    
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* player = (Player*)targetActor;
 
     if (SkelAnime_Update(&this->skelAnime)) {
         this->unk_304++;
@@ -512,7 +526,9 @@ void func_80AE3454(EnRd* this, PlayState* play) {
         case 1:
             Animation_PlayLoop(&this->skelAnime, &gGibdoRedeadGrabAttackAnim);
             this->unk_304++;
-            play->damagePlayer(play, -8);
+            if (player == localPlayer) {
+                play->damagePlayer(play, -8);
+            }
             func_800AA000(this->actor.xzDistToPlayer, 0xFF, 1, 0xC);
             this->unk_319 = 20;
         case 0:
@@ -546,10 +562,12 @@ void func_80AE3454(EnRd* this, PlayState* play) {
             this->unk_319--;
 
             if (this->unk_319 == 0) {
-                play->damagePlayer(play, -8);
+                if (player == localPlayer) {
+                    play->damagePlayer(play, -8);
+                    Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S + player->ageProperties->unk_92);
+                }
                 func_800AA000(this->actor.xzDistToPlayer, 0xF0, 1, 0xC);
                 this->unk_319 = 20;
-                Player_PlaySfx(&player->actor, NA_SE_VO_LI_DAMAGE_S + player->ageProperties->unk_92);
             }
             break;
         case 3:
@@ -581,14 +599,24 @@ void func_80AE3834(EnRd* this, PlayState* play) {
     Vec3f sp34 = D_80AE492C;
     Color_RGBA8 sp30 = D_80AE4938;
     Color_RGBA8 sp2C = D_80AE493C;
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
+    
+    // Anchor: Target closest player
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* player = (Player*)targetActor;
+
     s16 temp_v0 = this->actor.yawTowardsPlayer - this->actor.shape.rot.y - this->unk_30E - this->unk_310;
 
     if (ABS(temp_v0) < 0x2008) {
         if (!(this->unk_312 & 0x80) && GameInteractor_Should(VB_REDEAD_GIBDO_FREEZE_LINK, true, this)) {
-            player->actor.freezeTimer = 60;
-            func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
-            Player_SetAutoLockOnActor(play, &this->actor);
+            if (player == localPlayer) {
+                player->actor.freezeTimer = 60;
+                func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
+                Player_SetAutoLockOnActor(play, &this->actor);
+            }
         }
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_REDEAD_AIM);
         func_80AE2B90(this, play);

@@ -7,6 +7,7 @@
 #include "z_en_torch2.h"
 #include "objects/object_torch2/object_torch2.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -193,7 +194,14 @@ Actor* EnTorch2_GetAttackItem(PlayState* play, Player* this) {
 s32 EnTorch2_SwingSword(PlayState* play, Input* input, Player* this) {
     f32 noAttackChance = 0.0f;
     s32 attackDelay = 7;
-    Player* player = GET_PLAYER(play);
+    Player* localPlayer = GET_PLAYER(play);
+    
+    // Anchor: Target closest player
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* player = (Player*)targetActor;
 
     if ((this->linearVelocity < 0.0f) || (player->linearVelocity < 0.0f)) {
         return 0;
@@ -238,8 +246,19 @@ void EnTorch2_Backflip(Player* this, Input* input, Actor* thisx) {
 
 void EnTorch2_Update(Actor* thisx, PlayState* play2) {
     PlayState* play = play2;
-    Player* player2 = GET_PLAYER(play2);
-    Player* player = player2;
+    Player* localPlayer = GET_PLAYER(play2);
+    
+    // Anchor: Target closest player
+    Actor* targetActor = Anchor_GetClosestPlayerActor(play, thisx);
+    if (targetActor == NULL) {
+        targetActor = &localPlayer->actor;
+    }
+    Player* player = (Player*)targetActor;
+
+    // Anchor: Update dist/yaw to target
+    thisx->xzDistToPlayer = Math_Vec3f_DistXZ(&thisx->world.pos, &targetActor->world.pos);
+    thisx->yawTowardsPlayer = Math_Vec3f_Yaw(&thisx->world.pos, &targetActor->world.pos);
+
     Player* this = (Player*)thisx;
     Input* input = &sInput;
     Camera* camera;

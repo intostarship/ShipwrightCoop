@@ -421,6 +421,13 @@ void EnKarebaba_Update(Actor* thisx, PlayState* play) {
     EnKarebaba* this = (EnKarebaba*)thisx;
     f32 height;
 
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+    }
+
     this->actionFunc(this, play);
 
     if (this->actionFunc != EnKarebaba_Dead) {

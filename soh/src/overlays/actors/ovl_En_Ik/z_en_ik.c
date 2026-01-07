@@ -10,6 +10,7 @@
 #include "vt.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED
 
@@ -444,7 +445,11 @@ void func_80A74EBC(EnIk* this, PlayState* play) {
         sp2C.y = this->actor.world.pos.y;
         Audio_PlayActorSound2(&this->actor, NA_SE_EN_IRONNACK_HIT_GND);
         Camera_AddQuake(&play->mainCamera, 2, 0x19, 5);
-        func_800AA000(this->actor.xzDistToPlayer, 0xFF, 0x14, 0x96);
+        
+        // Anchor: Calculate distance to local player for screen shake
+        f32 distToLocal = Math_Vec3f_DistXZ(&this->actor.world.pos, &GET_PLAYER(play)->actor.world.pos);
+        func_800AA000(distToLocal, 0xFF, 0x14, 0x96);
+        
         CollisionCheck_SpawnShieldParticles(play, &sp2C);
     }
 
@@ -770,6 +775,15 @@ void func_80A75FA0(Actor* thisx, PlayState* play) {
     u8 prevInvincibilityTimer;
 
     this->unk_2FA = this->unk_2FB;
+    
+    // Anchor: Target closest player
+    Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->actor);
+    if (targetPlayer != NULL) {
+        this->actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->actor.world.pos, &targetPlayer->world.pos);
+        this->actor.yDistToPlayer = targetPlayer->world.pos.y - this->actor.world.pos.y;
+        this->actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->actor.world.pos, &targetPlayer->world.pos);
+    }
+
     func_80A75C38(this, play);
     if ((this->actor.params == 0) && (this->actor.colChkInfo.health <= 10)) {
         func_80A781CC(&this->actor, play);

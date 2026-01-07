@@ -9,6 +9,7 @@
 #include "overlays/actors/ovl_En_Bom/z_en_bom.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/Network/Anchor/AnchorHelpers.h"
 
 #define FLAGS                                                                                 \
     (ACTOR_FLAG_ATTENTION_ENABLED | ACTOR_FLAG_HOSTILE | ACTOR_FLAG_UPDATE_CULLING_DISABLED | \
@@ -379,7 +380,7 @@ void EnAm_Sleep(EnAm* this, PlayState* play) {
     Player* player = GET_PLAYER(play);
 
     if ((this->unk_258 != 0) ||
-        ((this->hurtCollider.base.ocFlags1 & OC1_HIT) && (this->hurtCollider.base.oc == &player->actor)) ||
+        ((this->hurtCollider.base.ocFlags1 & OC1_HIT) && (this->hurtCollider.base.oc != NULL) && (this->hurtCollider.base.oc->category == ACTORCAT_PLAYER)) ||
         (this->hurtCollider.base.acFlags & AC_HIT)) {
         this->hurtCollider.base.acFlags &= ~AC_HIT;
 
@@ -864,6 +865,14 @@ void EnAm_Update(Actor* thisx, PlayState* play) {
     if (this->dyna.actor.colChkInfo.damageEffect != AM_DMGEFF_MAGIC_FIRE_LIGHT) {
         if (this->attackTimer != 0) {
             this->attackTimer--;
+        }
+
+        // Anchor: Target closest player
+        Actor* targetPlayer = Anchor_GetClosestPlayerActor(play, &this->dyna.actor);
+        if (targetPlayer != NULL) {
+            this->dyna.actor.xzDistToPlayer = Math_Vec3f_DistXZ(&this->dyna.actor.world.pos, &targetPlayer->world.pos);
+            this->dyna.actor.yDistToPlayer = targetPlayer->world.pos.y - this->dyna.actor.world.pos.y;
+            this->dyna.actor.yawTowardsPlayer = Math_Vec3f_Yaw(&this->dyna.actor.world.pos, &targetPlayer->world.pos);
         }
 
         this->actionFunc(this, play);

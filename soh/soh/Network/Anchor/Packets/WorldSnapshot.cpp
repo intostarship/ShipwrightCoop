@@ -300,6 +300,7 @@ void Anchor::ProcessPendingActorKills() {
 /**
  * Check if the owner of an actor is still online.
  * Returns false if: no owner, owner not in clients list, or owner is offline.
+ * Uses sessionId for identification to avoid clientId duplicates.
  */
 bool Anchor::IsOwnerOnline(u32 networkActorId) {
     auto it = networkIdToOwner.find(networkActorId);
@@ -307,27 +308,32 @@ bool Anchor::IsOwnerOnline(u32 networkActorId) {
         return false;  // No owner recorded
     }
 
-    uint32_t ownerClientId = it->second;
-    if (!clients.contains(ownerClientId)) {
-        return false;  // Owner not in clients list
+    uint64_t ownerSessionId = it->second;
+
+    // Find client by sessionId
+    for (auto& [clientId, client] : clients) {
+        if (client.sessionId == ownerSessionId) {
+            return client.online;
+        }
     }
 
-    return clients[ownerClientId].online;
+    return false;  // Owner not found
 }
 
 /**
- * Get the client ID of the player closest to an actor.
+ * Get the sessionId of the player closest to an actor.
+ * Uses sessionId instead of clientId to avoid duplicates.
  * Used to determine ownership for state broadcasting.
  */
-uint32_t Anchor::GetClosestPlayerToActor(Actor* actor) {
-    if (actor == nullptr || gPlayState == nullptr) return ownClientId;
+uint64_t Anchor::GetClosestPlayerToActor(Actor* actor) {
+    if (actor == nullptr || gPlayState == nullptr) return sessionId;
 
     Player* localPlayer = GET_PLAYER(gPlayState);
-    if (localPlayer == nullptr) return ownClientId;
+    if (localPlayer == nullptr) return sessionId;
 
     // Start with local player distance
     f32 minDist = Actor_WorldDistXZToActor(actor, &localPlayer->actor);
-    uint32_t closestClientId = ownClientId;
+    uint64_t closestSessionId = sessionId;
 
     // Check all DummyPlayers (other connected players)
     Actor* npcActor = gPlayState->actorCtx.actorLists[ACTORCAT_NPC].head;
@@ -338,21 +344,21 @@ uint32_t Anchor::GetClosestPlayerToActor(Actor* actor) {
                 f32 dist = Actor_WorldDistXZToActor(actor, npcActor);
                 if (dist < minDist) {
                     minDist = dist;
-                    closestClientId = dummyClientId;
+                    closestSessionId = clients[dummyClientId].sessionId;
                 }
             }
         }
         npcActor = npcActor->next;
     }
 
-    return closestClientId;
+    return closestSessionId;
 }
 
 /**
  * Check if the local player is the owner (closest player) of an actor.
  */
 bool Anchor::IsActorOwner(Actor* actor) {
-    return GetClosestPlayerToActor(actor) == ownClientId;
+    return GetClosestPlayerToActor(actor) == sessionId;
 }
 
 /**
@@ -529,14 +535,8 @@ void Anchor::SendPacket_WorldSnapshot() {
                 continue;
             }
 
-            // ONLY sync scene actors (spawnIdx >= 0)
-            // Dynamic actors (projectiles, dropped items, effects) have spawnIdx == -1
-            // and don't need to be synced - they're handled by player actions
+            // Get spawn index for networkId generation (scene actors vs dynamic actors)
             s16 spawnIdx = GetActorListIndex(actor);
-            if (spawnIdx < 0) {
-                actor = actor->next;
-                continue;
-            }
 
             // Only send actors in LOADED rooms (curRoom + prevRoom during transitions)
             // This allows syncing actors from both rooms during room transitions!
@@ -566,8 +566,9 @@ void Anchor::SendPacket_WorldSnapshot() {
 
                 // Mark ourselves as the owner if we're claiming/sending this actor
                 // This prevents the other client from thinking we "stopped sending" when we're the authority
-                networkIdToOwner[networkActorId] = ownClientId;
-                ownerToNetworkIds[ownClientId].insert(networkActorId);
+                // Uses sessionId to avoid clientId duplicates
+                networkIdToOwner[networkActorId] = sessionId;
+                ownerToNetworkIds[sessionId].insert(networkActorId);
                 actorJson["networkActorId"] = networkActorId;
                 actorJson["id"] = actor->id;
                 actorJson["cat"] = actor->category;
@@ -593,6 +594,13 @@ void Anchor::SendPacket_WorldSnapshot() {
 
                 // Scale
                 actorJson["scale"] = actor->scale;
+
+                // Mark if this actor is held by a player (let Player_Draw handle position)
+                // Uses sessionId to avoid clientId duplicates
+                Player* localPlayer = GET_PLAYER(gPlayState);
+                if (localPlayer != nullptr && localPlayer->heldActor == actor) {
+                    actorJson["heldBy"] = sessionId;
+                }
 
                 // Animation state if available (GetActorSkelAnime uses ActorSyncGenerated.inc)
                 SkelAnime* skelAnime = GetActorSkelAnime(actor);
@@ -654,8 +662,17 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         }
 
         uint32_t senderClientId = payload["clientId"].get<uint32_t>();
-        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} with {} actors (snapshot {}/{})",
-                    senderClientId, payload["actors"].size(), receivedSnapshotCount, REQUIRED_SNAPSHOTS);
+        // Get sender's sessionId for ownership tracking (avoids clientId duplicates)
+        uint64_t senderSessionId = 0;
+        if (clients.contains(senderClientId)) {
+            senderSessionId = clients[senderClientId].sessionId;
+        }
+        if (senderSessionId == 0) {
+            SPDLOG_WARN("[Anchor] Received WORLD_SNAPSHOT from client {} but couldn't find sessionId", senderClientId);
+            return;
+        }
+        SPDLOG_INFO("[Anchor] Received WORLD_SNAPSHOT from client {} (session {}) with {} actors (snapshot {}/{})",
+                    senderClientId, senderSessionId, payload["actors"].size(), receivedSnapshotCount, REQUIRED_SNAPSHOTS);
 
     // Apply scene flags from the snapshot - this syncs chest/switch/collectible state
     if (payload.contains("sceneFlags")) {
@@ -740,10 +757,10 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     // Track which networkActorIds we receive from this sender
     std::set<u32> receivedNetworkActorIds;
 
-    // Get the set of networkActorIds this sender previously owned
+    // Get the set of networkActorIds this sender previously owned (uses sessionId)
     std::set<u32> previouslyOwnedByThisSender;
-    if (ownerToNetworkIds.count(senderClientId) > 0) {
-        previouslyOwnedByThisSender = ownerToNetworkIds[senderClientId];
+    if (ownerToNetworkIds.count(senderSessionId) > 0) {
+        previouslyOwnedByThisSender = ownerToNetworkIds[senderSessionId];
     }
 
     for (const auto& actorJson : payload["actors"]) {
@@ -759,14 +776,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         s8 actorRoom = actorJson.contains("room") ? actorJson["room"].get<s8>() : -1;
         s16 spawnIdx = actorJson.contains("spawnIdx") ? actorJson["spawnIdx"].get<s16>() : -1;
 
-        // ONLY process scene actors (spawnIdx >= 0)
-        // Dynamic actors should not be in snapshots anymore, but skip them if present
-        if (spawnIdx < 0) {
-            continue;
-        }
-
         // Compute the DETERMINISTIC spawn ID locally - should match sender's ID
-        // For scene actors: ID = (scene << 16) | spawnIdx - 100% unique!
+        // For scene actors (spawnIdx >= 0): ID includes scene/room/spawnIdx
+        // For dynamic actors (spawnIdx < 0): ID is hash of actor type + position
         u32 networkActorId = GetDeterministicSpawnId(sceneNum, spawnIdx, actorRoom, actorId, homePos);
 
         // Skip per-player actors (each player has their own instance, don't sync)
@@ -779,11 +791,12 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // IMPORTANT: Record ownership IMMEDIATELY when we receive this actor in a snapshot
         // This must happen BEFORE any early returns, otherwise IsOwnerOnline() will return false
         // because we never recorded who owns this actor
+        // Uses sessionId to avoid clientId duplicates
         if (networkActorId != 0) {
             auto existingOwner = networkIdToOwner.find(networkActorId);
-            if (existingOwner == networkIdToOwner.end() || existingOwner->second != ownClientId) {
+            if (existingOwner == networkIdToOwner.end() || existingOwner->second != sessionId) {
                 // We're not the owner - record that the sender owns it
-                networkIdToOwner[networkActorId] = senderClientId;
+                networkIdToOwner[networkActorId] = senderSessionId;
             }
         }
 
@@ -829,56 +842,63 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
             continue;
         }
 
-        // Get target state
-        Vec3f targetPos = actorJson["pos"].get<Vec3f>();
-        Vec3s targetRot = actorJson.contains("sRot") ? actorJson["sRot"].get<Vec3s>() : actorJson["wRot"].get<Vec3s>();
+        // Check if this actor is held by another player - skip position/movement sync
+        // Player_Draw will handle positioning for held actors
+        bool isHeldByOther = actorJson.contains("heldBy");
 
-        // Store interpolation data
-        {
-            std::lock_guard<std::mutex> lock(actorInterpMutex);
-            ActorInterpData& interp = actorInterpData[networkActorId];
+        // Only sync position/rotation/movement for non-held actors
+        if (!isHeldByOther) {
+            // Get target state
+            Vec3f targetPos = actorJson["pos"].get<Vec3f>();
+            Vec3s targetRot = actorJson.contains("sRot") ? actorJson["sRot"].get<Vec3s>() : actorJson["wRot"].get<Vec3s>();
 
-            if (!interp.hasData) {
-                // First update - snap to position
-                interp.prevPos = targetPos;
-                interp.targetPos = targetPos;
-                interp.prevRot = targetRot;
-                interp.targetRot = targetRot;
-                interp.hasData = true;
-            } else {
-                // Subsequent updates - set up interpolation
-                interp.prevPos = actor->world.pos;
-                interp.targetPos = targetPos;
-                interp.prevRot = actor->shape.rot;
-                interp.targetRot = targetRot;
+            // Store interpolation data
+            {
+                std::lock_guard<std::mutex> lock(actorInterpMutex);
+                ActorInterpData& interp = actorInterpData[networkActorId];
+
+                if (!interp.hasData) {
+                    // First update - snap to position
+                    interp.prevPos = targetPos;
+                    interp.targetPos = targetPos;
+                    interp.prevRot = targetRot;
+                    interp.targetRot = targetRot;
+                    interp.hasData = true;
+                } else {
+                    // Subsequent updates - set up interpolation
+                    interp.prevPos = actor->world.pos;
+                    interp.targetPos = targetPos;
+                    interp.prevRot = actor->shape.rot;
+                    interp.targetRot = targetRot;
+                }
+                interp.interpAlpha = 0.0f;
+                interp.lastUpdateFrame = gPlayState->state.frames;
             }
-            interp.interpAlpha = 0.0f;
-            interp.lastUpdateFrame = gPlayState->state.frames;
+
+            // Apply velocity
+            if (actorJson.contains("vel")) {
+                actor->velocity = actorJson["vel"].get<Vec3f>();
+            }
+
+            // Apply speed
+            if (actorJson.contains("spd")) {
+                actor->speedXZ = actorJson["spd"].get<f32>();
+            }
+
+            // Apply gravity
+            if (actorJson.contains("grav")) {
+                actor->gravity = actorJson["grav"].get<f32>();
+            }
+
+            // Apply world rotation
+            if (actorJson.contains("wRot")) {
+                actor->world.rot = actorJson["wRot"].get<Vec3s>();
+            }
         }
 
-        // Apply health
+        // Apply health (always sync, even for held actors)
         if (actorJson.contains("hp")) {
             actor->colChkInfo.health = actorJson["hp"].get<s16>();
-        }
-
-        // Apply velocity
-        if (actorJson.contains("vel")) {
-            actor->velocity = actorJson["vel"].get<Vec3f>();
-        }
-
-        // Apply speed
-        if (actorJson.contains("spd")) {
-            actor->speedXZ = actorJson["spd"].get<f32>();
-        }
-
-        // Apply gravity
-        if (actorJson.contains("grav")) {
-            actor->gravity = actorJson["grav"].get<f32>();
-        }
-
-        // Apply world rotation
-        if (actorJson.contains("wRot")) {
-            actor->world.rot = actorJson["wRot"].get<Vec3s>();
         }
 
         // Apply flags (but preserve some local-only flags)
@@ -942,8 +962,8 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         // to ensure IsOwnerOnline() works correctly for all actors we receive
     }
 
-    // Update the full set of actors owned by this sender
-    ownerToNetworkIds[senderClientId] = receivedNetworkActorIds;
+    // Update the full set of actors owned by this sender (uses sessionId)
+    ownerToNetworkIds[senderSessionId] = receivedNetworkActorIds;
 
     // Despawn actors that this sender USED to own but no longer sends
     // This handles cases like: player A throws a rock, rock breaks, player B should see it disappear
@@ -953,8 +973,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
         if (receivedNetworkActorIds.count(oldNetworkId) == 0) {
             // This actor was owned by the sender but is no longer in their snapshot
             // BUT don't despawn if WE are the owner (we might have claimed it)
+            // Uses sessionId to avoid clientId duplicates
             auto ownerIt = networkIdToOwner.find(oldNetworkId);
-            if (ownerIt != networkIdToOwner.end() && ownerIt->second == ownClientId) {
+            if (ownerIt != networkIdToOwner.end() && ownerIt->second == sessionId) {
                 // We own this actor - don't despawn it just because someone else stopped sending
                 continue;
             }
@@ -1006,29 +1027,25 @@ void Anchor::ApplyActorInterpolation() {
 
     std::lock_guard<std::mutex> lock(actorInterpMutex);
 
-    // Build a set of actors held by DummyPlayers (skip interpolation for these)
-    // Use client.heldActorNetworkId directly because DummyPlayer_Update hasn't run yet
-    // (OnGameFrameUpdate runs before Actor_Update)
-    std::set<Actor*> heldByDummyPlayer;
+    // Build a set of networkIds for actors held by DummyPlayers (skip interpolation for these)
+    // Use networkIds directly to avoid FindActorByNetworkId lookup issues
+    std::set<u32> heldNetworkIds;
     for (auto& [clientId, client] : clients) {
         if (client.self || !client.online) continue;
         if (client.heldActorNetworkId != 0) {
-            Actor* heldActor = FindActorByNetworkId(client.heldActorNetworkId);
-            if (heldActor != nullptr) {
-                heldByDummyPlayer.insert(heldActor);
-            }
+            heldNetworkIds.insert(client.heldActorNetworkId);
         }
     }
 
     for (auto& [networkActorId, interp] : actorInterpData) {
         if (!interp.hasData) continue;
 
-        Actor* actor = FindActorByNetworkId(networkActorId);
-        if (actor == nullptr || actor->update == NULL) continue;
-
         // Skip interpolation for actors held by DummyPlayers
         // Player_Draw will position them at the holder's hands
-        if (heldByDummyPlayer.count(actor) > 0) continue;
+        if (heldNetworkIds.count(networkActorId) > 0) continue;
+
+        Actor* actor = FindActorByNetworkId(networkActorId);
+        if (actor == nullptr || actor->update == NULL) continue;
 
         // Apply interpolation to all synced actors
 

@@ -60,6 +60,7 @@ typedef struct {
 
     // Held actor (for rocks, bombs, etc.)
     u32 heldActorNetworkId;
+    Vec3f heldActorPos;  // Position of held actor (calculated by Player_Draw)
 
     // Ptr to the dummy player
     Player* player;
@@ -160,9 +161,10 @@ class Anchor : public Network {
     u32 nextNetworkId = 1;                        // Counter for next available ID
     bool hasAssignedNetworkIds = false;           // Have we assigned IDs as the first player?
 
-    // Ownership tracking - which client owns which actors (for despawn detection)
-    std::map<u32, uint32_t> networkIdToOwner;    // Network ID -> owner client ID
-    std::map<uint32_t, std::set<u32>> ownerToNetworkIds;  // Owner client ID -> set of network IDs they own
+    // Ownership tracking - which session owns which actors (for despawn detection)
+    // Uses sessionId (uint64_t) instead of clientId to avoid duplicates
+    std::map<u32, uint64_t> networkIdToOwner;    // Network ID -> owner sessionId
+    std::map<uint64_t, std::set<u32>> ownerToNetworkIds;  // Owner sessionId -> set of network IDs they own
     std::vector<Actor*> actorsPendingKill;       // Actors to kill next frame (deferred for safety)
 
     u32 GetActorUniqueId(Actor* actor);           // Legacy hash-based ID (fallback)
@@ -180,11 +182,12 @@ class Anchor : public Network {
     // Network ID public methods (needed by DummyPlayer and AnchorHelpers)
     u32 GetOrAssignNetworkId(Actor* actor);       // Get existing or assign new networkActorId
     Actor* FindActorByNetworkId(u32 networkActorId);   // Find actor by networkActorId
-    uint32_t GetClosestPlayerToActor(Actor* actor);
+    uint64_t GetClosestPlayerToActor(Actor* actor);  // Returns sessionId of closest player
     bool IsActorOwner(Actor* actor);
     bool IsWaitingForInitialSync();               // Check if waiting for first snapshot in scene with others
 
     uint32_t ownClientId;
+    uint64_t GetSessionId() const { return sessionId; }  // Unique ID for this session (no duplicates)
     inline static const std::string clientVersion = (char*)gBuildVersion;
 
     // Packet types //

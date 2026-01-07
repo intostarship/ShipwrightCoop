@@ -38,6 +38,9 @@ void Anchor::OnConnected() {
     SendPacket_Handshake();
     RegisterHooks();
 
+    // Increase draw distance x10 for multiplayer (so players can see each other from far away)
+    CVarSetInteger(CVAR_ENHANCEMENT("DisableDrawDistance"), 10);
+
     // Reset snapshot state to trigger initial sync with other players
     // This ensures we receive the world state from others if they're in our room
     receivedSnapshotCount = 0;

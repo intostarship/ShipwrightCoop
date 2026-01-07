@@ -85,6 +85,8 @@ void Anchor::SendPacket_PlayerUpdate() {
     u32 heldActorNetworkId = 0;
     if (player->heldActor != nullptr) {
         heldActorNetworkId = Anchor::Instance->GetOrAssignNetworkId(player->heldActor);
+        // Send the actual position of the held actor (calculated by Player_Draw)
+        payload["heldActorPos"] = player->heldActor->world.pos;
     }
     payload["heldActorNetworkId"] = heldActorNetworkId;
 
@@ -152,6 +154,9 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
         // Held actor
         if (payload.contains("heldActorNetworkId")) {
             client.heldActorNetworkId = payload["heldActorNetworkId"].get<u32>();
+            if (payload.contains("heldActorPos")) {
+                client.heldActorPos = payload["heldActorPos"].get<Vec3f>();
+            }
         } else {
             client.heldActorNetworkId = 0;
         }
