@@ -38,6 +38,12 @@ void Anchor::OnConnected() {
     SendPacket_Handshake();
     RegisterHooks();
 
+    // Reset snapshot state to trigger initial sync with other players
+    // This ensures we receive the world state from others if they're in our scene
+    hasReceivedSnapshotThisScene = false;
+    lastSnapshotSceneNum = -1;
+    ClearNetworkIds();
+
     if (IsSaveLoaded()) {
         SendPacket_RequestTeamState();
     }
