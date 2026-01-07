@@ -121,7 +121,37 @@ void Anchor::HandlePacket_PlayerUpdate(nlohmann::json payload) {
         client.sceneNum = payload["sceneNum"].get<s16>();
         client.entranceIndex = payload["entranceIndex"].get<s32>();
         client.linkAge = payload["linkAge"].get<s32>();
-        client.posRot = payload["posRot"].get<PosRot>();
+
+        // Set up interpolation for smooth movement
+        PosRot newPosRot = payload["posRot"].get<PosRot>();
+
+        // Calculate distance from current target to new position
+        f32 dx = newPosRot.pos.x - client.interpTargetPos.x;
+        f32 dy = newPosRot.pos.y - client.interpTargetPos.y;
+        f32 dz = newPosRot.pos.z - client.interpTargetPos.z;
+        f32 distSq = dx*dx + dy*dy + dz*dz;
+
+        // If distance is too large (teleport, scene change, etc.), snap instead of interpolate
+        const f32 TELEPORT_THRESHOLD_SQ = 500.0f * 500.0f;  // 500 units
+        bool shouldSnap = !client.interpHasData || distSq > TELEPORT_THRESHOLD_SQ;
+
+        if (shouldSnap) {
+            // Snap to position (first update or teleport)
+            client.interpPrevPos = newPosRot.pos;
+            client.interpTargetPos = newPosRot.pos;
+            client.interpPrevRot = newPosRot.rot;
+            client.interpTargetRot = newPosRot.rot;
+            client.interpAlpha = 1.0f;  // Already at target
+            client.interpHasData = true;
+        } else {
+            // Smooth interpolation from current position to new target
+            client.interpPrevPos = client.interpTargetPos;
+            client.interpTargetPos = newPosRot.pos;
+            client.interpPrevRot = client.interpTargetRot;
+            client.interpTargetRot = newPosRot.rot;
+            client.interpAlpha = 0.0f;
+        }
+        client.posRot = newPosRot;
 
         // Deserialize all 5 animation tables
         auto deserializeTable = [](const nlohmann::json& arr, Vec3s* table) {

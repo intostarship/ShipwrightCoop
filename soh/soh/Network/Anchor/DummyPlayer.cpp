@@ -124,8 +124,34 @@ void DummyPlayer_Update(Actor* actor, PlayState* play) {
     }
 
     actor->shape.shadowAlpha = 255;
-    Math_Vec3s_Copy(&actor->shape.rot, &client.posRot.rot);
-    Math_Vec3f_Copy(&actor->world.pos, &client.posRot.pos);
+
+    // Apply smooth interpolation for position and rotation
+    if (client.interpHasData) {
+        // Advance interpolation alpha (complete in ~3 frames for smoothness)
+        client.interpAlpha += 0.35f;
+        if (client.interpAlpha > 1.0f) client.interpAlpha = 1.0f;
+
+        // Smoothstep for smoother interpolation (ease in/out)
+        f32 t = client.interpAlpha;
+        f32 smooth = t * t * (3.0f - 2.0f * t);
+
+        // Interpolate position
+        actor->world.pos.x = client.interpPrevPos.x + (client.interpTargetPos.x - client.interpPrevPos.x) * smooth;
+        actor->world.pos.y = client.interpPrevPos.y + (client.interpTargetPos.y - client.interpPrevPos.y) * smooth;
+        actor->world.pos.z = client.interpPrevPos.z + (client.interpTargetPos.z - client.interpPrevPos.z) * smooth;
+
+        // Interpolate rotation (handle wraparound for s16 angles)
+        s16 rotDiffX = client.interpTargetRot.x - client.interpPrevRot.x;
+        s16 rotDiffY = client.interpTargetRot.y - client.interpPrevRot.y;
+        s16 rotDiffZ = client.interpTargetRot.z - client.interpPrevRot.z;
+        actor->shape.rot.x = client.interpPrevRot.x + (s16)(rotDiffX * smooth);
+        actor->shape.rot.y = client.interpPrevRot.y + (s16)(rotDiffY * smooth);
+        actor->shape.rot.z = client.interpPrevRot.z + (s16)(rotDiffZ * smooth);
+    } else {
+        // No interpolation data yet - use direct values
+        Math_Vec3s_Copy(&actor->shape.rot, &client.posRot.rot);
+        Math_Vec3f_Copy(&actor->world.pos, &client.posRot.pos);
+    }
 
     // Apply all 5 animation tables for 100% accurate animation sync
     // This includes upper body animations (arms raised when holding items, etc.)
