@@ -972,25 +972,37 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
     for (u32 oldNetworkId : previouslyOwnedByThisSender) {
         if (receivedNetworkActorIds.count(oldNetworkId) == 0) {
             // This actor was owned by the sender but is no longer in their snapshot
-            // BUT don't despawn if WE are the owner (we might have claimed it)
-            // Uses sessionId to avoid clientId duplicates
+            // Find the actor first to check ownership
+            Actor* actorToCheck = FindActorByNetworkId(oldNetworkId);
+
+            // CRITICAL FIX: Check if WE are now the closest player (ownership transferred)
+            // The sender stopped sending because they moved away - we might be the new owner!
+            // This fixes the Saria disappearing bug when players move around
+            if (actorToCheck != nullptr && IsActorOwner(actorToCheck)) {
+                // We're now the closest player to this actor - claim ownership!
+                SPDLOG_INFO("[Anchor] Claiming ownership of actor id={} networkActorId={} (sender moved away, we're closer)",
+                            actorToCheck->id, oldNetworkId);
+                networkIdToOwner[oldNetworkId] = sessionId;
+                ownerToNetworkIds[sessionId].insert(oldNetworkId);
+                continue;
+            }
+
+            // Also check the ownership map (for actors we can't find locally)
             auto ownerIt = networkIdToOwner.find(oldNetworkId);
             if (ownerIt != networkIdToOwner.end() && ownerIt->second == sessionId) {
                 // We own this actor - don't despawn it just because someone else stopped sending
                 continue;
             }
 
-            // Find the actor to check its room
-            Actor* actorToKill = FindActorByNetworkId(oldNetworkId);
-            if (actorToKill != nullptr && actorToKill->update != nullptr) {
+            if (actorToCheck != nullptr && actorToCheck->update != nullptr) {
                 // CRITICAL: Only despawn if actor is in the sender's room
                 // If sender is in room 1 but this actor is in room 0, the sender
                 // just changed rooms - the actor is still alive in room 0
-                if (senderRoom >= 0 && actorToKill->room >= 0 && actorToKill->room != senderRoom) {
+                if (senderRoom >= 0 && actorToCheck->room >= 0 && actorToCheck->room != senderRoom) {
                     // Actor is in a different room than sender - don't despawn
                     // The sender stopped sending it because they left the room, not because it died
                     SPDLOG_INFO("[Anchor] NOT despawning actor id={} networkActorId={} (actor room {} != sender room {})",
-                                actorToKill->id, oldNetworkId, actorToKill->room, senderRoom);
+                                actorToCheck->id, oldNetworkId, actorToCheck->room, senderRoom);
                     // Release ownership so someone else can claim it
                     networkIdToOwner.erase(oldNetworkId);
                     continue;
@@ -998,9 +1010,9 @@ void Anchor::HandlePacket_WorldSnapshot(nlohmann::json payload) {
 
                 // Don't kill it immediately during packet processing - defer to next frame
                 // This avoids crashes from killing actors during draw/update loops
-                actorsPendingKill.push_back(actorToKill);
+                actorsPendingKill.push_back(actorToCheck);
                 SPDLOG_INFO("[Anchor] Queueing actor id={} networkActorId={} for kill (owner stopped sending)",
-                            actorToKill->id, oldNetworkId);
+                            actorToCheck->id, oldNetworkId);
             }
 
             // Clean up mappings
